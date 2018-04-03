@@ -9,7 +9,7 @@
 namespace App\Http\Controllers\Admin;
 use App\Service\Admin\House;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Validator;
 class HouseController extends AdminBaseController
 {
     public  $house;
@@ -28,6 +28,24 @@ class HouseController extends AdminBaseController
     public function create()
     {
         $res = $this->house->getSelect();
+        return $this->responseData($res);
+    }
+
+    public function store()
+    {
+        $data = trimValue( $this->request->all() );
+        //验证
+        $validator = Validator::make(
+            $data,
+            $this->house->getRules(),
+            $this->house->errorsMessages()
+        );
+        if ($validator->fails())
+        {
+            $messages = $validator->errors()->first();
+            return $this->responseData(['status'=>\StatusCode::CHECK_FROM,'messages'=>'验证失败','data'=>$messages]);
+        }
+        $res = $this->house->storeHouse( $data );
         return $this->responseData($res);
     }
 }

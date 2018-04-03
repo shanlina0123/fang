@@ -17,5 +17,6 @@ $router->group(['prefix' => 'api/admin','namespace'=>'Admin'], function () use (
     $router->group(['middleware' =>'token'], function () use ($router)
     {
         $router->post('house/create', 'HouseController@create');//发房下拉数据
+        $router->post('house/store', 'HouseController@store');//发布房源
     });
 });
