@@ -64,3 +64,53 @@ function trimValue( $data )
     }
     return $t_data;
 }
+
+
+
+//对象转数组
+function object_to_array($obj) {
+    $obj = (array)$obj;
+    foreach ($obj as $k => $v) {
+        if (gettype($v) == 'resource') {
+            return;
+        }
+        if (gettype($v) == 'object' || gettype($v) == 'array') {
+            $obj[$k] = (array)($v);
+        }
+    }
+    return $obj;
+}
+
+/***
+ * 错误提示转为数组
+ * @param $obj
+ * @return mixed
+ *
+ * 调用
+ *  if ($validator->fails()) {
+        responseData(\StatusCode::PARAM_ERROR,"参数错误","",validateParam($validator->errors()));
+    }
+ */
+function validateParam($obj)
+{
+    $arr=object_to_array($obj);
+   return head($arr);
+}
+
+
+/**
+ * 返回信息
+ */
+function responseData($status="",$messages="",$data="",$errorparam="")
+{
+    $res = new \stdClass();
+    $res->status = $status;//请求结果的状态
+    $res->messages = $messages;//请求结果的文字描述
+    $res->data = $data;//返回的数据结果
+    if(!empty($errorparam))
+    {
+        $errorparam=validateParam($errorparam);
+    }
+    $res->errorparam=$errorparam; //错误参数对应提示
+    return response()->json($res,200);die;
+}
