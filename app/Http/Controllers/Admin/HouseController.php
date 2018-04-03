@@ -7,14 +7,14 @@
  */
 
 namespace App\Http\Controllers\Admin;
-use App\Service\Admin\House;
+use App\Service\Admin\HouseService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 class HouseController extends AdminBaseController
 {
     public  $house;
     public  $request;
-    public function __construct(Request $request, House $house)
+    public function __construct(Request $request, HouseService $house)
     {
         $this->request = $request;
         $this->house = $house;
@@ -31,13 +31,34 @@ class HouseController extends AdminBaseController
         return $this->responseData($res);
     }
 
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     * 添加房源
+     */
     public function store()
     {
         $data = trimValue( $this->request->all() );
+        //公用验证规则
+        $rulesPublic = $this->house->getRules();
+        switch ( (int)$data['typeid'] )
+        {
+            case 1:
+                //新房
+                $rules = array_collapse( $rulesPublic, $this->house->getNewRules() );
+                break;
+            case 2:
+                //二手
+                $rules = array_collapse( $rulesPublic, $this->house->getSencodRules() );
+                break;
+            case 3:
+                //商铺
+                $rules = array_collapse( $rulesPublic, $this->house->getShopRules() );
+                break;
+        }
         //验证
         $validator = Validator::make(
             $data,
-            $this->house->getRules(),
+            $rules,
             $this->house->errorsMessages()
         );
         if ($validator->fails())

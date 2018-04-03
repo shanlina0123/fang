@@ -11,7 +11,7 @@ namespace App\Service\Admin;
 
 use App\Service\AdminBase;
 
-class User extends AdminBase
+class UserService extends AdminBase
 {
    public function getA()
    {

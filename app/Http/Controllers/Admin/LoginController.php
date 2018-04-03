@@ -7,7 +7,7 @@
  */
 
 namespace App\Http\Controllers\Admin;
-use App\Service\Admin\Login;
+use App\Service\Admin\LoginService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -16,7 +16,7 @@ class LoginController extends AdminBaseController
     public  $mod;
     public  $request;
     public  $code;
-    public function __construct(Request $request, Login $mod)
+    public function __construct(Request $request, LoginService $mod)
     {
         $this->mod = $mod;
         $this->request = $request;

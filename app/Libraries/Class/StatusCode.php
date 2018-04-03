@@ -12,4 +12,5 @@ class StatusCode
     const CHECK_FROM = 100100100; //表单数据验证失败
     const USER_LOCKING = 100100101; //用户锁定
     const LOGIN_FAILURE = 100100102; //用户名密码不正确
+    const HOUSE_STORE_FAIL = 100200101; //房源基本信息发布失败
 }

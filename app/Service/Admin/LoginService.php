@@ -11,7 +11,7 @@ use App\Service\AdminBase;
 use App\Model\User\AdminUser;
 use App\Model\User\UserToken;
 
-class Login extends AdminBase
+class LoginService extends AdminBase
 {
 
     /**

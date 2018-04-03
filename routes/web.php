@@ -11,6 +11,7 @@
 |
 */
 
+
 $router->group(['prefix' => 'api/admin','namespace'=>'Admin'], function () use ($router)
 {
     $router->post('login', 'LoginController@login');//登陆

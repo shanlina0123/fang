@@ -8,11 +8,13 @@
 
 namespace App\Service\Admin;
 use App\Model\Data\SelectCateDefault;
+use App\Model\House\House;
 use App\Service\AdminBase;
 use App\Model\Data\SelectCate;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
-class House extends AdminBase
+class HouseService extends AdminBase
 {
 
     /**
@@ -44,6 +46,50 @@ class House extends AdminBase
             'ownershipid' =>'required|numeric',
             'hasdoublegas' =>'required|numeric',
             'propertyfee' =>'required|string|max:30',
+        ];
+        return $rules;
+    }
+
+    /**
+     * @return array
+     * 新房规则
+     */
+    public function getNewRules()
+    {
+        $rules = [
+            'salestatusid' =>'required|numeric',
+            'opendate' =>'date',
+            'price' =>'required',
+            'roomtypeid' =>'required|numeric',
+        ];
+        return $rules;
+    }
+
+    /**
+     * @return array
+     * 二手房源规则
+     */
+    public function getSencodRules()
+    {
+        $rules = [
+            'price' =>'required',
+            'total' =>'required',
+            'roomtypeid' =>'required|numeric',
+        ];
+        return $rules;
+    }
+
+    /**
+     * @return array
+     * 商铺规则
+     */
+    public function getShopRules()
+    {
+        $rules = [
+            'total' =>'required',
+            'depth' =>'required|max:50',
+            'storey' =>'required|max:50',
+            'wide' =>'required|max:100',
         ];
         return $rules;
     }
@@ -118,14 +164,66 @@ class House extends AdminBase
             }
             $arr['define'] = $define;
             $arr['system'] = $system;
+
             Cache::put('getSelect',$arr,config('configure.sCache'));
             return ['status'=>\StatusCode::PUBLIC_STATUS,'messages'=>'发布房源下拉列表数据','data'=>$arr];
         }
     }
 
-    public function storeHouse()
+    public function storeHouse( $data )
     {
-
+        try{
+            $arr['uuid'] = create_uuid();//楼盘名称
+            $arr['name'] = $data['name'];//楼盘名称
+            $arr['iscommission'] = $data['iscommission'];//展示拥金
+            $arr['commissionid'] = $data['commissionid'];//佣金规则
+            $arr['ishome'] = $data['name'];//是否推荐 1推荐 0不推荐
+            $arr['provinceid'] = $data['provinceid'];
+            $arr['cityid'] = $data['cityid'];
+            $arr['countryid'] = $data['countryid'];
+            $arr['streeid'] = $data['streeid'];
+            $arr['street'] = $data['street'];//街道
+            $arr['addr'] = $data['addr'];//地址
+            $arr['fulladdr'] = $data['fulladdr'];//地址
+            $arr['floorpostionid'] = $data['floorpostionid'];//楼层位置
+            $arr['floor'] = $data['floor'];//楼层
+            $arr['orientationid'] = $data['orientationid'];//朝向
+            $arr['purposeid'] = $data['purposeid'];//用途
+            $arr['area'] = $data['area'];//面积
+            $arr['created_at'] = $data['created_at'];//发布时间
+            $arr['iselevator'] = $data['iselevator'];//电梯
+            $arr['years'] = $data['years'];//年代
+            $arr['decoratestyleid'] = $data['decoratestyleid'];//装修
+            $arr['ownershipid'] = $data['ownershipid'];//权属
+            $arr['hasdoublegasid'] = $data['hasdoublegasid'];//双气
+            $arr['propertyfee'] = $data['propertyfee'];//物业费
+            switch ( (int)$data['typeid'] )
+            {
+                case 1:
+                    //新房
+                    $arr['salestatusid'] = $data['salestatusid'];//现状
+                    $arr['opendate'] = $data['opendate'];//开盘日期
+                    $arr['price'] = $data['price'];//单价
+                    $arr['roomtypeid'] = $data['roomtypeid'];//房型
+                    break;
+                case 2:
+                    //二手
+                    $arr['price'] = $data['price'];//单价
+                    $arr['total'] = $data['total'];//总价
+                    $arr['roomtypeid'] = $data['roomtypeid'];//房型
+                    break;
+                case 3:
+                    //商铺
+                    $arr['total'] = $data['total'];//总价
+                    $arr['depth'] = $data['depth'];//进深
+                    $arr['storey'] = $data['storey'];//层高
+                    $arr['wide'] = $data['wide'];//面宽
+                    break;
+            }
+            $res = House::create( $arr );
+            return ['status'=>\StatusCode::PUBLIC_STATUS,'messages'=>'基本信息发布成功','data'=>$res->uuid];
+        }catch (Exception $e){
+            return ['status'=>\StatusCode::HOUSE_STORE_FAIL,'messages'=>'基本信息发布失败','data'=>[]];
+        }
     }
-
 }

@@ -7,14 +7,14 @@
  */
 
 namespace App\Http\Controllers\Admin;
-use App\Service\Admin\User;
+use App\Service\Admin\UserService;
 use Illuminate\Http\Request;
 
 class UserController extends AdminBaseController
 {
     public  $mod;
     public  $request;
-    public function __construct(Request $request, User $mod)
+    public function __construct(Request $request, UserService $mod)
     {
         $this->mod = $mod;
         $this->request = $request;
