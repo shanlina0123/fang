@@ -64,7 +64,7 @@ class HouseController extends AdminBaseController
         if ($validator->fails())
         {
             $messages = $validator->errors()->first();
-            return $this->responseData(['status'=>\StatusCode::CHECK_FROM,'messages'=>'验证失败','data'=>$messages]);
+            return $this->responseData(\StatusCode::CHECK_FROM,'验证失败',$messages);
         }
         $res = $this->house->storeHouse( $data );
         return $this->responseData($res);

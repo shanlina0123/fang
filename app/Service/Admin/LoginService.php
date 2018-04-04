@@ -38,6 +38,10 @@ class LoginService extends AdminBase
         }
         $where['password'] = optimizedSaltPwd(base64_decode($data['password']));
         $user = AdminUser::where( $where )->select('uuid','name','isadmin','mobile','status')->first();
+        if( $user == false )
+        {
+            return ['status'=>\StatusCode::LOGIN_FAILURE,'messages'=>'用户名密码错误','data'=>[]];
+        }
         if( $user->status == 0 )
         {
             return ['status'=>\StatusCode::USER_LOCKING,'messages'=>'用户锁定','data'=>[]];
@@ -64,7 +68,7 @@ class LoginService extends AdminBase
             }
             $user->token = $uToken->token;
             $user->expiration = $uToken->expiration;
-            return ['status'=>1,'messages'=>'登陆成功','data'=>$user];
+            return ['status'=>\StatusCode::PUBLIC_STATUS,'messages'=>'登陆成功','data'=>$user];
         }else
         {
             return ['status'=>\StatusCode::LOGIN_FAILURE,'messages'=>'登陆成功','data'=>[]];
