@@ -23,7 +23,7 @@ return array(
     'App\\Jobs\\ExampleJob' => $baseDir . '/app/Jobs/ExampleJob.php',
     'App\\Jobs\\Job' => $baseDir . '/app/Jobs/Job.php',
     'App\\Listeners\\ExampleListener' => $baseDir . '/app/Listeners/ExampleListener.php',
-    'App\\Model\\Data\\Select' => $baseDir . '/app/Model/Auth/RoleFunction.php',
+    'App\\Model\\Data\\Select' => $baseDir . '/app/Model/Data/Select.php',
     'App\\Model\\Data\\SelectCate' => $baseDir . '/app/Model/Data/SelectCate.php',
     'App\\Model\\Data\\SelectCateDefault' => $baseDir . '/app/Model/Data/SelectCateDefault.php',
     'App\\Model\\Data\\SelectDefault' => $baseDir . '/app/Model/Data/SelectDefault.php',

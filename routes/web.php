@@ -17,9 +17,14 @@ $router->group(['prefix' => 'api/admin','namespace'=>'Admin'], function () use (
     $router->post('login', 'LoginController@login');//登陆
     $router->group(['middleware' =>'token'], function () use ($router)
     {
+        //房源
         $router->post('house/create', 'HouseController@create');//发房下拉数据
         $router->post('house/store', 'HouseController@store');//发布房源
         $router->get('house/index', 'HouseController@index');//房源列表
+        $router->post('house/tag', 'HouseController@storeTag');//房源标签
+        $router->post('house/img', 'HouseController@storeImg');//房源图片
+        //图片上传到临时目录
+        $router->post('img/upload', 'PublicController@uploadImgToTemp');//图片上传到临时目录
 
         //系统设置
         //角色

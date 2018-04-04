@@ -9,6 +9,8 @@
 namespace App\Service\Admin;
 use App\Model\Data\SelectCateDefault;
 use App\Model\House\House;
+use App\Model\House\HouseImage;
+use App\Model\House\HouseTag;
 use App\Service\AdminBase;
 use App\Model\Data\SelectCate;
 use Illuminate\Support\Facades\Cache;
@@ -133,7 +135,7 @@ class HouseService extends AdminBase
      */
     public function getSelect()
     {
-        Cache::forget('getSelect');
+        //Cache::forget('getSelect');
         if ( Cache::has('getSelect') )
         {
             $arr = Cache::get('getSelect');
@@ -204,6 +206,7 @@ class HouseService extends AdminBase
             $arr['hasdoublegasid'] = $data['hasdoublegasid'];//双气
             $arr['propertyfee'] = $data['propertyfee'];//物业费
             $arr['typeid'] = (int)$data['typeid'];
+            $arr['status'] = 0;
             switch ( (int)$data['typeid'] )
             {
                 case 1:
@@ -227,8 +230,8 @@ class HouseService extends AdminBase
                     $arr['wide'] = $data['wide'];//面宽
                     break;
             }
-            $res = House::create( $arr );
-            return $res->uuid;
+            $res = House::insertGetId( $arr );
+            return $res;
         }catch (Exception $e){
             responseData(\StatusCode::ERROR,'基本信息发布失败',$data);
         }
@@ -241,30 +244,6 @@ class HouseService extends AdminBase
      */
     public function getList( $request )
     {
-
-        $typeID = $request->input('typeid');
-        $name = $request->input('name');
-        $isCommission = $request->input('iscommission');
-        $cTime = $request->input('created_at');
-        if(  $typeID )
-        {
-            $sWhere['typeid'] = $typeID;
-        }
-        if(  $isCommission )
-        {
-            $sWhere['iscommission'] = $isCommission;
-        }
-        if(  $cTime )
-        {
-            $sWhere['created_at'] = $cTime;
-        }
-        $sql = House::where( $sWhere )->orderBy('id','desc');
-        if( $name )
-        {
-            $sql->where('name','%'.$name.'%');
-        }
-        return $sql->paginate(config('configure.sPage'));
-        die();
         $tag = 'houseList';
         $where = $request->input('page').$request->input('typeid').$request->input('name').$request->input('iscommission').$request->input('created_at');
         $where = base64_encode($where);
@@ -273,19 +252,19 @@ class HouseService extends AdminBase
             $name = $request->input('name');
             $isCommission = $request->input('iscommission');
             $cTime = $request->input('created_at');
+            $sql = House::orderBy('id','desc');
             if(  $typeID )
             {
-                $sWhere['typeid'] = $typeID;
+                $sql->where('typeid',$typeID);
             }
             if(  $isCommission )
             {
-                $sWhere['iscommission'] = $isCommission;
+                $sql->where('iscommission',$isCommission);
             }
             if(  $cTime )
             {
-                $sWhere['created_at'] = $cTime;
+                $sql->where('created_at',$cTime);
             }
-            $sql = House::where( $sWhere )->orderBy('id','desc');
             if( $name )
             {
                 $sql->where('name','%'.$name.'%');
@@ -293,5 +272,73 @@ class HouseService extends AdminBase
             return $sql->paginate(config('configure.sPage'));
         });
         return $value;
+    }
+
+    /**
+     * @param $request
+     * @return mixed
+     * 发布标签
+     */
+    public function saveTag( $request )
+    {
+        try{
+            $arr = array();
+            foreach ( $request['tagid'] as $row )
+            {
+                $arr[]['uuid'] = create_uuid();
+                $arr[]['tagid'] = $row;
+                $arr[]['houseid'] = $request['houseid'];
+            }
+            $obj = HouseTag::insert( $arr );
+            if( $obj )
+            {
+                return $request['houseid'];
+            }else
+            {
+                responseData(\StatusCode::ERROR,'写入失败');
+            }
+        }catch (Exception $e){
+            responseData(\StatusCode::ERROR,'写入失败');
+        }
+    }
+
+
+    /**
+     * @param $request
+     * @return bool
+     * 图片上传
+     */
+    public function saveImg( $request )
+    {
+        try{
+            DB::beginTransaction();
+            $upload = new \Upload();
+            foreach ( $request['images'] as $row )
+            {
+                $res = $upload->uploadProductImage( $request['houseid'], $row, 'house' );
+                if( $res )
+                {
+                    $arr['uuid'] = create_uuid();
+                    $arr['url'] = '/house/'.$request['houseid'].'/'.$row;
+                    $arr['houseid'] = $request['houseid'];
+                    $arr['created_at'] = date("Y-m-d H:i:s");
+                    HouseImage::insert($arr);
+                }
+            }
+            //上传封面
+            $covermap = $upload->uploadProductImage( $request['houseid'], $request['covermap'], 'house' );
+            if( $covermap )
+            {
+                $obj = House::find($request['houseid']);
+                $obj->covermap = '/house/'.$request['houseid'].'/'.$request['covermap'];
+                $obj->status = $request['status'];
+                $obj->save();
+            }
+            DB::commit();
+            return 'success';
+        }catch (Exception $e){
+            DB::rollBack();
+            responseData(\StatusCode::ERROR,'写入失败');
+        }
     }
 }

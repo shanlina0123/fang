@@ -77,4 +77,52 @@ class HouseController extends AdminBaseController
         $res = $this->house->storeHouse( $data );
         responseData(\StatusCode::SUCCESS,'写入成功',$res);
     }
+
+
+    /**
+     * 发布房源标签
+     */
+    public function storeTag()
+    {
+        $data = trimValue( $this->request->all() );
+        //验证
+        $validator = Validator::make(
+            $data,[
+                'tagid'=>'required|array',
+                'houseid'=>'required|numeric'
+            ]
+        );
+        if ($validator->fails())
+        {
+            $messages = $validator->errors()->first();
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
+        }
+        $res = $this->house->saveTag( $data );
+        responseData(\StatusCode::SUCCESS,'写入成功',$res);
+    }
+
+
+    /**
+     * 图片上传
+     */
+    public function storeImg()
+    {
+        $data = trimValue( $this->request->all() );
+        //验证
+        $validator = Validator::make(
+            $data,[
+                'covermap'=>'required',
+                'images'=>'required|array',
+                'status'=>'required',
+                'houseid'=>'required|numeric',
+            ]
+        );
+        if ($validator->fails())
+        {
+            $messages = $validator->errors()->first();
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
+        }
+        $res = $this->house->saveImg( $data );
+        responseData(\StatusCode::SUCCESS,'写入成功',$res);
+    }
 }

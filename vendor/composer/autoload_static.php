@@ -341,7 +341,7 @@ class ComposerStaticIniteeb9bbeef625ab98ac9dcfb45d61b1cd
         'App\\Jobs\\ExampleJob' => __DIR__ . '/../..' . '/app/Jobs/ExampleJob.php',
         'App\\Jobs\\Job' => __DIR__ . '/../..' . '/app/Jobs/Job.php',
         'App\\Listeners\\ExampleListener' => __DIR__ . '/../..' . '/app/Listeners/ExampleListener.php',
-        'App\\Model\\Data\\Select' => __DIR__ . '/../..' . '/app/Model/Auth/RoleFunction.php',
+        'App\\Model\\Data\\Select' => __DIR__ . '/../..' . '/app/Model/Data/Select.php',
         'App\\Model\\Data\\SelectCate' => __DIR__ . '/../..' . '/app/Model/Data/SelectCate.php',
         'App\\Model\\Data\\SelectCateDefault' => __DIR__ . '/../..' . '/app/Model/Data/SelectCateDefault.php',
         'App\\Model\\Data\\SelectDefault' => __DIR__ . '/../..' . '/app/Model/Data/SelectDefault.php',
