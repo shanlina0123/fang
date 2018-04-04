@@ -14,11 +14,12 @@
 
 $router->group(['prefix' => 'api/admin','namespace'=>'Admin'], function () use ($router)
 {
-    $router->get('login', 'LoginController@login');//登陆
+    $router->post('login', 'LoginController@login');//登陆
     $router->group(['middleware' =>'token'], function () use ($router)
     {
         $router->post('house/create', 'HouseController@create');//发房下拉数据
         $router->post('house/store', 'HouseController@store');//发布房源
+        $router->get('house/index', 'HouseController@index');//房源列表
 
         //系统设置
         //角色

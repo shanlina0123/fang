@@ -133,11 +133,11 @@ class HouseService extends AdminBase
      */
     public function getSelect()
     {
-        //Cache::forget('getSelect');
+        Cache::forget('getSelect');
         if ( Cache::has('getSelect') )
         {
             $arr = Cache::get('getSelect');
-            return ['status'=>\StatusCode::PUBLIC_STATUS,'messages'=>'发布房源下拉列表数据','data'=>$arr];
+            return $arr;
         }else
         {
             //自定义数据
@@ -151,6 +151,7 @@ class HouseService extends AdminBase
                 $defineObject->selectValue = $row->cateToSelect()->where(['cateid'=>$row->id,'status'=>1])->select('id','name','cateid')->get();
                 $define[$row->id] = $defineObject;
             }
+
             //系统数据
             $system = array();
             $selectCateDefault = SelectCateDefault::where('status',1)->orderBy('id','asc')->select('id','name')->with('cateDefaultToSelect')->get();
@@ -166,10 +167,15 @@ class HouseService extends AdminBase
             $arr['system'] = $system;
 
             Cache::put('getSelect',$arr,config('configure.sCache'));
-            return ['status'=>\StatusCode::PUBLIC_STATUS,'messages'=>'发布房源下拉列表数据','data'=>$arr];
+            return $arr;
         }
     }
 
+    /**
+     * @param $data
+     * @return mixed
+     * 发布房源
+     */
     public function storeHouse( $data )
     {
         try{
@@ -197,6 +203,7 @@ class HouseService extends AdminBase
             $arr['ownershipid'] = $data['ownershipid'];//权属
             $arr['hasdoublegasid'] = $data['hasdoublegasid'];//双气
             $arr['propertyfee'] = $data['propertyfee'];//物业费
+            $arr['typeid'] = (int)$data['typeid'];
             switch ( (int)$data['typeid'] )
             {
                 case 1:
@@ -221,9 +228,70 @@ class HouseService extends AdminBase
                     break;
             }
             $res = House::create( $arr );
-            return ['status'=>\StatusCode::PUBLIC_STATUS,'messages'=>'基本信息发布成功','data'=>$res->uuid];
+            return $res->uuid;
         }catch (Exception $e){
-            return ['status'=>\StatusCode::HOUSE_STORE_FAIL,'messages'=>'基本信息发布失败','data'=>[]];
+            responseData(\StatusCode::ERROR,'基本信息发布失败',$data);
         }
+    }
+
+    /**
+     * @param $request
+     * @return mixed
+     * 房源列表
+     */
+    public function getList( $request )
+    {
+
+        $typeID = $request->input('typeid');
+        $name = $request->input('name');
+        $isCommission = $request->input('iscommission');
+        $cTime = $request->input('created_at');
+        if(  $typeID )
+        {
+            $sWhere['typeid'] = $typeID;
+        }
+        if(  $isCommission )
+        {
+            $sWhere['iscommission'] = $isCommission;
+        }
+        if(  $cTime )
+        {
+            $sWhere['created_at'] = $cTime;
+        }
+        $sql = House::where( $sWhere )->orderBy('id','desc');
+        if( $name )
+        {
+            $sql->where('name','%'.$name.'%');
+        }
+        return $sql->paginate(config('configure.sPage'));
+        die();
+        $tag = 'houseList';
+        $where = $request->input('page').$request->input('typeid').$request->input('name').$request->input('iscommission').$request->input('created_at');
+        $where = base64_encode($where);
+        $value = Cache::tags($tag)->remember( $tag.$where,config('configure.sCache'), function() use( $request ){
+            $typeID = $request->input('typeid');
+            $name = $request->input('name');
+            $isCommission = $request->input('iscommission');
+            $cTime = $request->input('created_at');
+            if(  $typeID )
+            {
+                $sWhere['typeid'] = $typeID;
+            }
+            if(  $isCommission )
+            {
+                $sWhere['iscommission'] = $isCommission;
+            }
+            if(  $cTime )
+            {
+                $sWhere['created_at'] = $cTime;
+            }
+            $sql = House::where( $sWhere )->orderBy('id','desc');
+            if( $name )
+            {
+                $sql->where('name','%'.$name.'%');
+            }
+            return $sql->paginate(config('configure.sPage'));
+        });
+        return $value;
     }
 }

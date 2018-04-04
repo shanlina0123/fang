@@ -34,17 +34,18 @@ class Roles extends AdminBase
      */
   public function  edit($uuid)
   {
-      responseData(\StatusCode::DB_ERROR,"获取失败");
       try{
           //获取详情数据
           $row = Role::where('uuid',$uuid)->first();
       }catch (\ErrorException $e)
       {
           //数据库执行失败
-          responseData(\StatusCode::DB_ERROR,"获取失败");
+          return responseData(\StatusCode::DB_ERROR,"获取失败");
       }finally{
           //返回处理结果数据
           return $row;
       }
+
+
   }
 }

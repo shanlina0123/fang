@@ -40,38 +40,33 @@ class LoginService extends AdminBase
         $user = AdminUser::where( $where )->select('uuid','name','isadmin','mobile','status')->first();
         if( $user == false )
         {
-            return ['status'=>\StatusCode::LOGIN_FAILURE,'messages'=>'用户名密码错误','data'=>[]];
+            responseData(\StatusCode::LOGIN_FAILURE,'用户名密码错误');
         }
         if( $user->status == 0 )
         {
-            return ['status'=>\StatusCode::USER_LOCKING,'messages'=>'用户锁定','data'=>[]];
+            responseData(\StatusCode::USER_LOCKING,'用户锁定');
         }
-        if( $user )
+
+        $tWhere['userid'] = $user->id;
+        $tWhere['type'] = 1;
+        $uToken = UserToken::where( $tWhere )->first();
+        if( $uToken )
         {
-            $tWhere['userid'] = $user->id;
-            $tWhere['type'] = 1;
-            $uToken = UserToken::where( $tWhere )->first();
-            if( $uToken )
-            {
-                $uToken->token = str_random(60);
-                $uToken->expiration = time()+7200;
-                $uToken->save();
-            }else
-            {
-                $uToken = new UserToken();
-                $uToken->uuid = create_uuid();
-                $uToken->token = str_random(60);
-                $uToken->expiration = time()+7200;
-                $uToken->userid = $user->id;
-                $uToken->type = 1;
-                $uToken->save();
-            }
-            $user->token = $uToken->token;
-            $user->expiration = $uToken->expiration;
-            return ['status'=>\StatusCode::PUBLIC_STATUS,'messages'=>'登陆成功','data'=>$user];
+            $uToken->token = str_random(60);
+            $uToken->expiration = time()+7200;
+            $uToken->save();
         }else
         {
-            return ['status'=>\StatusCode::LOGIN_FAILURE,'messages'=>'登陆成功','data'=>[]];
+            $uToken = new UserToken();
+            $uToken->uuid = create_uuid();
+            $uToken->token = str_random(60);
+            $uToken->expiration = time()+7200;
+            $uToken->userid = $user->id;
+            $uToken->type = 1;
+            $uToken->save();
         }
+        $user->token = $uToken->token;
+        $user->expiration = $uToken->expiration;
+        return $user;
     }
 }

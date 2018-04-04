@@ -22,18 +22,26 @@ class HouseController extends AdminBaseController
 
 
     /**
+     * 房源列表
+     */
+    public function index()
+    {
+        $res = $this->house->getList( $this->request );
+        responseData(\StatusCode::SUCCESS,'房源列表',$res);
+    }
+    /**
      * @param $type
      * 添加房源返回表单自定数据
      */
     public function create()
     {
         $res = $this->house->getSelect();
-        return $this->responseData($res);
+        responseData(\StatusCode::SUCCESS,'发布房源下拉列表数据',$res);
     }
 
     /**
      * @return \Illuminate\Http\JsonResponse
-     * 添加房源
+     * 添加房源基本信息
      */
     public function store()
     {
@@ -64,9 +72,9 @@ class HouseController extends AdminBaseController
         if ($validator->fails())
         {
             $messages = $validator->errors()->first();
-            return $this->responseData(\StatusCode::CHECK_FROM,'验证失败',$messages);
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
         }
         $res = $this->house->storeHouse( $data );
-        return $this->responseData($res);
+        responseData(\StatusCode::SUCCESS,'写入成功',$res);
     }
 }
