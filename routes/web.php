@@ -23,6 +23,8 @@ $router->group(['prefix' => 'api/admin','namespace'=>'Admin'], function () use (
         $router->get('house/index', 'HouseController@index');//房源列表
         $router->post('house/tag', 'HouseController@storeTag');//房源标签
         $router->post('house/img', 'HouseController@storeImg');//房源图片
+        $router->get('house/edit/{uuid}', 'HouseController@edit');//房源信息
+        $router->delete('house/delete/{uuid}', 'HouseController@destroy');//房源删除
         //图片上传到临时目录
         $router->post('img/upload', 'PublicController@uploadImgToTemp');//图片上传到临时目录
 

@@ -9,6 +9,7 @@
 namespace App\Service\Admin;
 use App\Model\Data\SelectCateDefault;
 use App\Model\House\House;
+use App\Model\House\HouseHome;
 use App\Model\House\HouseImage;
 use App\Model\House\HouseTag;
 use App\Service\AdminBase;
@@ -339,6 +340,54 @@ class HouseService extends AdminBase
         }catch (Exception $e){
             DB::rollBack();
             responseData(\StatusCode::ERROR,'写入失败');
+        }
+    }
+
+    /**
+     * @param $uuid
+     * 房源信息
+     */
+    public function editHouse( $uuid )
+    {
+        $res = House::where('uuid',$uuid)->first();
+        if( $res )
+        {
+
+            $res->images = $res->houseToImage()->select('uuid','url')->get();
+            return $res;
+        }else
+        {
+            responseData(\StatusCode::ERROR,'未查询到数据');
+        }
+    }
+
+    /**
+     * @param $uuid
+     * 删除房源
+     */
+    public function destroyHouse( $uuid )
+    {
+        try{
+            DB::beginTransaction();
+            $res = House::where('uuid',$uuid)->first();
+            $houseID = $res->id;
+            if( $res )
+            {
+                 HouseTag::where('houseid',$houseID)->delete();
+                 HouseImage::where('houseid',$houseID)->delete();
+                 HouseHome::where('houseid',$houseID)->delete();
+
+            }else
+            {
+                responseData(\StatusCode::ERROR,'未查询到数据');
+            }
+            DB::commit();
+            //删除图片
+            (new \Upload())->delDir('house',$houseID);
+            return 'success';
+        }catch (Exception $e){
+            DB::rollBack();
+            responseData(\StatusCode::ERROR,'删除失败');
         }
     }
 }

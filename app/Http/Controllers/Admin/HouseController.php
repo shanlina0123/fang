@@ -125,4 +125,49 @@ class HouseController extends AdminBaseController
         $res = $this->house->saveImg( $data );
         responseData(\StatusCode::SUCCESS,'写入成功',$res);
     }
+
+
+    /**
+     * @param $uuid
+     * 修改页面
+     */
+    public function edit( $uuid )
+    {
+        $data['uuid'] = $uuid;
+        //验证
+        $validator = Validator::make(
+            $data,[
+                'uuid'=>'required|min:32|max:32',
+            ]
+        );
+        if ($validator->fails())
+        {
+            $messages = $validator->errors()->first();
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
+        }
+        $res = $this->house->editHouse( $uuid );
+        responseData(\StatusCode::SUCCESS,'房源信息',$res);
+    }
+
+    /**
+     * @param $uuid
+     * 删除房源
+     */
+    public function destroy( $uuid )
+    {
+        $data['uuid'] = $uuid;
+        //验证
+        $validator = Validator::make(
+            $data,[
+                'uuid'=>'required|min:32|max:32',
+            ]
+        );
+        if ($validator->fails())
+        {
+            $messages = $validator->errors()->first();
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
+        }
+        $res = $this->house->destroyHouse( $uuid );
+        responseData(\StatusCode::SUCCESS,'删除成功',$res);
+    }
 }
