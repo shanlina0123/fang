@@ -88,7 +88,7 @@ function object_to_array($obj) {
  *
  * 调用
  *  if ($validator->fails()) {
-        responseData(\StatusCode::PARAM_ERROR,"参数错误","",validateParam($validator->errors()));
+        responseData(\StatusCode::PARAM_ERROR,"参数错误","",$validator->errors());
     }
  */
 function validateParam($obj)
@@ -103,14 +103,14 @@ function validateParam($obj)
  */
 function responseData($status="",$messages="",$data="",$errorparam="")
 {
-    $res = new \stdClass();
-    $res->status = $status;//请求结果的状态
-    $res->messages = $messages;//请求结果的文字描述
-    $res->data = $data;//返回的数据结果
+    $res["status"] = $status;//请求结果的状态
+    $res["messages"] = $messages;//请求结果的文字描述
+    $res["data"] = $data;//返回的数据结果
     if(!empty($errorparam))
     {
         $errorparam=validateParam($errorparam);
     }
-    $res->errorparam=$errorparam; //错误参数对应提示
-    return response()->json($res,200);die;
+    $res["errorparam"]=$errorparam; //错误参数对应提示
+   // return response()->json($res,200);die;
+    echo json_encode($res);die;
 }

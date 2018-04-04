@@ -35,7 +35,7 @@ class RolesController extends AdminBaseController
         //获取业务数据
         $list=$this->roles->index();
         //接口返回结果
-        return responseData(\StatusCode::SUCCESS,"获取成功",$list);
+         responseData(\StatusCode::SUCCESS,"获取成功",$list);
     }
 
     /***
@@ -50,12 +50,12 @@ class RolesController extends AdminBaseController
 
         //进行验证
         if ($validator->fails()) {
-            return responseData(\StatusCode::PARAM_ERROR,"参数错误");
+             responseData(\StatusCode::PARAM_ERROR,"参数错误");
         }
         //获取业务数据
         $data=$this->roles->edit($uuid);
         //接口返回结果
-        return responseData(\StatusCode::SUCCESS,"获取成功",$data);
+         responseData(\StatusCode::SUCCESS,"获取成功",$data);
     }
 
 }
