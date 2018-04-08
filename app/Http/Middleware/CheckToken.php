@@ -21,11 +21,11 @@ class CheckToken
             $request->attributes->add(['admin_user'=>$user]);//添加参数
             if( $res->expiration <= time() )
             {
-                return response()->json('token失效', 401);
+                responseData(\StatusCode::TOKEN_ERROR,"token失效");
             }
         }else
         {
-            return response()->json('非法请求', 401);
+            responseData(\StatusCode::REQUEST_ERROR,"非法请求");
         }
         return $next($request);
     }

@@ -15,7 +15,6 @@ class ClientDynamic extends Model
     protected $table = 'client_dynamic';
     public $timestamps = false;
 
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      * 关联用户表

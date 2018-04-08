@@ -7,38 +7,60 @@
  */
 
 namespace App\Http\Controllers\Admin;
-use App\Service\Admin\RolesService;
+use App\Service\Admin\DatasService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 /***
- * 角色管理
+ * 自定义属性管理 +默认属性列表
  * Class RolesController
  * @package App\Http\Controllers\Admin
  */
-class RolesController extends AdminBaseController
+class DatasController extends AdminBaseController
 {
-    public  $roles_service;
+    public  $datas_service;
     public  $request;
-    public function __construct(Request $request, RolesService $roles)
+    public function __construct(Request $request, DatasService $datas)
     {
         $this->request = $request;
-        $this->roles_service = $roles;
+        $this->datas_service = $datas;
     }
 
+
     /***
-     * 获取角色列表
+     * 获取数据源列表 所有
      */
     public function  index()
     {
         //获取业务数据
-        $list=$this->roles_service->index();
+        $list=$this->datas_service->index();
+        //接口返回结果
+        responseData(\StatusCode::SUCCESS,"获取成功",$list);
+    }
+
+
+    /***
+     * 获取数据源列表-具体分类对应
+     */
+    public function  getOne($cateid)
+    {
+        //验证规则
+        $validator = Validator::make(["cateid"=>$cateid],[
+            'cateid' => 'required|numeric'
+        ],['cateid.required'=>'参数错误','cateid.numeric'=>'参数错误']);
+
+        //进行验证
+        if ($validator->fails()) {
+            responseData(\StatusCode::PARAM_ERROR,"参数错误");
+        }
+        //获取业务数据
+        $list=$this->datas_service->getOne($cateid);
         //接口返回结果
         responseData(\StatusCode::SUCCESS,"获取成功",$list);
     }
 
     /***
-     * 角色详情
+     * 数据源详情
      * @param $uuid
      */
     public function edit($uuid)
@@ -53,51 +75,55 @@ class RolesController extends AdminBaseController
              responseData(\StatusCode::PARAM_ERROR,"参数错误");
         }
         //获取业务数据
-        $data=$this->roles_service->edit($uuid);
+        $data=$this->datas_service->edit($uuid);
         //接口返回结果
          responseData(\StatusCode::SUCCESS,"获取成功",$data);
     }
 
 
     /***
-     * 新增角色 - 执行
+     * 新增数据源 - 执行
      */
     public  function  store()
     {
         //获取请求参数
-        $data=$this->getData(["uuid","name"],$this->request->all());
+        $data=$this->getData(["uuid","cateid","name"],$this->request->all());
         //验证规则
         $validator = Validator::make($data,[
             'uuid' => 'required|max:32|min:32',
+            'cateid' => 'required|numeric',
             "name"=>'required|max:100|min:1',
         ],['uuid.required'=>'参数错误','uuid.max'=>'参数错误','uuid.min'=>'参数错误',
+            'cateid.required'=>'参数cateid错误','cateid.numeric'=>'参数cateid格式必须int',
             'name.required'=>'名称不能为空','name.max'=>'名称长度不能大于100个字符','name.min'=>'名称长度不能小于1个字符']);
         //进行验证
         if ($validator->fails()) {
             responseData(\StatusCode::PARAM_ERROR,"验证失败","",$validator->errors());
         }
         //执行业务处理
-         $this->roles_service->store($data);
+         $this->datas_service->store($data);
         //接口返回结果
         responseData(\StatusCode::SUCCESS,"新增成功");
     }
 
 
     /***
-     * 修改角色 - 执行
+     * 修改数据源 - 执行
      */
     public  function  update($uuid)
     {
         //获取请求参数
-        $data=$this->getData(["name"],$this->request->all());
+        $data=$this->getData(["name","cateid"],$this->request->all());
         //拼接验证数据集
         $validateData=array_merge(["uuid"=>$uuid],$data);
 
         //定义验证规则
         $validator = Validator::make($validateData,[
             'uuid' => 'required|max:32|min:32',
+            'cateid' => 'required|numeric',
             "name"=>'required|max:100|min:1',
         ],['uuid.required'=>'参数错误','uuid.max'=>'参数错误','uuid.min'=>'参数错误',
+            'cateid.required'=>'参数cateid错误','cateid.numeric'=>'参数cateid格式必须int',
             'name.required'=>'名称不能为空','name.max'=>'名称长度不能大于100个字符','name.min'=>'名称长度不能小于1个字符']);
 
         //进行验证
@@ -105,16 +131,16 @@ class RolesController extends AdminBaseController
             responseData(\StatusCode::PARAM_ERROR,"验证失败","",$validator->errors());
         }
         //获取业务数据
-        $this->roles_service->update($uuid,$data);
+        $this->datas_service->update($uuid,$data);
         //接口返回结果
         responseData(\StatusCode::SUCCESS,"修改成功");
     }
 
 
     /***
-     * 删除角色
+     * 禁用/启用
      */
-    public function  delete($uuid)
+    public function  setting($uuid)
     {
         //定义验证规则
         $validator = Validator::make(["uuid"=>$uuid],[
@@ -126,10 +152,41 @@ class RolesController extends AdminBaseController
             responseData(\StatusCode::PARAM_ERROR,"参数错误");
         }
         //获取业务数据
-        $this->roles_service->delete($uuid);
+        $this->datas_service->setting($uuid);
         //接口返回结果
-        responseData(\StatusCode::SUCCESS,"删除成功");
+        responseData(\StatusCode::SUCCESS,"设置成功");
     }
 
 
+    /***
+     * 获取数据源列表-默认数据 所有
+     */
+    public function  getDefault()
+    {
+        //获取业务数据
+        $list=$this->datas_service->getDefault();
+        //接口返回结果
+        responseData(\StatusCode::SUCCESS,"获取成功",$list);
+    }
+
+
+    /***
+     * 获取数据源列表-默认数据 具体分类对应
+     */
+    public function  getDefaultOne($cateid)
+    {
+        //验证规则
+        $validator = Validator::make(["cateid"=>$cateid],[
+            'cateid' => 'required|numeric'
+        ],['cateid.required'=>'参数错误','cateid.numeric'=>'参数错误']);
+
+        //进行验证
+        if ($validator->fails()) {
+            responseData(\StatusCode::PARAM_ERROR,"参数错误");
+        }
+        //获取业务数据
+        $list=$this->datas_service->getDefaultOne($cateid);
+        //接口返回结果
+        responseData(\StatusCode::SUCCESS,"获取成功",$list);
+    }
 }

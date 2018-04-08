@@ -7,13 +7,15 @@
  */
 
 namespace App\Http\Controllers\Admin;
+
 use App\Service\Admin\UserService;
 use Illuminate\Http\Request;
 
 class UserController extends AdminBaseController
 {
-    public  $mod;
-    public  $request;
+    public $mod;
+    public $request;
+
     public function __construct(Request $request, UserService $mod)
     {
         $this->mod = $mod;
@@ -26,7 +28,18 @@ class UserController extends AdminBaseController
      */
     public function broker()
     {
-        $res = $this->mod->getList( $this->request );
-        responseData(\StatusCode::SUCCESS,'经纪人列表', $res );
+        $res = $this->mod->getList($this->request);
+        responseData(\StatusCode::SUCCESS, '经纪人列表', $res);
+    }
+
+    /*
+     * 获取所有经纪人
+     */
+    public function index()
+    {
+        //获取业务数据
+        $list = $this->mod->index();
+        //接口返回结果
+        responseData(\StatusCode::SUCCESS, "获取成功", $list);
     }
 }
