@@ -268,7 +268,7 @@ class HouseService extends AdminBase
             }
             if( $name )
             {
-                $sql->where('name','%'.$name.'%');
+                $sql->where('name','like','%'.$name.'%');
             }
             return $sql->paginate(config('configure.sPage'));
         });
@@ -388,6 +388,137 @@ class HouseService extends AdminBase
         }catch (Exception $e){
             DB::rollBack();
             responseData(\StatusCode::ERROR,'删除失败');
+        }
+    }
+
+    /**
+     * @param $data
+     * 修改房源
+     */
+    public function updateHouse( $data )
+    {
+        try{
+            DB::beginTransaction();
+            $obj = House::where('uuid',$data['uuid'])->first();
+            if( $obj == false )
+            {
+                responseData(\StatusCode::ERROR,'未查询到数据');
+            }
+            $obj->name = $data['name'];//楼盘名称
+            $obj->iscommission = $data['iscommission'];//展示拥金
+            $obj->commissionid = $data['commissionid'];//佣金规则
+            $obj->ishome = $data['name'];//是否推荐 1推荐 0不推荐
+            $obj->provinceid = $data['provinceid'];
+            $obj->cityid = $data['cityid'];
+            $obj->countryid = $data['countryid'];
+            $obj->streeid = $data['streeid'];
+            $obj->street = $data['street'];//街道
+            $obj->addr = $data['addr'];//地址
+            $obj->fulladdr = $data['fulladdr'];//地址
+            $obj->floorpostionid = $data['floorpostionid'];//楼层位置
+            $obj->floor = $data['floor'];//楼层
+            $obj->orientationid = $data['orientationid'];//朝向
+            $obj->purposeid = $data['purposeid'];//用途
+            $obj->area = $data['area'];//面积
+            $obj->created_at = $data['created_at'];//发布时间
+            $obj->iselevator = $data['iselevator'];//电梯
+            $obj->years = $data['years'];//年代
+            $obj->decoratestyleid = $data['decoratestyleid'];//装修
+            $obj->ownershipid = $data['ownershipid'];//权属
+            $obj->hasdoublegasid = $data['hasdoublegasid'];//双气
+            $obj->propertyfee = $data['propertyfee'];//物业费
+            $obj->status = $data['status'];
+            switch ( (int)$data['typeid'] )
+            {
+                case 1:
+                    //新房
+                    $obj->salestatusid = $data['salestatusid'];//现状
+                    $obj->opendate = $data['opendate'];//开盘日期
+                    $obj->price = $data['price'];//单价
+                    $obj->roomtypeid = $data['roomtypeid'];//房型
+                    break;
+                case 2:
+                    //二手
+                    $obj->price = $data['price'];//单价
+                    $obj->total = $data['total'];//总价
+                    $obj->roomtypeid = $data['roomtypeid'];//房型
+                    break;
+                case 3:
+                    //商铺
+                    $obj->total = $data['total'];//总价
+                    $obj->depth = $data['depth'];//进深
+                    $obj->storey = $data['storey'];//层高
+                    $obj->wide = $data['wide'];//面宽
+                    break;
+            }
+            //修改标签
+            foreach ( $data['tagid'] as $row )
+            {
+                $arr[]['uuid'] = create_uuid();
+                $arr[]['tagid'] = $row;
+                $arr[]['houseid'] = $obj->id;
+            }
+            HouseTag::insert( $arr );
+            //删除标签
+            if(  $data['del_tagid'] )
+            {
+                if( is_array($data['del_tagid']) )
+                {
+                    HouseTag::where('houseid',$obj->id)->whereIn('id',$data['del_tagid'])->delete();
+                }
+            }
+            //上传图片
+            $upload = new \Upload();
+            if( is_array( $data['images'] ) )
+            {
+                //上传
+                foreach ( $data['images'] as $row )
+                {
+                    $res = $upload->uploadProductImage( $data['houseid'], $row, 'house' );
+                    if( $res )
+                    {
+                        $arr['uuid'] = create_uuid();
+                        $arr['url'] = '/house/'.$obj->id.'/'.$row;
+                        $arr['houseid'] = $obj->id;
+                        $arr['created_at'] = date("Y-m-d H:i:s");
+                        HouseImage::insert($arr);
+                    }
+                }
+            }
+            if( is_array( $data['del_images'] ) )
+            {
+                //删除
+                foreach ( $data['del_images'] as $row )
+                {
+                    $res = $upload->delImg( $row );
+                    if( $res )
+                    {
+                        HouseImage::where(['url'=>$row,'houseid'=>$obj->id])->delete();
+                    }
+                }
+            }
+            //上传封面
+            if( $data['covermap'] )
+            {
+                $covermap = $upload->uploadProductImage( $obj->id, $data['covermap'], 'house' );
+                if( $covermap )
+                {
+                    $obj->covermap = '/house/'.$obj->id.'/'.$data['covermap'];
+                }
+            }
+            //删除封面
+            if( $data['del_covermap'] )
+            {
+                $upload->delImg( $data['del_covermap'] );
+            }
+            //修改房源信息
+            $obj->save();
+            DB::commit();
+            return "success";
+        }catch (Exception $e)
+        {
+            DB::rollBack();
+            responseData(\StatusCode::ERROR,'修改失败',$data);
         }
     }
 }

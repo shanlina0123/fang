@@ -24,9 +24,21 @@ $router->group(['prefix' => 'api/admin','namespace'=>'Admin'], function () use (
         $router->post('house/tag', 'HouseController@storeTag');//房源标签
         $router->post('house/img', 'HouseController@storeImg');//房源图片
         $router->get('house/edit/{uuid}', 'HouseController@edit');//房源信息
+        $router->put('house/update/{uuid}', 'HouseController@update');//房源编辑
         $router->delete('house/delete/{uuid}', 'HouseController@destroy');//房源删除
-        //图片上传到临时目录
         $router->post('img/upload', 'PublicController@uploadImgToTemp');//图片上传到临时目录
+        //公司
+        $router->get('company/index', 'CompanyController@index');//公司列表
+        $router->post('company/store', 'CompanyController@store');//添加公司
+        //客户
+        $router->get('client/index', 'ClientController@index');//客户列表
+        $router->delete('client/delete/{uuid}', 'ClientController@destroy');//客户删除
+        $router->get('client/edit/{uuid}', 'ClientController@edit');//客户编辑信息
+        $router->put('client/update/{uuid}', 'ClientController@update');//客户编辑信息
+        $router->get('client-follow/edit/{client}', 'ClientController@followEdit');//客户跟进
+        $router->put('client-follow/store', 'ClientController@followStore');//客户跟进保存
+        $router->post('client-transfer/update', 'ClientController@transferUpdate');//客户移交
+
 
         //系统设置
         //角色

@@ -6,16 +6,15 @@
  * Time: 11:26
  */
 
-namespace App\Model\User;
+namespace App\Model\Client;
 use Illuminate\Database\Eloquent\Model;
-class AdminUser extends Model
+class ClientFollow extends Model
 {
     protected $primaryKey = 'id';
     protected $guarded = ['id'];
-    protected $table = 'admin';
+    protected $table = 'client_follow';
     public $timestamps = false;
-
     protected $hidden = [
-        'password','created_at','updated_at'
+        'created_at','updated_at'
     ];
 }

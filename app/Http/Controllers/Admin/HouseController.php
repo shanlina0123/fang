@@ -170,4 +170,44 @@ class HouseController extends AdminBaseController
         $res = $this->house->destroyHouse( $uuid );
         responseData(\StatusCode::SUCCESS,'删除成功',$res);
     }
+
+    /**
+     * @param $uuid
+     * 编辑保存
+     */
+    public function update( $uuid )
+    {
+        $data = trimValue( $this->request->all() );
+        $data['uuid'] = $uuid;
+        //公用验证规则
+        $rulesPublic = $this->house->getRules();
+        switch ( (int)$data['typeid'] )
+        {
+            case 1:
+                //新房
+                $rules = array_collapse( $rulesPublic, $this->house->getNewRules(), ['uuid'=>'required|mix:32|max:32'] );
+                break;
+            case 2:
+                //二手
+                $rules = array_collapse( $rulesPublic, $this->house->getSencodRules(), ['uuid'=>'required|mix:32|max:32'] );
+                break;
+            case 3:
+                //商铺
+                $rules = array_collapse( $rulesPublic, $this->house->getShopRules(), ['uuid'=>'required|mix:32|max:32'] );
+                break;
+        }
+        //验证
+        $validator = Validator::make(
+            $data,
+            $rules,
+            $this->house->errorsMessages()
+        );
+        if ($validator->fails())
+        {
+            $messages = $validator->errors()->first();
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
+        }
+        $res = $this->house->updateHouse( $data );
+        responseData(\StatusCode::SUCCESS,'写入成功',$res);
+    }
 }
