@@ -21,4 +21,12 @@ class UserController extends AdminBaseController
     }
 
 
+    /**
+     * 经纪人列表
+     */
+    public function broker()
+    {
+        $res = $this->mod->getList( $this->request );
+        responseData(\StatusCode::SUCCESS,'经纪人列表', $res );
+    }
 }
