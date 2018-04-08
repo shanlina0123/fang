@@ -6,16 +6,16 @@
  * Time: 11:26
  */
 
-namespace App\Model\Data;
+namespace App\Model\Client;
 use Illuminate\Database\Eloquent\Model;
-class Select extends Model
+class Client extends Model
 {
     protected $primaryKey = 'id';
     protected $guarded = ['id'];
-    protected $table = 'role_user';
+    protected $table = 'client';
     public $timestamps = false;
 
 
 
-    
+
 }

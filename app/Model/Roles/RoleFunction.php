@@ -6,9 +6,9 @@
  * Time: 11:26
  */
 
-namespace App\Model\Data;
+namespace App\Model\Roles;
 use Illuminate\Database\Eloquent\Model;
-class Select extends Model
+class RoleFunction extends Model
 {
     protected $primaryKey = 'id';
     protected $guarded = ['id'];
