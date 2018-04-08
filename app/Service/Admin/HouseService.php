@@ -518,7 +518,7 @@ class HouseService extends AdminBase
         }catch (Exception $e)
         {
             DB::rollBack();
-            responseData(\StatusCode::ERROR,'修改失败',$data);
+            responseData(\StatusCode::ERROR,'编辑失败',$data);
         }
     }
 }

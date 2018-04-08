@@ -208,6 +208,6 @@ class HouseController extends AdminBaseController
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
         }
         $res = $this->house->updateHouse( $data );
-        responseData(\StatusCode::SUCCESS,'写入成功',$res);
+        responseData(\StatusCode::SUCCESS,'编辑成功',$res);
     }
 }

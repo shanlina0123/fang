@@ -30,6 +30,9 @@ $router->group(['prefix' => 'api/admin','namespace'=>'Admin'], function () use (
         //公司
         $router->get('company/index', 'CompanyController@index');//公司列表
         $router->post('company/store', 'CompanyController@store');//添加公司
+        $router->get('company/edit/{uuid}', 'CompanyController@edit');//公司修改信息
+        $router->post('company/update/{uuid}', 'CompanyController@update');//公司修改信息
+        $router->delete('company/delete/{uuid}', 'CompanyController@destroy');//公司修改信息
         //客户
         $router->get('client/index', 'ClientController@index');//客户列表
         $router->delete('client/delete/{uuid}', 'ClientController@destroy');//客户删除

@@ -41,6 +41,9 @@ class CompanyController extends AdminBaseController
             $data,
             [
                 'name' => 'required|max:255',
+                'mobile' => 'required|max:11|min:11',
+                'conncat' => 'required|max:30',
+                'addr' => 'required|max:255',
             ]
         );
         if ($validator->fails())
@@ -50,5 +53,77 @@ class CompanyController extends AdminBaseController
         }
         $res = $this->company->companySave( $data );
         responseData(\StatusCode::SUCCESS,'添加成功', $res );
+    }
+
+    /**
+     * @param $uuid
+     *  修改公司信息
+     */
+    public function edit( $uuid )
+    {
+        $data['uuid'] = $uuid;
+        //验证
+        $validator = Validator::make(
+            $data,[
+                'uuid'=>'required|min:32|max:32',
+            ]
+        );
+        if ($validator->fails())
+        {
+            $messages = $validator->errors()->first();
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
+        }
+        $res = $this->company->editCompany( $uuid );
+        responseData(\StatusCode::SUCCESS,'公司信息',$res);
+    }
+
+    /**
+     * @param $uuid
+     * 修改
+     */
+    public function update( $uuid )
+    {
+        $data = trimValue( $this->request->all() );
+        $data['uuid'] = $uuid;
+        //验证
+        $validator = Validator::make(
+            $data,[
+                'uuid'=>'required|min:32|max:32',
+                'name' => 'required|max:255',
+                'mobile' => 'required|max:11|min:11',
+                'conncat' => 'required|max:30',
+                'addr' => 'required|max:255',
+            ]
+        );
+        if ($validator->fails())
+        {
+            $messages = $validator->errors()->first();
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
+        }
+        $res = $this->company->updateCompany( $data );
+        responseData(\StatusCode::SUCCESS,'修改成功',$res);
+    }
+
+
+    /**
+     * @param $uuid
+     * 删除公司
+     */
+    public function destroy( $uuid )
+    {
+        $data['uuid'] = $uuid;
+        //验证
+        $validator = Validator::make(
+            $data,[
+                'uuid'=>'required|min:32|max:32',
+            ]
+        );
+        if ($validator->fails())
+        {
+            $messages = $validator->errors()->first();
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
+        }
+        $res = $this->company->destroyCompany( $uuid );
+        responseData(\StatusCode::SUCCESS,'删除成功',$res);
     }
 }
