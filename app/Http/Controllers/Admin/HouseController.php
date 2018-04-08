@@ -22,18 +22,26 @@ class HouseController extends AdminBaseController
 
 
     /**
+     * 房源列表
+     */
+    public function index()
+    {
+        $res = $this->house->getList( $this->request );
+        responseData(\StatusCode::SUCCESS,'房源列表',$res);
+    }
+    /**
      * @param $type
      * 添加房源返回表单自定数据
      */
     public function create()
     {
         $res = $this->house->getSelect();
-        return $this->responseData($res);
+        responseData(\StatusCode::SUCCESS,'发布房源下拉列表数据',$res);
     }
 
     /**
      * @return \Illuminate\Http\JsonResponse
-     * 添加房源
+     * 添加房源基本信息
      */
     public function store()
     {
@@ -64,9 +72,142 @@ class HouseController extends AdminBaseController
         if ($validator->fails())
         {
             $messages = $validator->errors()->first();
-            return $this->responseData(\StatusCode::CHECK_FROM,'验证失败',$messages);
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
         }
         $res = $this->house->storeHouse( $data );
-        return $this->responseData($res);
+        responseData(\StatusCode::SUCCESS,'写入成功',$res);
+    }
+
+
+    /**
+     * 发布房源标签
+     */
+    public function storeTag()
+    {
+        $data = trimValue( $this->request->all() );
+        //验证
+        $validator = Validator::make(
+            $data,[
+                'tagid'=>'required|array',
+                'houseid'=>'required|numeric'
+            ]
+        );
+        if ($validator->fails())
+        {
+            $messages = $validator->errors()->first();
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
+        }
+        $res = $this->house->saveTag( $data );
+        responseData(\StatusCode::SUCCESS,'写入成功',$res);
+    }
+
+
+    /**
+     * 图片上传
+     */
+    public function storeImg()
+    {
+        $data = trimValue( $this->request->all() );
+        //验证
+        $validator = Validator::make(
+            $data,[
+                'covermap'=>'required',
+                'images'=>'required|array',
+                'status'=>'required',
+                'houseid'=>'required|numeric',
+            ]
+        );
+        if ($validator->fails())
+        {
+            $messages = $validator->errors()->first();
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
+        }
+        $res = $this->house->saveImg( $data );
+        responseData(\StatusCode::SUCCESS,'写入成功',$res);
+    }
+
+
+    /**
+     * @param $uuid
+     * 修改页面
+     */
+    public function edit( $uuid )
+    {
+        $data['uuid'] = $uuid;
+        //验证
+        $validator = Validator::make(
+            $data,[
+                'uuid'=>'required|min:32|max:32',
+            ]
+        );
+        if ($validator->fails())
+        {
+            $messages = $validator->errors()->first();
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
+        }
+        $res = $this->house->editHouse( $uuid );
+        responseData(\StatusCode::SUCCESS,'房源信息',$res);
+    }
+
+    /**
+     * @param $uuid
+     * 删除房源
+     */
+    public function destroy( $uuid )
+    {
+        $data['uuid'] = $uuid;
+        //验证
+        $validator = Validator::make(
+            $data,[
+                'uuid'=>'required|min:32|max:32',
+            ]
+        );
+        if ($validator->fails())
+        {
+            $messages = $validator->errors()->first();
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
+        }
+        $res = $this->house->destroyHouse( $uuid );
+        responseData(\StatusCode::SUCCESS,'删除成功',$res);
+    }
+
+    /**
+     * @param $uuid
+     * 编辑保存
+     */
+    public function update( $uuid )
+    {
+        $data = trimValue( $this->request->all() );
+        $data['uuid'] = $uuid;
+        //公用验证规则
+        $rulesPublic = $this->house->getRules();
+        switch ( (int)$data['typeid'] )
+        {
+            case 1:
+                //新房
+                $rules = array_collapse( $rulesPublic, $this->house->getNewRules(), ['uuid'=>'required|mix:32|max:32'] );
+                break;
+            case 2:
+                //二手
+                $rules = array_collapse( $rulesPublic, $this->house->getSencodRules(), ['uuid'=>'required|mix:32|max:32'] );
+                break;
+            case 3:
+                //商铺
+                $rules = array_collapse( $rulesPublic, $this->house->getShopRules(), ['uuid'=>'required|mix:32|max:32'] );
+                break;
+        }
+        //验证
+        $validator = Validator::make(
+            $data,
+            $rules,
+            $this->house->errorsMessages()
+        );
+        if ($validator->fails())
+        {
+            $messages = $validator->errors()->first();
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
+        }
+        $res = $this->house->updateHouse( $data );
+        responseData(\StatusCode::SUCCESS,'写入成功',$res);
     }
 }

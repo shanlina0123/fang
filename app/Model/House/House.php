@@ -14,4 +14,13 @@ class House extends Model
     protected $guarded = ['id'];
     protected $table = 'house';
     public $timestamps = false;
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * 关联下拉数据
+     */
+    public function houseToImage()
+    {
+        return $this->hasMany('App\Model\House\HouseImage','houseid','id');
+    }
 }

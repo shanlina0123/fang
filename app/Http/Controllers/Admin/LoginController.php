@@ -39,10 +39,10 @@ class LoginController extends AdminBaseController
         );
         if ($validator->fails())
         {
-            $messages = $validator->errors();
-            return $this->responseData(['status'=>\StatusCode::CHECK_FROM,'messages'=>'验证失败','data'=>$messages]);
+            $messages = $validator->errors()->first();
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages );
         }
         $res = $this->mod->checkUser( $data );
-        return $this->responseData($res);
+        responseData(\StatusCode::SUCCESS,'登陆成功', $res );
     }
 }

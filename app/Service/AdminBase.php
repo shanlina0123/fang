@@ -34,4 +34,5 @@ class AdminBase
       $info=["id"=>1,"name"=>"管理员"] ;
       return $field?$info[$field]:$info;
    }
+
 }

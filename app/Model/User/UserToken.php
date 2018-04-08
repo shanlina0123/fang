@@ -14,4 +14,13 @@ class UserToken extends Model
     protected $guarded = ['id'];
     protected $table = 'user_token';
     public $timestamps = true;
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * 关联用户表
+     */
+    public function tokenToAdminUser()
+    {
+        return $this->belongsTo('App\Model\User\AdminUser','userid','id');
+    }
 }

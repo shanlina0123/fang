@@ -14,6 +14,7 @@
 class StatusCode
 {
     const SUCCESS=1;//成功
+    const PUBLIC_STATUS= 1;//1成功
     const ERROR=0;//失败
     const PARAM_ERROR=2;
     const DB_ERROR=3;//数据库错误失败
@@ -27,10 +28,8 @@ class StatusCode
     const NOT_DEFINED=11;//非预定义
     const NOT_EXIST_ERROR=12;//不存在
     const NOT_CHANGE=13;//无变化
-    const PUBLIC_STATUS= 1;//1成功
-    const EXIST_NOT_DELETE=10;//存在不能删除的数据
+    const EXIST_NOT_DELETE=14;//存在不能删除的数据
     const CHECK_FROM = 100100100; //表单数据验证失败
     const USER_LOCKING = 100100101; //用户锁定
     const LOGIN_FAILURE = 100100102; //用户名密码不正确
-    const HOUSE_STORE_FAIL = 100200101; //房源基本信息发布失败
 }

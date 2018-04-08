@@ -14,4 +14,8 @@ class AdminUser extends Model
     protected $guarded = ['id'];
     protected $table = 'admin';
     public $timestamps = false;
+
+    protected $hidden = [
+        'password','created_at','updated_at'
+    ];
 }
