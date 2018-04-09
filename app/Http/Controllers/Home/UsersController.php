@@ -32,8 +32,9 @@ class UsersController extends HomeBaseController
      */
     public function  index()
     {
+        $userid=1;//$this->request->get("admin_user")->id;//userid
         //获取业务数据
-        $list=$this->users_service->index();
+        $list=$this->users_service->index($userid);
         //接口返回结果
         responseData(\StatusCode::SUCCESS,"获取成功",$list);
     }
@@ -57,9 +58,11 @@ class UsersController extends HomeBaseController
         if ($validator->fails()) {
             responseData(\StatusCode::PARAM_ERROR,"验证失败","",$validator->errors());
         }
+        //获取当前登录用户信息
+        $userinfo=$this->request->get("admin_user");//对象
+        $userinfo=["id"=>1,"mobile"=>"15002960355"];// $userinfo->toArray();//数组
         //获取业务数据
-        $userid=$this->request->get("admin_user")->id;
-        $this->users_service->update($userid,$data);
+        $this->users_service->update($userinfo,$data);
         //接口返回结果
         responseData(\StatusCode::SUCCESS,"修改成功");
     }

@@ -15,7 +15,9 @@
  * 后台
  */
 $router->group(['prefix' => 'api/admin', 'namespace' => 'Admin'], function () use ($router) {
-    $router->post('login', 'LoginController@login');//登陆
+    //登录前
+    $router->post('login', 'LoginController@login');//登录
+    //登录后
     $router->group(['middleware' => 'admin_token'], function () use ($router) {
         //房源
         $router->post('house/create', 'HouseController@create');//发房下拉数据
@@ -93,9 +95,14 @@ $router->group(['prefix' => 'api/admin', 'namespace' => 'Admin'], function () us
  */
 $router->group(['prefix' => 'api/home', 'namespace' => 'Home'], function () use ($router) {
 
+    $router->get('users', 'UsersController@index');//获取用户列表 ----OK
+    $router->post('users', 'UsersController@update');//修改用户信息 ----OK
+
+    //登录前
     $router->post('user/register', 'LoginOrRegisterController@register');//注册
     $router->post('user/login', 'LoginOrRegisterController@login');//登陆
 
+    //登录后
     $router->group(['middleware' => 'user_token'], function () use ($router) {
         //自定义属性管理
         $router->get('datas', 'DatasController@index');//获取自定义所有属性列表----OK
@@ -107,6 +114,10 @@ $router->group(['prefix' => 'api/home', 'namespace' => 'Home'], function () use 
 
         //配置
         $router->get('conf', 'ConfController@index');//获取web手机端配置列表 ----OK
+
+        //个人中心
+//        $router->get('users', 'UsersController@index');//获取用户列表 ----OK
+//        $router->post('users', 'UsersController@update');//修改用户信息 ----OK
 
     });
 

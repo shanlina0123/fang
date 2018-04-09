@@ -22,12 +22,12 @@ class UsersService extends HomeBase
      * 获取用户信息
      * @return mixed
      */
-    public  function  index()
+    public  function  index($userid)
     {
         //redis缓存数据，无则执行数据库获取业务数据
         // return Cache::get('confList', function() {
         //列表
-        $objList=Users::where(["status",1])->select("nickname","economictid","mobile")->orderBy('id','asc')->get();
+        $list=Users::where("id",$userid)->select("nickname","economictid","mobile","faceimg")->orderBy('id','asc')->get();
         //结果检测
         if(empty($list))
         {
@@ -44,29 +44,30 @@ class UsersService extends HomeBase
      * 修改用户 - 执行
      * @param $uuid
      */
-    public  function  update($userid,$data)
+    public  function  update($userinfo,$data)
     {
         try{
             //开启事务
             DB::beginTransaction();
-            //业务处理
-            $row=User::where("id",$userid)->first();
 
             //检测手机号是否被占用
-            if($row["mobile"]!==$data["mobile"])
+            if($userinfo["mobile"]!==$data["mobile"])
             {
                 $existMobile=User::where("mobile",$data["mobile"])->exists();
                 if($existMobile>0)
                 {
                     responseData(\StatusCode::EXIST_ERROR,"手机号".$data["mobile"]."已存在");
                 }
+            }else{
+                responseData(\StatusCode::EXIST_ERROR,"无变化");
             }
 
+            //业务处理
             //整理修改数据
             $userUpdate["mobile"]=$data["mobile"];
             $userUpdate["updated_at"]=date("Y-m-d H:i:s");
-            //修改Admin数据
-            $rs=User::where("id",$userid)->update($userUpdate);
+            //修改User数据
+            $rs=User::where("id",$userinfo["id"])->update($userUpdate);
             //结果处理
             if($rs!==false)
             {
