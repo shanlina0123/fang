@@ -11,6 +11,9 @@
 |
 */
 
+/**
+ * 后台
+ */
 $router->group(['prefix' => 'api/admin','namespace'=>'Admin'], function () use ($router)
 {
     $router->post('login', 'LoginController@login');//登陆
@@ -24,6 +27,7 @@ $router->group(['prefix' => 'api/admin','namespace'=>'Admin'], function () use (
         $router->post('house/img', 'HouseController@storeImg');//房源图片
         $router->get('house/edit/{uuid}', 'HouseController@edit');//房源信息
         $router->put('house/update/{uuid}', 'HouseController@update');//房源编辑
+        $router->post('house/recommend', 'HouseController@recommend');//房源推荐
         $router->delete('house/delete/{uuid}', 'HouseController@destroy');//房源删除
         $router->post('img/upload', 'PublicController@uploadImgToTemp');//图片上传到临时目录
         //公司
@@ -83,4 +87,14 @@ $router->group(['prefix' => 'api/admin','namespace'=>'Admin'], function () use (
        $router->get('user', 'UserController@index');//客户分析----OK
 
     });
+});
+
+/**
+ * 前台
+ */
+$router->group(['prefix' => 'api','namespace'=>'Home'], function () use ($router)
+{
+    $router->post('user/register', 'LoginOrRegisterController@register');//注册
+    $router->post('user/login', 'LoginOrRegisterController@login');//登陆
+
 });

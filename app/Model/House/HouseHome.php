@@ -13,6 +13,6 @@ class HouseHome extends Model
     protected $primaryKey = 'id';
     protected $guarded = ['id'];
     protected $table = 'house_home';
-    public $timestamps = false;
+    public $timestamps = true;
 
 }
