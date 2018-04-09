@@ -7,7 +7,6 @@
  */
 
 namespace App\Service\Home;
-use App\Http\Model\User\User;
 use App\Model\User\Users;
 use App\Service\HomeBase;
 use Illuminate\Support\Facades\Cache;
@@ -53,7 +52,7 @@ class UsersService extends HomeBase
             //检测手机号是否被占用
             if($userinfo["mobile"]!==$data["mobile"])
             {
-                $existMobile=User::where("mobile",$data["mobile"])->exists();
+                $existMobile=Users::where("mobile",$data["mobile"])->exists();
                 if($existMobile>0)
                 {
                     responseData(\StatusCode::EXIST_ERROR,"手机号".$data["mobile"]."已存在");
@@ -67,7 +66,7 @@ class UsersService extends HomeBase
             $userUpdate["mobile"]=$data["mobile"];
             $userUpdate["updated_at"]=date("Y-m-d H:i:s");
             //修改User数据
-            $rs=User::where("id",$userinfo["id"])->update($userUpdate);
+            $rs=Users::where("id",$userinfo["id"])->update($userUpdate);
             //结果处理
             if($rs!==false)
             {

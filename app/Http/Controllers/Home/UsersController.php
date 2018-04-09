@@ -32,7 +32,7 @@ class UsersController extends HomeBaseController
      */
     public function  index()
     {
-        $userid=1;//$this->request->get("admin_user")->id;//userid
+        $userid=$this->request->get("userinfo")->id;//userid
         //获取业务数据
         $list=$this->users_service->index($userid);
         //接口返回结果
@@ -51,7 +51,7 @@ class UsersController extends HomeBaseController
 
         //定义验证规则
         $validator = Validator::make($data,[
-            "mobile"=>'required|max:11|min:11',
+            'mobile' => 'required|regex:/^1[345789][0-9]{9}$/',
         ],['mobile.required'=>'手机号不能为空','mobile.max'=>'手机号不能大于11位字符','mobile.min'=>'手机号不能少于11位字符']);
 
         //进行验证
@@ -59,8 +59,12 @@ class UsersController extends HomeBaseController
             responseData(\StatusCode::PARAM_ERROR,"验证失败","",$validator->errors());
         }
         //获取当前登录用户信息
-        $userinfo=$this->request->get("admin_user");//对象
-        $userinfo=["id"=>1,"mobile"=>"15002960355"];// $userinfo->toArray();//数组
+        $userinfo=$this->request->get("userinfo");//对象
+        if(empty($userinfo))
+        {
+            responseData(\StatusCode::PARAM_ERROR,"用户信息获取失败","",$validator->errors());
+        }
+        $userinfo=$userinfo->toArray();
         //获取业务数据
         $this->users_service->update($userinfo,$data);
         //接口返回结果

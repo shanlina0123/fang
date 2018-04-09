@@ -8,8 +8,9 @@
 
 namespace App\Http\Controllers\Home;
 
+use App\Http\Controllers\Controller;
 
-class HomeBaseController
+class HomeBaseController extends  Controller
 {
 
 }
