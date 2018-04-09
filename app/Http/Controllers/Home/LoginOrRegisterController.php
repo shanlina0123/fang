@@ -8,6 +8,8 @@
 
 namespace App\Http\Controllers\Home;
 use App\Service\Home\LoginOrRegisterService;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 class LoginOrRegisterController extends HomeBaseController

@@ -5,5 +5,4 @@ return [
     "sCache"=>120,//缓存时长
     "uploads"=>"uploads",//图片文件路径
     "temp"=>"/temp/"//图片临时目录
-
 ];

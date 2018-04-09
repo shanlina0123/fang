@@ -26,6 +26,7 @@ class LoginOrRegisterService extends HomeBase
         $obj->economictid = $data['economictid'];
         $obj->isadminafter = 0;
         $obj->wechatopenid = $data['wechatopenid'];
+        $obj->status = 1;
         if( $obj->save() )
         {
             return 'success';
@@ -45,18 +46,16 @@ class LoginOrRegisterService extends HomeBase
     {
         $where['nickname'] = $data['nickname'];
         $where['mobile'] = $data['mobile'];
-        $user = Users::where( $where )->select('id','uuid','companyid','nickname','name','mobile','economictid','isadminafter','wechatopenid')->first();
+        $user = Users::where( $where )->select('id','uuid','companyid','nickname','name','mobile','economictid','isadminafter','wechatopenid','status')->first();
         if( $user == false )
         {
             responseData(\StatusCode::LOGIN_FAILURE,'用户名密码错误');
         }
-       /* if( $user->status == 0 )
+        if( $user->status != 1 )
         {
             responseData(\StatusCode::USER_LOCKING,'用户锁定');
-        }*/
-
+        }
         $tWhere['userid'] = $user->id;
-        $tWhere['type'] = 2;
         $uToken = UserToken::where( $tWhere )->first();
         if( $uToken )
         {
@@ -70,7 +69,6 @@ class LoginOrRegisterService extends HomeBase
             $uToken->token = str_random(60);
             $uToken->expiration = time()+7200;
             $uToken->userid = $user->id;
-            $uToken->type = 2;
             $uToken->save();
         }
         $user->token = $uToken->token;

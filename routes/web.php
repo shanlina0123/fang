@@ -93,8 +93,14 @@ $router->group(['prefix' => 'api/admin', 'namespace' => 'Admin'], function () us
  */
 $router->group(['prefix' => 'api/home', 'namespace' => 'Home'], function () use ($router) {
 
+    //用户
     $router->post('user/register', 'LoginOrRegisterController@register');//注册
     $router->post('user/login', 'LoginOrRegisterController@login');//登陆
+
+    //首页
+    $router->get('house/recommend', 'HouseController@recommend');//首页房源推荐
+    //房源列表
+    $router->get('house/list', 'HouseController@index');//房源列表
 
     $router->group(['middleware' => 'user_token'], function () use ($router) {
         //自定义属性管理

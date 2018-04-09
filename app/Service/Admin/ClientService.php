@@ -12,8 +12,8 @@ use App\Model\Client\ClientDispatch;
 use App\Model\Client\ClientDynamic;
 use App\Model\Client\ClientFollow;
 use App\Model\Client\ClientTransfer;
-use App\Model\Company\Company;
 use App\Service\AdminBase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class ClientService extends AdminBase

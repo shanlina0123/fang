@@ -7,9 +7,9 @@
  */
 
 namespace App\Service\Admin;
+use App\Model\User\AdminToken;
 use App\Service\AdminBase;
 use App\Model\User\AdminUser;
-use App\Model\User\UserToken;
 
 class LoginService extends AdminBase
 {
@@ -48,8 +48,7 @@ class LoginService extends AdminBase
         }
 
         $tWhere['userid'] = $user->id;
-        $tWhere['type'] = 1;
-        $uToken = UserToken::where( $tWhere )->first();
+        $uToken = AdminToken::where( $tWhere )->first();
         if( $uToken )
         {
             $uToken->token = str_random(60);
@@ -57,12 +56,11 @@ class LoginService extends AdminBase
             $uToken->save();
         }else
         {
-            $uToken = new UserToken();
+            $uToken = new AdminToken();
             $uToken->uuid = create_uuid();
             $uToken->token = str_random(60);
             $uToken->expiration = time()+7200;
             $uToken->userid = $user->id;
-            $uToken->type = 1;
             $uToken->save();
         }
         $user->token = $uToken->token;
