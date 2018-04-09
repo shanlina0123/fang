@@ -14,7 +14,6 @@ class AdminToken extends Model
     protected $guarded = ['id'];
     protected $table = 'admin_token';
     public $timestamps = true;
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      * 关联用户表

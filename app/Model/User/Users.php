@@ -14,4 +14,7 @@ class Users extends Model
     protected $guarded = ['id'];
     protected $table = 'user';
     public $timestamps = false;
+    protected $hidden = [
+        'created_at'
+    ];
 }
