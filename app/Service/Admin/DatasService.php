@@ -39,7 +39,7 @@ class DatasService extends AdminBase
         //整理tree
        foreach($objList as $k=>$v)
        {
-           $list[$v["cateid"]]["second"][]=$v;
+           $list[$v["cateid"]]["_child"][]=$v;
        }
         sort($list);
         //结果检测
@@ -272,7 +272,7 @@ class DatasService extends AdminBase
         //整理tree
         foreach($objList as $k=>$v)
         {
-            $list[$v["cateid"]]["second"][]=$v;
+            $list[$v["cateid"]]["_child"][]=$v;
         }
         sort($list);
         //结果检测
@@ -295,7 +295,7 @@ class DatasService extends AdminBase
     public  function  getDefaultOne($cateid)
     {
         //redis缓存数据，无则执行数据库获取业务数据
-        // return Cache::get('datasList', function() {
+        // return Cache::get('datasDefaultList', function() {
 
         //检测cateid是否存在
         $cateExists=SelectCateDefault::where("id",$cateid)->exists();
@@ -312,7 +312,7 @@ class DatasService extends AdminBase
             responseData(\StatusCode::EMPTY_ERROR,"无结果");
         }
         //写入redis缓存
-        //    Cache::put('datasList',$list,config('configure.sCache'));
+        //    Cache::put('datasDefaultList',$list,config('configure.sCache'));
         //返回数据库层查询结果
         return $list;
         //    });

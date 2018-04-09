@@ -8,22 +8,20 @@
 
 namespace App\Model\User;
 use Illuminate\Database\Eloquent\Model;
-class UserToken extends Model
+class AdminToken extends Model
 {
     protected $primaryKey = 'id';
     protected $guarded = ['id'];
-    protected $table = 'user_token';
+    protected $table = 'admin_token';
     public $timestamps = true;
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      * 关联用户表
      */
-    public function tokenToUser()
+    public function tokenToAdminUser()
     {
-        return $this->belongsTo('App\Model\User\Users','userid','id');
+        return $this->belongsTo('App\Model\User\AdminUser','userid','id');
     }
-
-
 
 }

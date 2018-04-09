@@ -11,10 +11,11 @@
 |
 */
 
+//PC端
 $router->group(['prefix' => 'api/admin','namespace'=>'Admin'], function () use ($router)
 {
     $router->post('login', 'LoginController@login');//登陆
-    $router->group(['middleware' =>'token'], function () use ($router)
+    $router->group(['middleware' =>'admin_token'], function () use ($router)
     {
         //房源
         $router->post('house/create', 'HouseController@create');//发房下拉数据
@@ -79,8 +80,29 @@ $router->group(['prefix' => 'api/admin','namespace'=>'Admin'], function () use (
         $router->get('chart', 'ChartController@index');//客户分析----OK
 
 
-        //数据分析
-       $router->get('user', 'UserController@index');//客户分析----OK
+        //经纪人列表
+       $router->get('user', 'UserController@index');//经纪人列表----OK
 
     });
+});
+
+//手机端
+$router->group(['prefix' => 'api/home','namespace'=>'Home'], function () use ($router)
+{
+        $router->post('login', 'LoginController@login');//登陆
+        $router->group(['middleware' => 'user_token'], function () use ($router) {
+
+            //自定义属性管理
+        $router->get('datas', 'DatasController@index');//获取自定义所有属性列表----OK
+        $router->get('datas-one/{cateid}', 'DatasController@getOne');//获取单个属性列表----OK
+
+        //默认属性管理
+        $router->get('datas-default', 'DatasController@getDefault');//获取默认所有属性列表----OK
+        $router->get('datas-default-one/{cateid}', 'DatasController@getDefaultOne');//获取默认单个属性列表----OK
+
+        //配置
+        $router->get('conf', 'ConfController@index');//获取web手机端配置列表 ----OK
+
+        });
+
 });

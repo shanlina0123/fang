@@ -9,7 +9,7 @@
 namespace App\Http\Middleware;
 use App\Model\User\UserToken;
 use Closure;
-class CheckToken
+class CheckUserToken
 {
     public function handle($request, Closure $next)
     {

@@ -68,7 +68,8 @@ $app->singleton(
 // ]);
 
 $app->routeMiddleware([
-    'token' => App\Http\Middleware\CheckToken::class,
+    'admin_token' => App\Http\Middleware\CheckAdminToken::class,
+    'user_token' => App\Http\Middleware\CheckUserToken::class,
 ]);
 
 /*
