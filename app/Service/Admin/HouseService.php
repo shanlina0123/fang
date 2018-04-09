@@ -521,4 +521,24 @@ class HouseService extends AdminBase
             responseData(\StatusCode::ERROR,'编辑失败',$data);
         }
     }
+
+    /**
+     * @param $data
+     * 房源推荐
+     */
+    public function recommendHouse( $data )
+    {
+        $res =  House::where(['uuid'=>$data['uuid']])->first();
+        if( $res == false )
+        {
+            responseData(\StatusCode::ERROR,'未查询到数据');
+        }
+        $obj = new HouseHome();
+        $obj->cityid = $res->cityid;
+        $obj->houseid = $res->id;
+        if( $obj->save() ) {
+            return 'success';
+        }
+        responseData(\StatusCode::ERROR,'推荐失败');
+    }
 }

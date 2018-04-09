@@ -78,14 +78,15 @@ function responseData($status="",$messages="",$data="",$errorparam="")
     $res["status"] = $status;//请求结果的状态
     $res["messages"] = $messages;//请求结果的文字描述
     $res["data"] = $data;//返回的数据结果
-    if(!empty($errorparam))
+    /*if(!empty($errorparam))
     {
         if(!is_array($errorparam))
         {
             $errorparam=$errorparam->toArray();
         }
-    }
+    }*/
     $res["errorparam"]=$errorparam; //错误参数对应提示
+
     echo json_encode($res);die;
 }
 

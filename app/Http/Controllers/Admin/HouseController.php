@@ -210,4 +210,25 @@ class HouseController extends AdminBaseController
         $res = $this->house->updateHouse( $data );
         responseData(\StatusCode::SUCCESS,'编辑成功',$res);
     }
+
+    /**
+     * 房源推荐
+     */
+    public function recommend()
+    {
+        $data = trimValue( $this->request->all() );
+        //验证
+        $validator = Validator::make(
+            $data,[
+                'uuid'=>'required|min:32|max:32',
+            ]
+        );
+        if ($validator->fails())
+        {
+            $messages = $validator->errors()->first();
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
+        }
+        $res = $this->house->recommendHouse( $data );
+        responseData(\StatusCode::SUCCESS,'删除成功',$res);
+    }
 }

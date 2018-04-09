@@ -11,12 +11,12 @@
 |
 */
 
-//PC端
-$router->group(['prefix' => 'api/admin','namespace'=>'Admin'], function () use ($router)
-{
+/**
+ * 后台
+ */
+$router->group(['prefix' => 'api/admin', 'namespace' => 'Admin'], function () use ($router) {
     $router->post('login', 'LoginController@login');//登陆
-    $router->group(['middleware' =>'admin_token'], function () use ($router)
-    {
+    $router->group(['middleware' => 'admin_token'], function () use ($router) {
         //房源
         $router->post('house/create', 'HouseController@create');//发房下拉数据
         $router->post('house/store', 'HouseController@store');//发布房源
@@ -25,6 +25,7 @@ $router->group(['prefix' => 'api/admin','namespace'=>'Admin'], function () use (
         $router->post('house/img', 'HouseController@storeImg');//房源图片
         $router->get('house/edit/{uuid}', 'HouseController@edit');//房源信息
         $router->put('house/update/{uuid}', 'HouseController@update');//房源编辑
+        $router->post('house/recommend', 'HouseController@recommend');//房源推荐
         $router->delete('house/delete/{uuid}', 'HouseController@destroy');//房源删除
         $router->post('img/upload', 'PublicController@uploadImgToTemp');//图片上传到临时目录
         //公司
@@ -81,18 +82,22 @@ $router->group(['prefix' => 'api/admin','namespace'=>'Admin'], function () use (
 
 
         //经纪人列表
-       $router->get('user', 'UserController@index');//经纪人列表----OK
+        $router->get('user', 'UserController@index');//经纪人列表----OK
 
     });
 });
 
-//手机端
-$router->group(['prefix' => 'api/home','namespace'=>'Home'], function () use ($router)
-{
-        $router->post('login', 'LoginController@login');//登陆
-        $router->group(['middleware' => 'user_token'], function () use ($router) {
 
-            //自定义属性管理
+/**
+ * 前台手机端
+ */
+$router->group(['prefix' => 'api/home', 'namespace' => 'Home'], function () use ($router) {
+
+    $router->post('user/register', 'LoginOrRegisterController@register');//注册
+    $router->post('user/login', 'LoginOrRegisterController@login');//登陆
+
+    $router->group(['middleware' => 'user_token'], function () use ($router) {
+        //自定义属性管理
         $router->get('datas', 'DatasController@index');//获取自定义所有属性列表----OK
         $router->get('datas-one/{cateid}', 'DatasController@getOne');//获取单个属性列表----OK
 
@@ -103,6 +108,6 @@ $router->group(['prefix' => 'api/home','namespace'=>'Home'], function () use ($r
         //配置
         $router->get('conf', 'ConfController@index');//获取web手机端配置列表 ----OK
 
-        });
+    });
 
 });
