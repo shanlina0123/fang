@@ -25,7 +25,7 @@ class UsersService extends HomeBase
     public  function  index($userid)
     {
         //redis缓存数据，无则执行数据库获取业务数据
-        // return Cache::get('confList', function() {
+        // return Cache::get('webUserList', function() {
         //列表
         $list=Users::where("id",$userid)->select("nickname","economictid","mobile","faceimg")->orderBy('id','asc')->get();
         //结果检测
@@ -34,7 +34,7 @@ class UsersService extends HomeBase
             responseData(\StatusCode::EMPTY_ERROR,"无结果");
         }
         //写入redis缓存
-        //    Cache::put('confList',$list,config('configure.sCache'));
+        //    Cache::put('webUserList',$list,config('configure.sCache'));
         //返回数据库层查询结果
         return $list;
         //    });
