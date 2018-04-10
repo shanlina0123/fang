@@ -102,8 +102,9 @@ $router->group(['prefix' => 'api/home', 'namespace' => 'Home'], function () use 
     //首页
     $router->get('house/recommend', 'HouseController@recommend');//首页房源推荐
 
-    //房源列表
+    //房源
     $router->get('house/list', 'HouseController@index');//房源列表
+    $router->get('house/info/{id}', 'HouseController@info');//房源详情
 
     //登录后
     $router->group(['middleware' => 'user_token'], function () use ($router) {
