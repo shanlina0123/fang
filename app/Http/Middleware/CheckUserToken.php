@@ -14,11 +14,12 @@ class CheckUserToken
     public function handle($request, Closure $next)
     {
         $token = $request->header('Authorization');
-        $res = UserToken::where('token',$token)->with('tokenToAdminUser')->first();
+        $res = UserToken::where('token',$token)->with('tokenToUser')->first();
+
         if( $res )
         {
-            $user = $res->tokenToAdminUser;
-            $request->attributes->add(['admin_user'=>$user]);//添加参数
+            $user = $res->tokenToUser;
+            $request->attributes->add(['userinfo'=>$user]);//添加参数
             if( $res->expiration <= time() )
             {
                 responseData(\StatusCode::TOKEN_ERROR,"token失效");

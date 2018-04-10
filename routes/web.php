@@ -105,10 +105,6 @@ $router->group(['prefix' => 'api/home', 'namespace' => 'Home'], function () use 
     //房源列表
     $router->get('house/list', 'HouseController@index');//房源列表
 
-    $router->get('users', 'UsersController@index');//获取用户列表 ----OK
-    $router->post('users', 'UsersController@update');//修改用户信息 ----OK
-
-
     //登录后
     $router->group(['middleware' => 'user_token'], function () use ($router) {
         //自定义属性管理
@@ -123,8 +119,8 @@ $router->group(['prefix' => 'api/home', 'namespace' => 'Home'], function () use 
         $router->get('conf', 'ConfController@index');//获取web手机端配置列表 ----OK
 
         //个人中心
-//        $router->get('users', 'UsersController@index');//获取用户列表 ----OK
-//        $router->post('users', 'UsersController@update');//修改用户信息 ----OK
+        $router->get('users', 'UsersController@index');//获取用户列表 ----OK
+        $router->put('users-update', 'UsersController@update');//修改用户信息 ----OK
 
     });
 
