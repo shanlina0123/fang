@@ -33,8 +33,7 @@ class HouseService extends AdminBase
             'ishome' =>'numeric',
             'provinceid' =>'numeric',
             'cityid' =>'numeric',
-            'countryid' =>'numeric',
-            'streeid' =>'numeric',
+            'stree' =>'present',
             'addr' =>'required|string',
             'fulladdr' =>'required|string',
             'floorpostionid' =>'numeric',
@@ -110,8 +109,6 @@ class HouseService extends AdminBase
            'ishome.numeric'=>'是否推荐规则数值',
            'provinceid.numeric'=>'省规则数值',
            'cityid.numeric'=>'市规则数值',
-           'countryid.numeric'=>'区规则数值',
-           'streeid.numeric'=>'街道规则数值',
            'addr.required'=>'请填写地址',
            'fulladdr.required'=>'请填写详细地址',
            'floorpostionid.numeric'=>'楼层位置规则数值',
@@ -189,8 +186,6 @@ class HouseService extends AdminBase
             $arr['ishome'] = $data['name'];//是否推荐 1推荐 0不推荐
             $arr['provinceid'] = $data['provinceid'];
             $arr['cityid'] = $data['cityid'];
-            $arr['countryid'] = $data['countryid'];
-            $arr['streeid'] = $data['streeid'];
             $arr['street'] = $data['street'];//街道
             $arr['addr'] = $data['addr'];//地址
             $arr['fulladdr'] = $data['fulladdr'];//地址
@@ -208,6 +203,9 @@ class HouseService extends AdminBase
             $arr['propertyfee'] = $data['propertyfee'];//物业费
             $arr['typeid'] = (int)$data['typeid'];
             $arr['status'] = 0;
+            $arr['lng'] = $data['lng'];
+            $arr['lat'] = $data['lat'];
+            $arr['userid'] = 1;
             switch ( (int)$data['typeid'] )
             {
                 case 1:
@@ -410,8 +408,6 @@ class HouseService extends AdminBase
             $obj->ishome = $data['name'];//是否推荐 1推荐 0不推荐
             $obj->provinceid = $data['provinceid'];
             $obj->cityid = $data['cityid'];
-            $obj->countryid = $data['countryid'];
-            $obj->streeid = $data['streeid'];
             $obj->street = $data['street'];//街道
             $obj->addr = $data['addr'];//地址
             $obj->fulladdr = $data['fulladdr'];//地址
@@ -428,6 +424,8 @@ class HouseService extends AdminBase
             $obj->hasdoublegasid = $data['hasdoublegasid'];//双气
             $obj->propertyfee = $data['propertyfee'];//物业费
             $obj->status = $data['status'];
+            $obj->lng = $data['lng'];
+            $obj->lat = $data['lat'];
             switch ( (int)$data['typeid'] )
             {
                 case 1:
@@ -452,15 +450,21 @@ class HouseService extends AdminBase
                     break;
             }
             //修改标签
-            foreach ( $data['tagid'] as $row )
+            if( array_has($data,'tagid') )
             {
-                $arr[]['uuid'] = create_uuid();
-                $arr[]['tagid'] = $row;
-                $arr[]['houseid'] = $obj->id;
+                foreach ( $data['tagid'] as $k=>$row )
+                {
+                    $arr[$k]['uuid'] = create_uuid();
+                    $arr[$k]['tagid'] = $row;
+                    $arr[$k]['houseid'] = $obj->id;
+                    $arr[$k]['created_at'] = date('Y-m-d H:i:s');
+                    $arr[$k]['updated_at'] = date('Y-m-d H:i:s');
+                }
+                HouseTag::insert( $arr );
             }
-            HouseTag::insert( $arr );
+
             //删除标签
-            if(  $data['del_tagid'] )
+            if(  array_has($data,'del_tagid') &&  $data['del_tagid'] )
             {
                 if( is_array($data['del_tagid']) )
                 {
@@ -469,7 +473,7 @@ class HouseService extends AdminBase
             }
             //上传图片
             $upload = new \Upload();
-            if( is_array( $data['images'] ) )
+            if( array_has($data,'images') && is_array( $data['images'] ) )
             {
                 //上传
                 foreach ( $data['images'] as $row )
@@ -485,7 +489,7 @@ class HouseService extends AdminBase
                     }
                 }
             }
-            if( is_array( $data['del_images'] ) )
+            if( array_has($data,'del_images') &&  is_array( $data['del_images'] ) )
             {
                 //删除
                 foreach ( $data['del_images'] as $row )
@@ -498,7 +502,7 @@ class HouseService extends AdminBase
                 }
             }
             //上传封面
-            if( $data['covermap'] )
+            if(  array_has($data,'covermap') && $data['covermap'] )
             {
                 $covermap = $upload->uploadProductImage( $obj->id, $data['covermap'], 'house' );
                 if( $covermap )
@@ -507,7 +511,7 @@ class HouseService extends AdminBase
                 }
             }
             //删除封面
-            if( $data['del_covermap'] )
+            if( array_has($data,'del_covermap') && $data['del_covermap'] )
             {
                 $upload->delImg( $data['del_covermap'] );
             }

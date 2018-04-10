@@ -14,6 +14,7 @@
 /**
  * 后台
  */
+//$router->get('api-test','Admin\TestController@index');
 $router->group(['prefix' => 'api/admin', 'namespace' => 'Admin'], function () use ($router) {
     //登录前
     $router->post('login', 'LoginController@login');//登录
@@ -34,8 +35,8 @@ $router->group(['prefix' => 'api/admin', 'namespace' => 'Admin'], function () us
         $router->get('company/index', 'CompanyController@index');//公司列表
         $router->post('company/store', 'CompanyController@store');//添加公司
         $router->get('company/edit/{uuid}', 'CompanyController@edit');//公司修改信息
-        $router->post('company/update/{uuid}', 'CompanyController@update');//公司修改信息
-        $router->delete('company/delete/{uuid}', 'CompanyController@destroy');//公司修改信息
+        $router->put('company/update/{uuid}', 'CompanyController@update');//公司修改信息
+        $router->delete('company/delete/{uuid}', 'CompanyController@destroy');//公司删除
         $router->get('user/broker', 'UserController@broker');//经纪人
         //客户
         $router->get('client/index', 'ClientController@index');//客户列表
