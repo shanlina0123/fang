@@ -49,7 +49,7 @@ class ClientController extends AdminBaseController
         );
         if ($validator->fails())
         {
-            $messages = $validator->errors()->first();
+            $messages = ['uuid'=>'uuid不合法'];
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
         }
         $res = $this->client->destroyClient( $uuid, $this->request );
@@ -72,7 +72,7 @@ class ClientController extends AdminBaseController
         );
         if ($validator->fails())
         {
-            $messages = $validator->errors()->first();
+            $messages = ['uuid'=>'uuid不合法'];
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
         }
         $res = $this->client->editClient( $uuid, $this->request );
@@ -100,7 +100,7 @@ class ClientController extends AdminBaseController
         );
         if ($validator->fails())
         {
-            $messages = $validator->errors()->first();
+            $messages = $validator->errors();
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
         }
         $res = $this->client->updateClient( $data, $this->request );
@@ -122,7 +122,7 @@ class ClientController extends AdminBaseController
         );
         if ($validator->fails())
         {
-            $messages = $validator->errors()->first();
+            $messages = $validator->errors();
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
         }
         $res = $this->client->followEditInfo( $client, $this->request );
@@ -146,7 +146,7 @@ class ClientController extends AdminBaseController
         );
         if ($validator->fails())
         {
-            $messages = $validator->errors()->first();
+            $messages = $validator->errors();
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
         }
         $res = $this->client->followSave( $data, $this->request );
@@ -169,7 +169,7 @@ class ClientController extends AdminBaseController
         );
         if ($validator->fails())
         {
-            $messages = $validator->errors()->first();
+            $messages = $validator->errors();
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
         }
         $res = $this->client->transferSave( $data, $this->request );
