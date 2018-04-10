@@ -230,6 +230,7 @@ class HouseService extends AdminBase
                     break;
             }
             $res = House::insertGetId( $arr );
+            Cache::tags(['houseList','HomeHouseList'])->flush();
             return $res;
         }catch (Exception $e){
             responseData(\StatusCode::ERROR,'基本信息发布失败',$data);
@@ -291,6 +292,7 @@ class HouseService extends AdminBase
             $obj = HouseTag::insert( $arr );
             if( $obj )
             {
+                Cache::tags(['houseList','HomeHouseList','HomeRecommend','HomeInfo'])->flush();
                 return $request['houseid'];
             }else
             {
@@ -334,6 +336,7 @@ class HouseService extends AdminBase
                 $obj->save();
             }
             DB::commit();
+            Cache::tags(['houseList','HomeHouseList','HomeRecommend','HomeInfo'])->flush();
             return 'success';
         }catch (Exception $e){
             DB::rollBack();
@@ -380,6 +383,7 @@ class HouseService extends AdminBase
                 responseData(\StatusCode::ERROR,'未查询到数据');
             }
             DB::commit();
+            Cache::tags(['houseList','HomeHouseList','HomeRecommend'])->flush();
             //删除图片
             (new \Upload())->delDir('house',$houseID);
             return 'success';
@@ -518,6 +522,7 @@ class HouseService extends AdminBase
             //修改房源信息
             $obj->save();
             DB::commit();
+            Cache::tags(['houseList','HomeHouseList','HomeRecommend','HomeInfo'])->flush();
             return "success";
         }catch (Exception $e)
         {
@@ -540,7 +545,9 @@ class HouseService extends AdminBase
         $obj = new HouseHome();
         $obj->cityid = $res->cityid;
         $obj->houseid = $res->id;
-        if( $obj->save() ) {
+        if( $obj->save() )
+        {
+            Cache::tags(['houseList','HomeHouseList','HomeRecommend'])->flush();
             return 'success';
         }
         responseData(\StatusCode::ERROR,'推荐失败');
