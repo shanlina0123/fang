@@ -19,6 +19,7 @@ class AdminBase
      * Cache::tags(['clientList'])->flush(); 客户列表
      * Cache::tags(['companyList'])->flush(); 公司列表
      * Cache::forget('getSelect') //房源数据
+     * Cache::forget('getAddress') //省市
      * Cache::tags(['houseList'])->flush();房列表
      *
      * //前台

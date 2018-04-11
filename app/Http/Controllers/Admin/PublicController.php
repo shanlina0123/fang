@@ -9,6 +9,7 @@
 namespace App\Http\Controllers\Admin;
 use App\Model\Data\Province;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class PublicController extends AdminBaseController
 {
@@ -37,17 +38,23 @@ class PublicController extends AdminBaseController
      */
     public function getAddress()
     {
-        $arr = array();
-        $res = Province::where('status',1)->with('ProvinceToCity')->get();
-        foreach ( $res as $row )
+        if ( Cache::has('getAddress') )
         {
-            $defaultObject = new \stdClass();
-            $defaultObject->id = $row->id;
-            $defaultObject->name = $row->name;
-            $defaultObject->city = $row->ProvinceToCity()->where(['provinceid'=>$row->id,'status'=>1])->select('id','name','provinceid')->get();
-            $arr[] = $defaultObject;
+            $arr = Cache::get('getAddress');
+        }else
+        {
+            $arr = array();
+            $res = Province::where('status',1)->with('ProvinceToCity')->get();
+            foreach ( $res as $row )
+            {
+                $defaultObject = new \stdClass();
+                $defaultObject->id = $row->id;
+                $defaultObject->name = $row->name;
+                $defaultObject->city = $row->ProvinceToCity()->where(['provinceid'=>$row->id,'status'=>1])->select('id','name','provinceid')->get();
+                $arr[] = $defaultObject;
+            }
+            Cache::put('getAddress',$arr,config('configure.sCache'));
         }
-
         responseData(\StatusCode::SUCCESS,'省市信息',$arr);
     }
 }

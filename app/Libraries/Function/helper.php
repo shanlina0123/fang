@@ -67,6 +67,22 @@ function trimValue( $data )
 
 
 /**
+ * @return array
+ * 获取控制器和方法
+ */
+function getControllerOrFunctionName()
+{
+    $route = app('request')->route();
+    if( !empty($route[1]['uses']) )
+    {
+        $action = $route[1]['uses'];
+        list($class, $method) = explode('@', $action);
+        $class = substr(strrchr($class,'\\'),1);
+        return ['controller' => $class, 'method' => $method];
+    }
+}
+
+/**
  * 返回信息
   * 调用
  *  if ($validator->fails()) {
@@ -85,8 +101,10 @@ function responseData($status="",$messages="",$data="",$errorparam="")
             $errorparam=$errorparam->toArray();
         }
     }*/
-    $res["errorparam"]=$errorparam; //错误参数对应提示
-
+    if( $errorparam )
+    {
+        $res["errorparam"]=$errorparam; //错误参数对应提示
+    }
     echo json_encode($res);die;
 }
 
