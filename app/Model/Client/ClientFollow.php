@@ -13,8 +13,17 @@ class ClientFollow extends Model
     protected $primaryKey = 'id';
     protected $guarded = ['id'];
     protected $table = 'client_follow';
-    public $timestamps = false;
+    public $timestamps = true;
     protected $hidden = [
         'created_at','updated_at'
     ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * 关联跟进人
+     */
+    public function followToAdminUser()
+    {
+        return $this->belongsTo('App\Model\User\AdminUser','adminid','id');
+    }
 }

@@ -210,10 +210,20 @@ class ClientService extends AdminBase
             $where['uuid'] = $client;
             $where['ownadminid'] = $admin_user->id;
         }
-        $obj = ClientFollow::orderBy('id','desc')->get();
+        $obj = ClientFollow::orderBy('id','desc')->with('followToAdminUser')->get();
         if( $obj )
         {
-            return $obj;
+            $arr = array();
+            foreach ( $obj as $row )
+            {
+                $rowObj = new \stdClass();
+                $rowObj->followstatusid = $row->followstatusid;
+                $rowObj->content = $row->content;
+                $rowObj->time = $row->created_at?date_format($row->created_at,date("Y-m-d")):'';
+                $rowObj->username = $row->followToAdminUser?$row->followToAdminUser->nickname:'';
+                $arr[] = $rowObj;
+            }
+            return $arr;
 
         }else
         {
@@ -237,12 +247,13 @@ class ClientService extends AdminBase
             $obj->clientid = $data['clientid'];
             $obj->followstatusid = $data['followstatusid'];
             $obj->content = $data['content'];
-            $obj->userid = $request->get('admin_user')->id;
+            $obj->adminid = $request->get('admin_user')->id;
             $obj->save();
             $dynamic = ClientDynamic::where('clientid',$data['clientid'])->first();
             $dynamic->followstatusid = $data['followstatusid'];
             $dynamic->followcount = $dynamic->followcount+1;
             $dynamic->followdate = date('Y-m-d H:i:s');
+            $dynamic->save();
             DB::commit();
             Cache::tags(['clientList'])->flush();
             return 'success';
@@ -263,22 +274,22 @@ class ClientService extends AdminBase
             $res = ClientDynamic::whereIn('uuid',$data['uuid'])->get();
             $dispatch = array();
             $transfer = array();
-            foreach ( $res as $row )
+            foreach ( $res as $key=>$row )
             {
                 //派单记录
-                $dispatch[]['uuid'] = create_uuid();
-                $dispatch[]['clientid'] = $row->clientid;
-                $dispatch[]['type'] = 3;
-                $dispatch[]['remark'] = '移交派单';
-                $dispatch[]['userid'] = $data['accept'];
-                $dispatch[]['created_at'] = date('Y-m-d H:i:s');
+                $dispatch[$key]['uuid'] = create_uuid();
+                $dispatch[$key]['clientid'] = $row->clientid;
+                $dispatch[$key]['type'] = 3;
+                $dispatch[$key]['remark'] = '移交派单';
+                $dispatch[$key]['adminid'] = $data['accept'];
+                $dispatch[$key]['created_at'] = date('Y-m-d H:i:s');
                 //移交记录
-                $transfer[]['uuid'] = create_uuid();
-                $transfer[]['clientid'] = $row->clientid;
-                $transfer[]['beforeownadminid'] = $row->ownuserid;
-                $transfer[]['afterownadminid'] = $data['transfer'];
-                $transfer[]['remark'] = '客户移交';
-                $transfer[]['created_at'] = date('Y-m-d H:i:s');
+                $transfer[$key]['uuid'] = create_uuid();
+                $transfer[$key]['clientid'] = $row->clientid;
+                $transfer[$key]['beforeownadminid'] = $data['transfer'];
+                $transfer[$key]['afterownadminid'] = $data['accept'];
+                $transfer[$key]['remark'] = '客户移交';
+                $transfer[$key]['created_at'] = date('Y-m-d H:i:s');
             }
             //写入派单记录
             ClientDispatch::insert($dispatch);
