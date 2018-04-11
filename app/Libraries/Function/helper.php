@@ -153,83 +153,6 @@ function i_array_column($input, $columnKey, $indexKey=null){
     return $tmpArray;
 }
 
-/***
- * 数组转为tree,最大支持3级 --- 此方法待完善
- * @param array $arrList 二维数组
- * @param $index 判定字段
- * @param $relation_key 关联主键id
- * @param $relation_parent 关联父类字段
- * @param int $deep 级别 最大不能超过3
- * @return array
- *例如：$arrList的值如下
- * Array
-(
-    [0] => Array ([id] => 1   [name] => 系统设置 [pid] => 0  [level] => 1  )
-    [1] => Array([id] => 100  [name] => 用户    [pid] => 1  [level] => 2 )
-   [2] => Array([id] => 101  [name] => 列表    [pid] => 100 [level] => 3 )
- ）
- * 调用   row_to_tree($arrList,"level","id","pid",3); 获取3级联动的一组数组
- * 结果 [1]->["second"][]->["third"][]
- */
-function row_to_tree($arrList=array(),$index,$relation_key,$relation_parent,$deep=3)
-{
-
-    if(empty($arrList))
-    {
-        return [];
-    }
-
-    if($deep>3)
-    {
-        return [];
-    }
-
-    //返回一级
-    if($deep==1)
-    {
-        foreach ($arrList as $k => $v) {
-                $level[$v[$relation_parent]][] = $v;
-        }
-    }
-
-    ///预定义一级值
-    if($deep>1)
-    {
-        foreach ($arrList as $k => $v) {
-            if ($v[$index] == 1) {
-                $level[$v[$relation_key]] = $v;
-            }
-        }
-    }
-
-    //预定义三级值
-    if($deep==3)
-    {
-        foreach ($arrList as $k => $v) {
-            if ($v[$index] == 3) {
-                $level3[$v[$relation_parent]][] = $v;
-            }
-        }
-    }
-    if($deep>=2)
-    {
-        foreach ($arrList as $k => $v) {
-            if ($v[$index] == 2) {
-                //返回的一级+二级
-                $level[$v[$relation_parent]]["second"][$v[$relation_key]] = $v;
-                if($deep==3)
-                {
-                    //返回的一级+二级+三级
-                    $level[$v[$relation_parent]]["second"][$v[$relation_key]]["third"] = $level3[$v[$relation_key]];
-                }
-            }
-        }
-    }
-
-    return $level;
-
-}
-
 /**
  * 发送HTTP请求方法
  * @param  string $url    请求URL
@@ -301,7 +224,27 @@ function checkStringIsBase64($str){
     return $str == base64_encode(base64_decode($str)) ? true : false;
 }
 
-
+/***
+ * 二位数组转为 一对多tree
+ * @param $list
+ * @param string $pk
+ * @param string $pid
+ * @param string $child
+ * @param int $root
+ * @return array
+ */
+function array_to_parent($list,$pid = 'pid') {
+    // 创建Tree
+    $tree = array();
+    if(is_array($list)) {
+        // 创建基于主键的数组引用
+        $refer = array();
+        foreach ($list as $key => $data) {
+            $refer[$data[$pid]][] =& $list[$key];
+        }
+    }
+    return $refer;
+}
 
 
 /**
@@ -320,6 +263,7 @@ function list_to_tree($list, $pk='id', $pid = 'pid', $child = '_child', $root = 
         foreach ($list as $key => $data) {
             $refer[$data[$pk]] =& $list[$key];
         }
+
         foreach ($list as $key => $data) {
             // 判断是否存在parent
             $parentId =  $data[$pid];

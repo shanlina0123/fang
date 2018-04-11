@@ -17,27 +17,21 @@ class ChartService extends AdminBase
 {
 
     /***
-     * 获取角色列表
+     * 获取客户数据分析列表
      * @return mixed
      */
     public  function  index()
     {
-        //redis缓存数据，无则执行数据库获取业务数据
-       // return Cache::get('chartList', function() {
             //默认条件
-            $list=ClientDynamic::with("dynamicToClient")->orderBy('id','asc')->paginate(config('configure.sPage'));
+            $list=ClientDynamic::with("dynamicToClient")->select("clientid","followstatusid","companyid","refereeuserid","ownuserid","housename","commissionid","makedate","comedate","dealdate")->orderBy('created_at','desc')->paginate(config('configure.sPage'));
             //结果检测
             if(empty($list))
             {
                 responseData(\StatusCode::EMPTY_ERROR,"无结果");
             }
-            //写入redis缓存
-        //    Cache::put('chartList',$list,config('configure.sCache'));
             //返回数据库层查询结果
             return $list;
-    //    });
+
     }
-
-
 
 }

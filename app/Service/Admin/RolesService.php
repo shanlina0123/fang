@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Log;
 
 class RolesService extends AdminBase
 {
-
     /***
      * 获取角色列表
      * @return mixed
@@ -24,19 +23,19 @@ class RolesService extends AdminBase
     public  function  index()
     {
         //redis缓存数据，无则执行数据库获取业务数据
-       // return Cache::get('roleList', function() {
+        return Cache::get('roleList', function() {
             //默认条件
-            $list=Role::orderBy('id','asc')->get();
+            $list=Role::select("uuid","name","status","isdeafult","created_at")->orderBy('id','asc')->get();
             //结果检测
             if(empty($list))
             {
                 responseData(\StatusCode::EMPTY_ERROR,"无结果");
             }
             //写入redis缓存
-        //    Cache::put('roleList',$list,config('configure.sCache'));
+           Cache::put('roleList',$list,config('configure.sCache'));
             //返回数据库层查询结果
             return $list;
-    //    });
+      });
     }
 
     /***
@@ -48,10 +47,10 @@ class RolesService extends AdminBase
     {
         try{
             //获取详情数据
-            $row = Role::where("uuid",$uuid)->first();
+            $row = Role::where("uuid",$uuid)->select("uuid","name","status","isdeafult","created_at")->first();
             if(empty($row))
             {
-                responseData(\StatusCode::EMPTY_ERROR,"请求数据不存在");
+                responseData(\StatusCode::NOT_EXIST_ERROR,"请求数据不存在");
             }
         }catch (\ErrorException $e)
         {
@@ -95,6 +94,8 @@ class RolesService extends AdminBase
             if($rs->id!==false)
             {
                 DB::commit();
+                //删除缓存
+                Cache::forget('roleList');
             }else{
                 DB::rollBack();
                 responseData(\StatusCode::DB_ERROR,"新增失败");
@@ -124,7 +125,7 @@ class RolesService extends AdminBase
             $roleData=Role::where("uuid",$uuid)->first();
             if(empty($roleData))
             {
-                responseData(\StatusCode::EXIST_ERROR,"请求数据不存在");
+                responseData(\StatusCode::NOT_EXIST_ERROR,"请求数据不存在");
             }
 
             //检测name是否存在
@@ -148,6 +149,8 @@ class RolesService extends AdminBase
             if($rs!==false)
             {
                 DB::commit();
+                //删除缓存
+                Cache::forget('roleList');
             }else{
                 DB::rollBack();
                 responseData(\StatusCode::DB_ERROR,"修改失败");
@@ -174,7 +177,7 @@ class RolesService extends AdminBase
             $row=Role::where("uuid",$uuid)->first();
             if(empty($row))
             {
-                responseData(\StatusCode::EXIST_ERROR,"请求数据不存在");
+                responseData(\StatusCode::NOT_EXIST_ERROR,"请求数据不存在");
             }
 
             //角色
@@ -198,6 +201,8 @@ class RolesService extends AdminBase
             if($rs!==false)
             {
                 DB::commit();
+                //删除缓存
+                Cache::forget('roleList');
             }else{
                 DB::rollBack();
                 responseData(\StatusCode::DB_ERROR,"删除失败");

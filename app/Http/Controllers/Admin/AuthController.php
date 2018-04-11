@@ -89,7 +89,7 @@ class AuthController extends AdminBaseController
         //获取业务数据
         $this->auth_service->update($role_uuid,$data);
         //接口返回结果
-        responseData(\StatusCode::SUCCESS,"设置成功");
+        responseData(\StatusCode::SUCCESS,"勾选成功");
     }
 
 

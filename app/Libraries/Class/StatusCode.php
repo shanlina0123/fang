@@ -16,7 +16,7 @@ class StatusCode
     const SUCCESS=1;//成功
     const PUBLIC_STATUS= 1;//1成功
     const ERROR=0;//失败
-    const PARAM_ERROR=2;
+    const PARAM_ERROR=2;//参数错误
     const DB_ERROR=3;//数据库错误失败
     const EMPTY_ERROR=4;//空数据
     const TOKEN_ERROR=5;//token错误

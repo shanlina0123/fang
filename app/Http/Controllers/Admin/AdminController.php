@@ -68,17 +68,15 @@ class AdminController extends AdminBaseController
     public  function  store()
     {
         //获取请求参数
-        $data=$this->getData(["uuid","nickname","name","mobile","password","roleid"],$this->request->all());
+        $data=$this->getData(["nickname","name","mobile","password","roleid"],$this->request->all());
         //验证规则
         $validator = Validator::make($data,[
-            'uuid' => 'required|max:32|min:32',
             "nickname"=>'required|max:100|min:1',
             "name"=>'required|max:100|min:1',
             "mobile"=>'required|max:11|min:11',
             'password' => 'required',
             'roleid' => 'required|numeric',
-        ],['uuid.required'=>'参数错误','uuid.max'=>'参数错误','uuid.min'=>'参数错误',
-            'nickname.required'=>'姓名不能为空','nickname.max'=>'姓名长度不能大于100个字符','nickname.min'=>'姓名长度不能小于1个字符',
+        ],['nickname.required'=>'姓名不能为空','nickname.max'=>'姓名长度不能大于100个字符','nickname.min'=>'姓名长度不能小于1个字符',
             'name.required'=>'账号不能为空','name.max'=>'账号长度不能大于100个字符','name.min'=>'账号长度不能小于1个字符',
             'mobile.required'=>'手机号不能为空','mobile.max'=>'手机号不能大于11位字符','mobile.min'=>'手机号不能少于11位字符',
             'password.required'=>'密码不能为空',
@@ -97,7 +95,7 @@ class AdminController extends AdminBaseController
        //密码长度验证
         if(strlen($data["password"])<6 || strlen($data["password"])>18)
         {
-            responseData(\StatusCode::PARAM_ERROR,"密码格式错误","",["password"=>["密码格式6到18位字符之间"]]);
+            responseData(\StatusCode::PARAM_ERROR,"验证失败","",["password"=>["密码格式6到18位字符之间"]]);
         }
 
         //执行业务处理
@@ -114,20 +112,18 @@ class AdminController extends AdminBaseController
     public  function  update($uuid)
     {
         //获取请求参数
-        $data=$this->getData(["nickname","name","mobile","password","roleid"],$this->request->all());
+        $data=$this->getData(["name","mobile","password","roleid"],$this->request->all());
         //拼接验证数据集
         $validateData=array_merge(["uuid"=>$uuid],$data);
 
         //定义验证规则
         $validator = Validator::make($validateData,[
             'uuid' => 'required|max:32|min:32',
-            "nickname"=>'required|max:100|min:1',
             "name"=>'required|max:100|min:1',
             "mobile"=>'required|max:11|min:11',
             'password' => 'required',
             'roleid' => 'required|numeric',
         ],['uuid.required'=>'参数错误','uuid.max'=>'参数错误','uuid.min'=>'参数错误',
-            'nickname.required'=>'姓名不能为空','nickname.max'=>'姓名长度不能大于100个字符','nickname.min'=>'姓名长度不能小于1个字符',
             'name.required'=>'账号不能为空','name.max'=>'账号长度不能大于100个字符','name.min'=>'账号长度不能小于1个字符',
             'mobile.required'=>'手机号不能为空','mobile.max'=>'手机号不能大于11位字符','mobile.min'=>'手机号不能少于11位字符',
             'password.required'=>'密码不能为空',

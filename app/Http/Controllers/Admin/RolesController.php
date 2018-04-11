@@ -65,13 +65,11 @@ class RolesController extends AdminBaseController
     public  function  store()
     {
         //获取请求参数
-        $data=$this->getData(["uuid","name"],$this->request->all());
+        $data=$this->getData(["name"],$this->request->all());
         //验证规则
         $validator = Validator::make($data,[
-            'uuid' => 'required|max:32|min:32',
             "name"=>'required|max:100|min:1',
-        ],['uuid.required'=>'参数错误','uuid.max'=>'参数错误','uuid.min'=>'参数错误',
-            'name.required'=>'名称不能为空','name.max'=>'名称长度不能大于100个字符','name.min'=>'名称长度不能小于1个字符']);
+        ],['name.required'=>'名称不能为空','name.max'=>'名称长度不能大于100个字符','name.min'=>'名称长度不能小于1个字符']);
         //进行验证
         if ($validator->fails()) {
             responseData(\StatusCode::PARAM_ERROR,"验证失败","",$validator->errors());
