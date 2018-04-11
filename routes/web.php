@@ -75,7 +75,7 @@ $router->group(['prefix' => 'api/admin', 'namespace' => 'Admin'], function () us
         $router->get('datas-default', 'DatasController@getDefault');//获取默认所有属性列表----OK
         $router->get('datas-default-one/{cateid}', 'DatasController@getDefaultOne');//获取默认单个属性列表----OK
         //数据分析
-        $router->get('chart', 'ChartController@index');//客户分析----OK
+        $router->post('chart', 'ChartController@index');//客户分析----OK
         $router->get('user', 'UserController@index');//前端经纪人/业务员列表----OK
 
     });
@@ -115,6 +115,12 @@ $router->group(['prefix' => 'api/home', 'namespace' => 'Home'], function () use 
         //个人中心
         $router->get('users', 'UsersController@index');//获取用户列表 ----OK
         $router->put('users-update', 'UsersController@update');//修改用户信息 ----OK
+
+        //推荐客户
+        $router->post('client', 'ClientController@index');//我的推荐客户列表
+        $router->post('client-houseData', 'ClientController@houseData');//推荐客户的房源下拉框内容
+        $router->get('client-statistics', 'ClientController@statistics');//我的推荐客户量统计
+        $router->post('client-refree', 'ClientController@store');//推荐客户
 
     });
 

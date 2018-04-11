@@ -144,7 +144,7 @@ class DatasService extends HomeBase
     public function getDefaultOne($cateid)
     {
         //redis缓存数据，无则执行数据库获取业务数据
-        return Cache::get('webDatasDefaultList', function ($cateid) {
+        return Cache::get('webDatasDefaultList', function ()  use ($cateid){
 
             //检测cateid是否存在
             $cateExists = SelectCateDefault::where("id", $cateid)->exists();

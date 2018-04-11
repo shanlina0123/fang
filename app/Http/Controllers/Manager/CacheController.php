@@ -24,11 +24,17 @@ class CacheController extends Controller
          Cache::forget("confList");
     }
 
-
-    public function  homeCache()
+    /***
+     * 业务处理更新缓存
+     */
+    public function  serviceForgetCache()
     {
         //@舒全刚 看下Admin/UserServie/getList
         //经纪人注册后->需更新缓存
         //经纪人修改找好->需更新缓存
+
+
+        //后台跟进客户、推荐客户
+        Cache::tags(["clientRefereeChart"])->flush();
     }
 }

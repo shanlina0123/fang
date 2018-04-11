@@ -321,3 +321,14 @@ function tree_to_list($tree, $child = '_child', $order='id', &$list = array()){
     }
     return $list;
 }
+
+/***
+ * 拼接字符串
+ * @return string
+ */
+function mosaic($segmentation="")
+{
+    $params=func_get_args();
+    unset($params[0]);
+    return implode($segmentation,$params);
+}

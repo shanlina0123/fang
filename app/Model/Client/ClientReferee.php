@@ -14,4 +14,17 @@ class ClientReferee extends Model
     protected $guarded = ['id'];
     protected $table = 'client_referee';
     public $timestamps = false;
+
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * 关联用户表
+     */
+    public function refereeToClientDynamic()
+    {
+        return $this->belongsTo('App\Model\Client\ClientDynamic','clientid','clientid');
+
+    }
+
+
 }

@@ -15,8 +15,6 @@ class CheckUserToken
     {
         $token = $request->header('Authorization');
         $res = UserToken::where('token',$token)->with('tokenToUser')->first();
-
-        print_r($request->method());die;
         if( $res )
         {
             $user = $res->tokenToUser;
