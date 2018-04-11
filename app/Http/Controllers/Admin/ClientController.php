@@ -76,7 +76,7 @@ class ClientController extends AdminBaseController
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
         }
         $res = $this->client->editClient( $uuid, $this->request );
-        responseData(\StatusCode::SUCCESS,'删除成功',$res);
+        responseData(\StatusCode::SUCCESS,'客户信息',$res);
     }
 
     /**
@@ -171,6 +171,10 @@ class ClientController extends AdminBaseController
         {
             $messages = $validator->errors();
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
+        }
+        if ( $data['accept'] == $data['transfer'] )
+        {
+            responseData(\StatusCode::ERROR,'接收人不能和移交人相同');
         }
         $res = $this->client->transferSave( $data, $this->request );
         responseData(\StatusCode::SUCCESS,'移交成功',$res);

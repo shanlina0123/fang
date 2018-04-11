@@ -41,4 +41,13 @@ class ClientDynamic extends Model
     {
         return $this->belongsTo('App\Model\User\Users','refereeuserid','id');
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * 关联跟进人
+     */
+    public function dynamicToAdminUser()
+    {
+        return $this->belongsTo('App\Model\User\AdminUser','followadminid','id');
+    }
 }
