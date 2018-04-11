@@ -61,7 +61,7 @@ class AuthService extends AdminBase
             //获取详情数据
             $objList = RoleFunction::where("roleid", $roleid)->select("functionid")->get();
             if (empty($objList)) {
-                responseData(\StatusCode::NOT_EXIST_ERROR, "您未设置权限");
+                responseData(\StatusCode::NOT_EXIST_ERROR, "角色未设置权限");
             }
             //对象转数组
             $arrList = $objList->toArray();

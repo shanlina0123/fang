@@ -7,9 +7,9 @@
  * @return string
  * 加密
  */
-function optimizedSaltPwd($password,  $saltGain = 1)
+function optimizedSaltPwd($type="home",$password,  $saltGain = 1)
 {
-    $salt = config('app.salt');
+    $salt = config('app.salt.'.$type);
     // 过滤参数
     if(!is_numeric($saltGain)) exit;
     if(intval($saltGain) < 0 || intval($saltGain) > 35) exit;
@@ -72,13 +72,15 @@ function trimValue( $data )
  */
 function getControllerOrFunctionName()
 {
-    $route = app('request')->route();
+    $request=app("request");
+    $route = $request->route();
+    $method= strtoupper($request->method());
     if( !empty($route[1]['uses']) )
     {
         $action = $route[1]['uses'];
-        list($class, $method) = explode('@', $action);
-        $class = substr(strrchr($class,'\\'),1);
-        return ['controller' => $class, 'method' => $method];
+        list($controller, $action) = explode('@', $action);
+        $controller = substr(strrchr($controller,'\\'),1);
+        return ['controller' => $controller, 'action' => $action,"method"=>$method];
     }
 }
 

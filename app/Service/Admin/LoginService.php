@@ -36,7 +36,7 @@ class LoginService extends AdminBase
         {
             $where['name'] = $data['name'];
         }
-        $where['password'] = optimizedSaltPwd(base64_decode($data['password']));
+        $where['password'] = optimizedSaltPwd("admin",base64_decode($data['password']));
         $user = AdminUser::where( $where )->select('id','uuid','name','isadmin','mobile','status')->first();
         if( $user == false )
         {

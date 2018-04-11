@@ -20,6 +20,7 @@ $router->group(['prefix' => 'api/admin', 'namespace' => 'Admin'], function () us
     //登录前
     $router->post('login', 'LoginController@login');//登录
     $router->get('get/poc', 'PublicController@getAddress');//省市数据
+    $router->get('menu', 'PublicController@getMenu');//获取菜单数据
     //登录后
     $router->group(['middleware' => 'admin_token'], function () use ($router) {
         //房源
