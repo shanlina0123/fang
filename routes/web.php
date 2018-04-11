@@ -14,7 +14,7 @@
 /**
  * 后台
  */
-//$router->get('api-test','Admin\TestController@index');
+$router->get('api-test','Admin\TestController@index');
 $router->group(['prefix' => 'api/admin', 'namespace' => 'Admin'], function () use ($router) {
     //登录前
     $router->post('login', 'LoginController@login');//登录
