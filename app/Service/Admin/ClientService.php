@@ -37,13 +37,13 @@ class ClientService extends AdminBase
             //管理员
             if(  $admin_user->isadmin == 1 )
             {
-                if( $request->input('ownuserid') )
+                if( $request->input('ownadminid') )
                 {
-                    $sql->where('ownuserid',$request->input('ownuserid'));
+                    $sql->where('ownadminid',$request->input('ownuserid'));
                 }
             }else
             {
-                $sql->where('ownuserid', $admin_user->id);
+                $sql->where('ownadminid', $admin_user->id);
             }
             //客户跟进状态
             if( $request->input('followstatusid') )
@@ -80,7 +80,7 @@ class ClientService extends AdminBase
             }else
             {
                 $where['uuid'] = $uuid;
-                $where['ownuserid'] = $admin_user->id;
+                $where['ownadminid'] = $admin_user->id;
             }
             $res = ClientDynamic::where($where)->first();
             if( $res )
@@ -122,7 +122,7 @@ class ClientService extends AdminBase
         }else
         {
             $where['uuid'] = $uuid;
-            $where['ownuserid'] = $admin_user->id;
+            $where['ownadminid'] = $admin_user->id;
         }
         $res = ClientDynamic::orderBy('id','desc')->with('dynamicToClient')->first();
         if( $res )
@@ -143,8 +143,8 @@ class ClientService extends AdminBase
             {
                 $obj->company = $res->dynamicToClient?$res->dynamicToClient->remark:'';
             }
-            $obj->refereeusername = $res->dynamicToUser?$res->dynamicToUser->nickname:'';
-            $obj->followname = $res->dynamicToClient?$res->dynamicToClient->name:'';
+            $obj->refereeusername = $res->dynamicToUser?$res->dynamicToUser->nickname:'';//经纪人
+            $obj->followname = $res->dynamicToAdminUser?$res->dynamicToAdminUser->nickname:'';//跟进人名称
             $obj->followcount = $res->followcount;
             $obj->followdate = $res->followdate;
             $obj->dealdate = $res->dealdate;
@@ -170,7 +170,7 @@ class ClientService extends AdminBase
         }else
         {
             $where['uuid'] = $data['uuid'];
-            $where['ownuserid'] = $admin_user->id;
+            $where['ownadminid'] = $admin_user->id;
         }
         $obj = ClientDynamic::orderBy('id','desc')->with('dynamicToClient')->first();
         if( $obj )
@@ -208,7 +208,7 @@ class ClientService extends AdminBase
         }else
         {
             $where['uuid'] = $client;
-            $where['ownuserid'] = $admin_user->id;
+            $where['ownadminid'] = $admin_user->id;
         }
         $obj = ClientFollow::orderBy('id','desc')->get();
         if( $obj )
@@ -275,8 +275,8 @@ class ClientService extends AdminBase
                 //移交记录
                 $transfer[]['uuid'] = create_uuid();
                 $transfer[]['clientid'] = $row->clientid;
-                $transfer[]['beforeownuserid'] = $row->ownuserid;
-                $transfer[]['afterownuserid'] = $data['transfer'];
+                $transfer[]['beforeownadminid'] = $row->ownuserid;
+                $transfer[]['afterownadminid'] = $data['transfer'];
                 $transfer[]['remark'] = '客户移交';
                 $transfer[]['created_at'] = date('Y-m-d H:i:s');
             }
@@ -285,7 +285,7 @@ class ClientService extends AdminBase
             //写入移交记录
             ClientTransfer::insert($transfer);
             //修改客户表
-            ClientDynamic::whereIn('uuid',$data['uuid'])->update(['ownuserid'=>$data['accept']]);
+            ClientDynamic::whereIn('uuid',$data['uuid'])->update(['ownadminid'=>$data['accept']]);
             DB::commit();
             //清除缓存
             Cache::tags(['clientList'])->flush();
