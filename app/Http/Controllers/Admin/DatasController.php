@@ -72,7 +72,7 @@ class DatasController extends AdminBaseController
 
         //进行验证
         if ($validator->fails()) {
-             responseData(\StatusCode::PARAM_ERROR,"参数错误");
+             responseData(\StatusCode::PARAM_ERROR,"验证失败");
         }
         //获取业务数据
         $data=$this->datas_service->edit($uuid);
@@ -87,14 +87,12 @@ class DatasController extends AdminBaseController
     public  function  store()
     {
         //获取请求参数
-        $data=$this->getData(["uuid","cateid","name"],$this->request->all());
+        $data=$this->getData(["cateid","name"],$this->request->all());
         //验证规则
         $validator = Validator::make($data,[
-            'uuid' => 'required|max:32|min:32',
             'cateid' => 'required|numeric',
             "name"=>'required|max:100|min:1',
-        ],['uuid.required'=>'参数错误','uuid.max'=>'参数错误','uuid.min'=>'参数错误',
-            'cateid.required'=>'参数cateid错误','cateid.numeric'=>'参数cateid格式必须int',
+        ],['cateid.required'=>'参数cateid错误','cateid.numeric'=>'参数cateid格式必须int',
             'name.required'=>'名称不能为空','name.max'=>'名称长度不能大于100个字符','name.min'=>'名称长度不能小于1个字符']);
         //进行验证
         if ($validator->fails()) {

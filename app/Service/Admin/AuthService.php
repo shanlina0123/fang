@@ -26,21 +26,20 @@ class AuthService extends AdminBase
     public function index()
     {
         //redis缓存数据，无则执行数据库获取业务数据
-        //return Cache::get('roleFunctionList', function() {
-        //默认条件
-        $objList = Functions::select("id", "name", "pid", "level")->orderBy('sort', 'asc')->get();
-        //结果检测
-        if (empty($objList)) {
-            responseData(\StatusCode::EMPTY_ERROR, "无结果");
-        }
-        //生成tree数组
-        $list = row_to_tree($objList->toArray(), "level", "id", "pid", 3);
-        sort($list);
-        //写入redis缓存
-        //  Cache::put('roleFunctionList',$list,config('configure.sCache'));
-        //返回数据库层查询结果
-        return $list;
-        // });
+        return Cache::get('authList', function () {
+            //默认条件
+            $objList = Functions::select("id", "name", "pid", "level")->orderBy('sort', 'asc')->get();
+            //结果检测
+            if (empty($objList)) {
+                responseData(\StatusCode::EMPTY_ERROR, "无结果");
+            }
+            //生成tree数组
+            $list=list_to_tree($objList->toArray(),"id","pid", '_child',0);
+            //写入redis缓存
+            Cache::put('authList', $list, config('configure.sCache'));
+            //返回数据库层查询结果
+            return $list;
+        });
     }
 
     /***
@@ -54,22 +53,22 @@ class AuthService extends AdminBase
 
             //获取角色
             $roleData = Role::where("uuid", $role_uuid)->first();
-            if(empty($roleData)){
-                responseData(\StatusCode::EMPTY_ERROR, "角色不存在");
+            if (empty($roleData)) {
+                responseData(\StatusCode::NOT_EXIST_ERROR, "角色不存在");
             }
             //角色id
-            $roleid=$roleData->id;
+            $roleid = $roleData->id;
             //获取详情数据
             $objList = RoleFunction::where("roleid", $roleid)->select("functionid")->get();
             if (empty($objList)) {
-                responseData(\StatusCode::EMPTY_ERROR, "您未设置权限");
+                responseData(\StatusCode::NOT_EXIST_ERROR, "您未设置权限");
             }
             //对象转数组
-            $arrList=$objList->toArray();
+            $arrList = $objList->toArray();
             //重组为键
-            $arrList=i_array_column($arrList,null,"functionid");
+            $arrList = i_array_column($arrList, null, "functionid");
             //取键
-            $list["functionid"]=array_keys($arrList);
+            $list["functionid"] = array_keys($arrList);
         } catch (\ErrorException $e) {
             //记录日志
             Log::error('======RolesService-edit:======' . $e->getMessage());
@@ -95,10 +94,10 @@ class AuthService extends AdminBase
             //检测角色是否存在
             $roleData = Role::where("uuid", $role_uuid)->first();
             if (empty($roleData)) {
-                responseData(\StatusCode::EXIST_ERROR, "角色名称不存在");
+                responseData(\StatusCode::NOT_EXIST_ERROR, "角色名称不存在");
             }
             //角色id
-            $roleid=$roleData->id;
+            $roleid = $roleData->id;
 
             //检查管理员
             if ($roleid == 1) {
@@ -110,13 +109,11 @@ class AuthService extends AdminBase
                 responseData(\StatusCode::NOT_DEFINED, "存在非定义数值，请移除");
             }
 
-
-
             //业务处理
             foreach ($data["functionid"] as $k => $v) {
                 //唯一条件
-                $condition["roleid"]=$roleid;
-                $condition["functionid"]=$v;
+                $condition["roleid"] = $roleid;
+                $condition["functionid"] = $v;
                 //判断处理
                 $existFR = RoleFunction::where($condition)->exists();
                 if (empty($existFR)) {
@@ -125,7 +122,7 @@ class AuthService extends AdminBase
                     $rolefunc["functionid"] = $v;
                     $rolefunc["created_at"] = date("Y-m-d H:i:s");
                     $rs[] = RoleFunction::create($rolefunc);
-                }else{
+                } else {
                     $rs[] = RoleFunction::where($condition)->delete();
                 }
             }
@@ -133,16 +130,18 @@ class AuthService extends AdminBase
             //结果处理
             if (!in_array(false, $rs, true)) {
                 DB::commit();
+                //删除缓存
+                Cache::forget("authList");
             } else {
                 DB::rollBack();
-                responseData(\StatusCode::DB_ERROR, "设置失败");
+                responseData(\StatusCode::DB_ERROR, "勾选失败");
             }
         } catch (\ErrorException $e) {
             //业务执行失败
             DB::rollBack();
             //记录日志
             Log::error('======RolesService-update:======' . $e->getMessage());
-            responseData(\StatusCode::CATCH_ERROR, "设置异常");
+            responseData(\StatusCode::CATCH_ERROR, "勾选异常");
         }
     }
 

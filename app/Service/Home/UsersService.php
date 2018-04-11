@@ -15,28 +15,22 @@ use Illuminate\Support\Facades\Log;
 
 class UsersService extends HomeBase
 {
-
-
     /***
      * 获取用户信息
      * @return mixed
      */
     public  function  index($userid)
     {
-        //redis缓存数据，无则执行数据库获取业务数据
-        // return Cache::get('webUserList', function() {
         //列表
-        $list=Users::where("id",$userid)->select("nickname","economictid","mobile","faceimg")->orderBy('id','asc')->get();
+        $row=Users::where("id",$userid)->select("nickname","economictid","mobile","faceimg")->orderBy('id','asc')->first();
         //结果检测
-        if(empty($list))
+        if(empty($row))
         {
             responseData(\StatusCode::EMPTY_ERROR,"无结果");
         }
         //写入redis缓存
-        //    Cache::put('webUserList',$list,config('configure.sCache'));
         //返回数据库层查询结果
-        return $list;
-        //    });
+        return $row;
     }
 
     /***

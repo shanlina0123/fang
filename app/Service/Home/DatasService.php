@@ -7,6 +7,7 @@
  */
 
 namespace App\Service\Home;
+
 use App\Model\Data\Select;
 use App\Model\Data\SelectCate;
 use App\Model\Data\SelectCateDefault;
@@ -24,64 +25,55 @@ class DatasService extends HomeBase
      * 获取数据源列表 所有
      * @return mixed
      */
-    public  function  index()
+    public function index()
     {
         //redis缓存数据，无则执行数据库获取业务数据
-        // return Cache::get('webDatasAllList', function() {
+        return Cache::get('webDatasAllList', function () {
 
-        //属性分类列表
-        $objCateList=SelectCate::select("id","name")->orderBy('id','asc')->get();
-        $list=i_array_column($objCateList->toArray(),null,"id");
+            //属性分类列表
+            $objCateList = SelectCate::select("id", "name")->orderBy('id', 'asc')->get();
+            $list = i_array_column($objCateList->toArray(), null, "id");
 
-        //列表
-        $objList=Select::where("status",1)->select("id","name","cateid","created_at")->orderBy('id','asc')->get();
-        $objList=i_array_column($objList->toArray(),null,"id");
+            //列表
+            $objList = Select::where("status", 1)->select("id", "name", "cateid", "created_at")->orderBy('id', 'asc')->get();
+            $objList = i_array_column($objList->toArray(), null, "id");
 
-        //整理tree
-       foreach($objList as $k=>$v)
-       {
-           $list[$v["cateid"]]["_child"][]=$v;
-       }
-        sort($list);
-        //结果检测
-        if(empty($list))
-        {
-            responseData(\StatusCode::EMPTY_ERROR,"无结果");
-        }
-        //写入redis缓存
-        //    Cache::put('webDatasAllList',$list,config('configure.sCache'));
-        //返回数据库层查询结果
-        return $list;
-        //    });
-    }
-    /***
-     * 获取数据源列表
-     * @return mixed
-     */
-    public  function  getOne($cateid)
-    {
-        //redis缓存数据，无则执行数据库获取业务数据
-       // return Cache::get('webDatasList', function() {
-
-            //检测cateid是否存在
-            $cateExists=SelectCate::where("id",$cateid)->exists();
-            if($cateExists==0)
-            {
-                responseData(\StatusCode::EMPTY_ERROR,"属性分类不存在");
+            //整理tree
+            foreach ($objList as $k => $v) {
+                $list[$v["cateid"]]["_child"][] = $v;
             }
-
-            //默认条件
-            $list=Select::where(["cateid"=>$cateid,"status"=>1])->select("id","name","cateid","created_at")->orderBy('id','asc')->get();
+            sort($list);
             //结果检测
-            if(empty($list))
-            {
-                responseData(\StatusCode::EMPTY_ERROR,"无结果");
+            if (empty($list)) {
+                responseData(\StatusCode::EMPTY_ERROR, "无结果");
             }
             //写入redis缓存
-        //    Cache::put('webDatasList',$list,config('configure.sCache'));
+            Cache::put('webDatasAllList', $list, config('configure.sCache'));
             //返回数据库层查询结果
             return $list;
-    //    });
+        });
+    }
+
+    /***
+     * 获取数据源列表 单个分类对应的列表
+     * @return mixed
+     */
+    public function getOne($cateid)
+    {
+        //检测cateid是否存在
+        $cateExists = SelectCate::where("id", $cateid)->exists();
+        if ($cateExists == 0) {
+            responseData(\StatusCode::EMPTY_ERROR, "属性分类不存在");
+        }
+
+        //默认条件
+        $list = Select::where(["cateid" => $cateid, "status" => 1])->select("id", "name", "cateid", "created_at")->orderBy('id', 'asc')->get();
+        //结果检测
+        if (empty($list)) {
+            responseData(\StatusCode::EMPTY_ERROR, "无结果");
+        }
+        //返回数据库层查询结果
+        return $list;
     }
 
     /***
@@ -89,27 +81,24 @@ class DatasService extends HomeBase
      * @param $uuid
      * @return mixed
      */
-    public function  edit($uuid)
+    public function edit($uuid)
     {
-        try{
+        try {
             //获取详情数据
-            $row = Select::where("uuid",$uuid)->select("id","name","status","cateid","created_at")->first();
-            if(empty($row))
-            {
-                responseData(\StatusCode::EMPTY_ERROR,"请求数据不存在");
+            $row = Select::where("uuid", $uuid)->select("id", "name", "status", "cateid", "created_at")->first();
+            if (empty($row)) {
+                responseData(\StatusCode::EMPTY_ERROR, "请求数据不存在");
             }
 
-            if($row["status"]==0)
-            {
-                responseData(\StatusCode::EMPTY_ERROR,"请求数据已禁用");
+            if ($row["status"] == 0) {
+                responseData(\StatusCode::EMPTY_ERROR, "请求数据已禁用");
             }
-        }catch (\ErrorException $e)
-        {
+        } catch (\ErrorException $e) {
             //记录日志
-            Log::error('======DatasService-edit:======'. $e->getMessage());
+            Log::error('======DatasService-edit:======' . $e->getMessage());
             //业务执行失败
-            responseData(\StatusCode::CATCH_ERROR,"获取异常");
-        }finally{
+            responseData(\StatusCode::CATCH_ERROR, "获取异常");
+        } finally {
             //返回处理结果数据
             return $row;
         }
@@ -119,34 +108,32 @@ class DatasService extends HomeBase
      * 获取数据源默认数据列表 所有
      * @return mixed
      */
-    public  function  getDefault()
+    public function getDefault()
     {
         //redis缓存数据，无则执行数据库获取业务数据
-        // return Cache::get('webDatasDefaultAllList', function() {
+        return Cache::get('webDatasDefaultAllList', function () {
 
-        //属性分类列表
-        $objCateList=SelectCateDefault::select("id","name")->orderBy('id','asc')->get();
-        $list=i_array_column($objCateList->toArray(),null,"id");
+            //属性分类列表
+            $objCateList = SelectCateDefault::select("id", "name")->orderBy('id', 'asc')->get();
+            $list = i_array_column($objCateList->toArray(), null, "id");
 
-        //列表
-        $objList=SelectDefault::select("id","name","status","cateid","created_at")->orderBy('id','asc')->get();
-        $objList=i_array_column($objList->toArray(),null,"id");
-        //整理tree
-        foreach($objList as $k=>$v)
-        {
-            $list[$v["cateid"]]["_child"][]=$v;
-        }
-        sort($list);
-        //结果检测
-        if(empty($list))
-        {
-            responseData(\StatusCode::EMPTY_ERROR,"无结果");
-        }
-        //写入redis缓存
-        //    Cache::put('webDatasDefaultAllList',$list,config('configure.sCache'));
-        //返回数据库层查询结果
-        return $list;
-        //    });
+            //列表
+            $objList = SelectDefault::select("id", "name", "status", "cateid", "created_at")->orderBy('id', 'asc')->get();
+            $objList = i_array_column($objList->toArray(), null, "id");
+            //整理tree
+            foreach ($objList as $k => $v) {
+                $list[$v["cateid"]]["_child"][] = $v;
+            }
+            sort($list);
+            //结果检测
+            if (empty($list)) {
+                responseData(\StatusCode::EMPTY_ERROR, "无结果");
+            }
+            //写入redis缓存
+            Cache::put('webDatasDefaultAllList', $list, config('configure.sCache'));
+            //返回数据库层查询结果
+            return $list;
+        });
     }
 
 
@@ -154,30 +141,28 @@ class DatasService extends HomeBase
      * 获取数据源列表-默认数据
      * @return mixed
      */
-    public  function  getDefaultOne($cateid)
+    public function getDefaultOne($cateid)
     {
         //redis缓存数据，无则执行数据库获取业务数据
-        // return Cache::get('webDatasDefaultList', function() {
+        return Cache::get('webDatasDefaultList', function ($cateid) {
 
-        //检测cateid是否存在
-        $cateExists=SelectCateDefault::where("id",$cateid)->exists();
-        if($cateExists==0)
-        {
-            responseData(\StatusCode::EMPTY_ERROR,"属性分类不存在");
-        }
+            //检测cateid是否存在
+            $cateExists = SelectCateDefault::where("id", $cateid)->exists();
+            if ($cateExists == 0) {
+                responseData(\StatusCode::EMPTY_ERROR, "属性分类不存在");
+            }
 
-        //默认条件
-        $list=SelectDefault::where("cateid",$cateid)->select("id","name","status","cateid","created_at")->orderBy('id','asc')->get();
-        //结果检测
-        if(empty($list))
-        {
-            responseData(\StatusCode::EMPTY_ERROR,"无结果");
-        }
-        //写入redis缓存
-        //    Cache::put('webDatasDefaultList',$list,config('configure.sCache'));
-        //返回数据库层查询结果
-        return $list;
-        //    });
+            //默认条件
+            $list = SelectDefault::where("cateid", $cateid)->select("id", "name", "status", "cateid", "created_at")->orderBy('id', 'asc')->get();
+            //结果检测
+            if (empty($list)) {
+                responseData(\StatusCode::EMPTY_ERROR, "无结果");
+            }
+            //写入redis缓存
+            Cache::put('webDatasDefaultList', $list, config('configure.sCache'));
+            //返回数据库层查询结果
+            return $list;
+        });
     }
 
 }
