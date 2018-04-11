@@ -21,7 +21,7 @@ class HouseService extends HomeBase
     public function getList( $request )
     {
         $tag = 'HomeHouseList';
-        $where = $request->input('page').$request->input('typeid').$request->input('name').$request->input('roomtypeid');
+        $where = $request->input('page').$request->input('typeid').$request->input('name').$request->input('roomtypeid').$request->input('price');
         $where = base64_encode($where);
         $value = Cache::tags($tag)->remember( $tag.$where,config('configure.sCache'), function() use( $request ){
             //房屋类型
@@ -42,6 +42,38 @@ class HouseService extends HomeBase
             if( $name )
             {
                 $sql->where('name','like','%'.$name.'%');
+            }
+            //价格
+            $price = $request->input('price');
+            if( $price )
+            {
+                //判断房源类型
+                switch ( (int)$typeID )
+                {
+                    case 1:
+                        //新房
+                    case 3:
+                        //商铺
+                        $priceType = 'total';
+                        break;
+                    case 2:
+                        //二手房
+                        $priceType = 'price';
+                        break;
+                    default:
+                        $priceType = 'total';
+                        break;
+                }
+                $arr = explode('-',$price);
+                if( count($arr) == 1 )
+                {
+                    $sql->where( $priceType, '>=', $price );
+                }else
+                {
+                    $arr = array_sort_recursive($arr);
+                    $priceWhere = $priceType.' >= '.$arr[0].' AND '.$priceType." <= ".$arr[1];
+                    $sql->whereRaw( $priceWhere );
+                }
             }
             return $sql->paginate(config('configure.sPage'));
         });
@@ -68,6 +100,22 @@ class HouseService extends HomeBase
             {
                 return $res;
             }
+        });
+        return $value;
+    }
+
+    /**
+     * @param $id
+     * 房源详情
+     */
+    public function getInfo( $id )
+    {
+        $tag = 'HomeInfo';
+        $value = Cache::tags($tag)->remember( $tag.$id,config('configure.sCache'), function() use( $id ){
+            $res = House::where('id',$id)->first();
+            $res->image = $res->houseToImage()->select('url')->get();
+            $res->tags = $res->houseToTag()->select('tagid')->get();
+            return $res;
         });
         return $value;
     }

@@ -9,7 +9,6 @@
 namespace App\Http\Controllers\Home;
 use App\Service\Home\HouseService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 class HouseController extends HomeBaseController
 {
     public  $house;
@@ -30,7 +29,6 @@ class HouseController extends HomeBaseController
         responseData(\StatusCode::SUCCESS,'房源列表',$res);
     }
 
-
     /**
      * 房源推荐
      */
@@ -38,5 +36,14 @@ class HouseController extends HomeBaseController
     {
         $res = $this->house->getRecommend();
         responseData(\StatusCode::SUCCESS,'房源推荐列表',$res);
+    }
+
+    /**
+     * 房源详情
+     */
+    public function info( $id )
+    {
+        $res = $this->house->getInfo( $id );
+        responseData(\StatusCode::SUCCESS,'房源详情',$res);
     }
 }

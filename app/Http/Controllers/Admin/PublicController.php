@@ -7,6 +7,7 @@
  */
 
 namespace App\Http\Controllers\Admin;
+use App\Model\Data\Province;
 use Illuminate\Http\Request;
 
 class PublicController extends AdminBaseController
@@ -29,5 +30,24 @@ class PublicController extends AdminBaseController
         {
             responseData(\StatusCode::ERROR,'上传失败');
         }
+    }
+
+    /**
+     *  省市json
+     */
+    public function getAddress()
+    {
+        $arr = array();
+        $res = Province::where('status',1)->with('ProvinceToCity')->get();
+        foreach ( $res as $row )
+        {
+            $defaultObject = new \stdClass();
+            $defaultObject->id = $row->id;
+            $defaultObject->name = $row->name;
+            $defaultObject->city = $row->ProvinceToCity()->where(['provinceid'=>$row->id,'status'=>1])->select('id','name','provinceid')->get();
+            $arr[] = $defaultObject;
+        }
+
+        responseData(\StatusCode::SUCCESS,'省市信息',$arr);
     }
 }

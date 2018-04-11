@@ -87,6 +87,8 @@ $app->routeMiddleware([
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
+//添加启动配置文件
+$app->configure('configure');
 /*
 |--------------------------------------------------------------------------
 | Load The Application Routes

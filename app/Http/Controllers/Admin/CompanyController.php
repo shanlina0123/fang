@@ -48,7 +48,7 @@ class CompanyController extends AdminBaseController
         );
         if ($validator->fails())
         {
-            $messages = $validator->errors()->first();
+            $messages = $validator->errors();
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages );
         }
         $res = $this->company->companySave( $data );
@@ -70,7 +70,7 @@ class CompanyController extends AdminBaseController
         );
         if ($validator->fails())
         {
-            $messages = $validator->errors()->first();
+            $messages = $validator->errors();
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
         }
         $res = $this->company->editCompany( $uuid );
@@ -97,7 +97,7 @@ class CompanyController extends AdminBaseController
         );
         if ($validator->fails())
         {
-            $messages = $validator->errors()->first();
+            $messages = $validator->errors();
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
         }
         $res = $this->company->updateCompany( $data );
@@ -120,7 +120,7 @@ class CompanyController extends AdminBaseController
         );
         if ($validator->fails())
         {
-            $messages = $validator->errors()->first();
+            $messages = ['uuid'=>'uuid不合法'];
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
         }
         $res = $this->company->destroyCompany( $uuid );

@@ -71,7 +71,7 @@ class HouseController extends AdminBaseController
         );
         if ($validator->fails())
         {
-            $messages = $validator->errors()->first();
+            $messages = $validator->errors();
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
         }
         $res = $this->house->storeHouse( $data );
@@ -94,7 +94,7 @@ class HouseController extends AdminBaseController
         );
         if ($validator->fails())
         {
-            $messages = $validator->errors()->first();
+            $messages = $validator->errors();
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
         }
         $res = $this->house->saveTag( $data );
@@ -119,7 +119,7 @@ class HouseController extends AdminBaseController
         );
         if ($validator->fails())
         {
-            $messages = $validator->errors()->first();
+            $messages = $validator->errors();
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
         }
         $res = $this->house->saveImg( $data );
@@ -164,7 +164,7 @@ class HouseController extends AdminBaseController
         );
         if ($validator->fails())
         {
-            $messages = $validator->errors()->first();
+            $messages = $validator->errors();
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
         }
         $res = $this->house->destroyHouse( $uuid );
@@ -204,7 +204,7 @@ class HouseController extends AdminBaseController
         );
         if ($validator->fails())
         {
-            $messages = $validator->errors()->first();
+            $messages = $validator->errors();
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
         }
         $res = $this->house->updateHouse( $data );
@@ -225,7 +225,7 @@ class HouseController extends AdminBaseController
         );
         if ($validator->fails())
         {
-            $messages = $validator->errors()->first();
+            $messages = ['uuid'=>'uuid不合法'];
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
         }
         $res = $this->house->recommendHouse( $data );

@@ -23,4 +23,14 @@ class House extends Model
     {
         return $this->hasMany('App\Model\House\HouseImage','houseid','id');
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * 关联标签
+     */
+    public function houseToTag()
+    {
+        return $this->hasMany('App\Model\House\HouseTag','houseid','id');
+    }
+
 }

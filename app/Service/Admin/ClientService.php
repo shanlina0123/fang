@@ -183,6 +183,7 @@ class ClientService extends AdminBase
                 $obj->save();
                 $obj->dynamicToClient->update(['name'=>$data['name']]);
                 DB::commit();
+                Cache::tags(['clientList'])->flush();
                 return 'success';
             }catch (Exception $e){
                 DB::rollBack();
@@ -243,6 +244,7 @@ class ClientService extends AdminBase
             $dynamic->followcount = $dynamic->followcount+1;
             $dynamic->followdate = date('Y-m-d H:i:s');
             DB::commit();
+            Cache::tags(['clientList'])->flush();
             return 'success';
         }catch (Exception $e)
         {
