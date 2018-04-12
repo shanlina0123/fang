@@ -48,9 +48,6 @@ return [
     | Cryptographic encryption parameters
     |
     */
-    'salt'=>[
-        "admin"=>"30b06afa21235689666220154e1adc540fa==HDDSmsl5895HG$##6",
-        "home"=>'30b06afa2e3b11e8b20154e##gsdgsdgHHHH==ddgg32231adc540f3a'
-    ]
+
 
 ];

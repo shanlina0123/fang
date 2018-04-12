@@ -9,7 +9,7 @@
  */
 function optimizedSaltPwd($type="home",$password,  $saltGain = 1)
 {
-    $salt = config('app.salt.'.$type);
+    $salt = config('configure.salt.'.$type);
     // 过滤参数
     if(!is_numeric($saltGain)) exit;
     if(intval($saltGain) < 0 || intval($saltGain) > 35) exit;
