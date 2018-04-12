@@ -50,8 +50,7 @@ class ClientController extends HomeBaseController
         //获取当前登录用户信息
         $userinfo=$this->request->get("userinfo");//对象
 
-        //获取业务数据
-        $list=$this->client_service->index($userinfo->id,$data,$page);
+        $list=$this->client_service->index($userinfo->id,$userinfo->adminid,$data,$page);
         //接口返回结果
         responseData(\StatusCode::SUCCESS,"获取成功",$list);
     }

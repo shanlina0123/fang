@@ -25,6 +25,8 @@ $router->group(['prefix' => 'api/admin', 'namespace' => 'Admin'], function () us
     $router->group(['middleware' => 'admin_token'], function () use ($router) {
         //菜单
         $router->get('auth-menu', 'AuthController@getMenu');//获取权限菜单数据
+
+
         //默认属性管理
         $router->get('datas-default', 'DatasController@getDefault');//获取默认所有属性列表----OK
         $router->get('datas-default-one/{cateid}', 'DatasController@getDefaultOne');//获取默认单个属性列表----OK
@@ -73,6 +75,8 @@ $router->group(['prefix' => 'api/admin', 'namespace' => 'Admin'], function () us
             $router->post('admin', 'AdminController@store');//添加用户----OK
             $router->put('admin/{uuid}', 'AdminController@update');//修改用户----OK
             $router->put('admin-setting/{uuid}', 'AdminController@setting');//禁用启用用户----OK
+            $router->post('admin-user-check', 'AdminController@checkUserMobile');//检测后端手机号手否于经纪人有关----OK
+
             //自定义属性管理
             $router->get('datas', 'DatasController@index');//获取自定义所有属性列表----OK
             $router->get('datas-one/{cateid}', 'DatasController@getOne');//获取单个属性列表----OK

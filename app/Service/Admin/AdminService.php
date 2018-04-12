@@ -69,6 +69,35 @@ class AdminService extends AdminBase
         }
     }
 
+    /****
+     * 检测后端用户的手机号，是否已经有前端用户
+     */
+    public  function  checkUserMobile($data)
+    {
+        try {
+            //检测是否存在
+            $row = Users::where("mobile", $data["mobile"])->first();
+            if (!empty($row)) {
+
+                if($row->adminid>0)
+                {
+                    responseData(\StatusCode::EXIST_ERROR, "业务员手机号" . $data["mobile"] . "已和经纪人".$row["nickname"]."绑定");
+                }else{
+                    responseData(\StatusCode::EXIST_ERROR, "业务员手机号" . $data["mobile"] . "只注册了经纪人,未和业务员绑定，新增业务员后系统自动进行绑定");
+                }
+            }
+
+        } catch (\ErrorException $e) {
+            //记录日志
+            Log::error('======AdminService-checkUserMobile:======' . $e->getMessage());
+            //业务执行失败
+            responseData(\StatusCode::CATCH_ERROR, "获取异常");
+        } finally {
+            //返回处理结果数据
+            return $row;
+        }
+    }
+
     /***
      * 新增用户 - 执行
      * @param $data
@@ -115,7 +144,7 @@ class AdminService extends AdminBase
             $admin["nickname"] = $data["nickname"];
             $admin["roleid"] = $data["roleid"];
             $admin["mobile"] = $data["mobile"];
-            $admin["password"] = optimizedSaltPwd($data['password']);
+            $admin["password"] = optimizedSaltPwd("admin",$data['password']);
             $admin["created_at"] = date("Y-m-d H:i:s");
             //录入数据
             $rsAdmin = AdminUser::create($admin);
@@ -137,7 +166,13 @@ class AdminService extends AdminBase
                 $rsUser = Users::create($user);
                 $userid = $rsUser->id;
             }else{
-                $userid=1;
+                //TODO::更新
+                $userUpdateData["name"] = $data["name"];
+                $userUpdateData["nickname"] = $data["nickname"];
+                $userUpdateData["adminid"] = $adminid;//后端用户id
+                $userUpdateData["isadminafter"] = 1;//后端
+                $userUpdateData["updated_at"] = date("Y-m-d H:i:s");
+                $userid= Users::where("id",$UserData["id"])->update($userUpdateData);
             }
 
             //结果处理
@@ -145,6 +180,8 @@ class AdminService extends AdminBase
                 DB::commit();
                 //删除缓存
                 Cache::forget("adminList");
+                //删除推荐人的客户列表缓存
+                Cache::tags(["HomeClientList"])->flush();
             } else {
                 DB::rollBack();
                 responseData(\StatusCode::DB_ERROR, "新增失败");
@@ -202,7 +239,7 @@ class AdminService extends AdminBase
             $admin["name"] = $data["name"];
             $admin["roleid"] = $data["roleid"];
             $admin["mobile"] = $data["mobile"];
-            $admin["password"] = optimizedSaltPwd($data['password']);
+            $admin["password"] = optimizedSaltPwd("admin",$data['password']);
             $admin["updated_at"] = date("Y-m-d H:i:s");
             //修改Admin数据
             $rs = AdminUser::where("uuid", $uuid)->update($admin);

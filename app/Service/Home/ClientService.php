@@ -26,29 +26,41 @@ class ClientService extends HomeBase
      * 获取我的客户列表
      * @return mixed
      */
-    public function index($userid, $data, $page, $tag = "HomeClientList")
+    public function index($userid, $adminid, $data, $page, $tag = "HomeClientList")
     {
         //定义tag的key
-        $tagKey = base64_encode(mosaic("", $tag, $userid, $page, $data["name"], $data["followstatusid"]));
+        $tagKey = base64_encode(mosaic("", $tag, $userid,$adminid, $page, $data["name"], $data["followstatusid"]));
         //redis缓存返回
-        return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($userid, $data) {
+       return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($userid, $adminid, $data) {
             //操作数据库
-            $sql = DB::table("client_referee")
-                ->select("client_referee.userid", "client_referee.clientid", "client_referee.houseid", "client_referee.housename", "client_referee.name", "client_referee.mobile", "client_referee.mobile", "client_referee.created_at",
-                    "client_dynamic.levelid", "client_dynamic.followstatusid", "client_dynamic.makedate")
-                ->join('client_dynamic', 'client_referee.clientid', '=', 'client_dynamic.clientid')
+            $sql = DB::table("client_referee");
+            //字段 业务员可以
+            if ($adminid > 0) {
+                $sql->select("client_referee.userid", "client_referee.clientid", "client_referee.houseid", "client_referee.housename", "client_referee.name", "client_referee.mobile", "client_referee.mobile", "client_referee.created_at",
+                    "client_dynamic.levelid", "client_dynamic.followstatusid", "client_dynamic.makedate");
+            } else {
+                //无客户状态
+                $sql->select("client_referee.userid", "client_referee.clientid", "client_referee.houseid", "client_referee.housename", "client_referee.name", "client_referee.mobile", "client_referee.mobile", "client_referee.created_at",
+                    "client_dynamic.levelid", "client_dynamic.makedate");
+            }
+            //innerjoin
+            $sql->join('client_dynamic', 'client_referee.clientid', '=', 'client_dynamic.clientid')
                 ->where("userid", $userid);
-            //搜索条件
+            //客户名称 - 搜索条件
             if (!empty($data["name"])) {
                 $sql->where("name", "like", "%" . $data["name"] . "%");
             }
-            //状态搜索
-            if (!empty($data["followstatusid"])) {
-                $sql->where("followstatusid", $data["followstatusid"]);
+            //业务员可以
+            if ($adminid > 0) {
+                //状态搜索 - 搜索条件
+                if (!empty($data["followstatusid"])) {
+                    $sql->where("followstatusid", $data["followstatusid"]);
+                }
             }
+
             return $sql->paginate(config('configure.sPage'));
 
-        });
+      });
     }
 
     /****
@@ -125,7 +137,7 @@ class ClientService extends HomeBase
 
             //检测房源是否存在
             $houseData = House::where("id", $data["houseid"])->first();
-            if (empty($houseData->toArray())) {
+            if (empty($houseData)) {
                 responseData(\StatusCode::NOT_EXIST_ERROR, "房源不存在");
             }
 
@@ -139,7 +151,7 @@ class ClientService extends HomeBase
             //获取随机派单后台用户id
             if (empty($adminid)) {
                 $adminUserList = AdminUser::select("id")->get();
-                $adminid=array_random(array_flatten($adminUserList->toArray()));
+                $adminid = array_random(array_flatten($adminUserList->toArray()));
             }
 
             //录入客户信息
@@ -194,8 +206,7 @@ class ClientService extends HomeBase
             if ($clientid !== false && $clientDispatchid !== false && $clientDynamicid !== false && $clientRefereeid !== false) {
                 DB::commit();
                 //TODO::删除后端客户列表缓存、前端客户列表缓存、客户推荐统计缓存
-                Cache::tags(["clientList"])->flush();
-                Cache::tags(["clientList","HomeClientList","clientRefereeChart"])->flush();
+                Cache::tags(["clientList", "HomeClientList", "clientRefereeChart"])->flush();
 
                 //TODO:: 发送微信推送消息
 

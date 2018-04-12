@@ -58,6 +58,28 @@ class AdminController extends AdminBaseController
          responseData(\StatusCode::SUCCESS,"获取成功",$data);
     }
 
+    /****
+     * 检测后端用户的手机号，是否已经有前端用户
+     */
+    public  function checkUserMobile()
+    {
+        $data=$this->getData(["mobile"],$this->request->all());
+        //验证规则
+        $validator = Validator::make($data,[
+            "mobile"=>'required|max:11|min:11',
+        ],['mobile.required'=>'手机号不能为空','mobile.max'=>'手机号格式错误','mobile.min'=>'手机号格式错误']);
+
+        //进行验证
+        if ($validator->fails()) {
+            responseData(\StatusCode::PARAM_ERROR,"参数错误");
+        }
+        //获取业务数据
+        $data=$this->admin_service->checkUserMobile($data);
+        //接口返回结果
+         responseData(\StatusCode::SUCCESS,"获取成功",$data);
+
+    }
+
 
     /***
      * 新增用户 - 执行
