@@ -20,9 +20,12 @@ $router->group(['prefix' => 'api/admin', 'namespace' => 'Admin'], function () us
     //登录前
     $router->post('login', 'LoginController@login');//登录
     $router->get('get/poc', 'PublicController@getAddress');//省市数据
-
+    //微信授权接口
+    $router->get('wechat/authorization', 'WechatController@authorization');
     //登录后
     $router->group(['middleware' => 'admin_token'], function () use ($router) {
+        //检测是否绑定
+        $router->get('user/binding', 'LoginController@binding');
         //菜单
         $router->get('auth-menu', 'AuthController@getMenu');//获取权限菜单数据
         //默认属性管理
