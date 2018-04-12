@@ -67,4 +67,16 @@ class LoginService extends AdminBase
         $user->expiration = $uToken->expiration;
         return $user;
     }
+
+    public function checkOpenid( $uuid )
+    {
+        $res = AdminUser::where('uuid',$uuid)->value('wechatopenid');
+        if( $res )
+        {
+            return 'success';
+        }else
+        {
+            responseData(\StatusCode::ERROR,'未绑定');
+        }
+    }
 }
