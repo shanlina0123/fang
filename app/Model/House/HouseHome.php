@@ -15,4 +15,5 @@ class HouseHome extends Model
     protected $table = 'house_home';
     public $timestamps = true;
 
+
 }

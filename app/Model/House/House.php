@@ -14,6 +14,9 @@ class House extends Model
     protected $guarded = ['id'];
     protected $table = 'house';
     public $timestamps = false;
+    protected $hidden = [
+        'updated_at','deleted_at'
+    ];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany

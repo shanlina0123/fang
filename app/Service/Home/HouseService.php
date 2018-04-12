@@ -95,7 +95,7 @@ class HouseService extends HomeBase
             {
                 $num = 8-count($res);
                 $defRes = House::orderBy('id','desc')->whereNotIn('id',$RecommendID)->take($num)->get()->toArray();
-                return array_collapse($res,$defRes);
+                return array_merge_recursive($res,$defRes);
             }else
             {
                 return $res;
