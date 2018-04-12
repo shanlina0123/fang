@@ -146,4 +146,42 @@ class AuthService extends AdminBase
     }
 
 
+    /***
+     *  获取菜单列表
+     * @return mixed
+     */
+    public function getMenu($adminid,$roleFunids,$tag="menuList")
+    {
+        //定义tag的key
+        $tagKey = base64_encode(mosaic("", $tag, $adminid));
+        //redis缓存返回
+        //return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($adminid, $roleFunids) {
+
+            //获取惨淡列表
+            $queryModel= Functions::select("id", "name", "pid", "level","url")
+                ->where("ismenu",1)
+                ->where("level","<=",2)
+                ->where("status",1)
+                ->orderBy('sort', 'asc');
+            //检查权限
+            if(count($roleFunids)>0)
+            {
+                $queryModel->whereIn("id",$roleFunids);
+            }
+
+            $objList =$queryModel->get();
+
+            //结果检测
+            if (empty($objList)) {
+                responseData(\StatusCode::EMPTY_ERROR, "无结果");
+            }
+            //生成tree数组
+            $list=list_to_tree($objList->toArray(),"id","pid", '_child',0);
+            //写入redis缓存
+            Cache::put('menuList', $list, config('configure.sCache'));
+            //返回数据库层查询结果
+            return $list;
+     //   });
+    }
+
 }

@@ -93,6 +93,21 @@ class AuthController extends AdminBaseController
     }
 
 
+    /***
+     * 获取菜单列表
+     */
+    public  function  getMenu()
+    {
+        //获取用户信息
+        $admin_user=$this->request->get("admin_user");//对象
+
+        //获取业务数据
+        $list=$this->auth_service->getMenu($admin_user->id,$admin_user->roleFunids);
+        //接口返回结果
+        responseData(\StatusCode::SUCCESS,"获取成功",$list);
+    }
+
+
 
 
 }
