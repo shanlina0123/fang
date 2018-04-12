@@ -58,6 +58,28 @@ class AdminController extends AdminBaseController
          responseData(\StatusCode::SUCCESS,"获取成功",$data);
     }
 
+    /****
+     * 检测后端用户的手机号，是否已经有前端用户
+     */
+    public  function checkUserMobile()
+    {
+        $data=$this->getData(["mobile"],$this->request->all());
+        //验证规则
+        $validator = Validator::make($data,[
+            "mobile"=>'required|max:11|min:11',
+        ],['mobile.required'=>'手机号不能为空','mobile.max'=>'手机号格式错误','mobile.min'=>'手机号格式错误']);
+
+        //进行验证
+        if ($validator->fails()) {
+            responseData(\StatusCode::PARAM_ERROR,"参数错误");
+        }
+        //获取业务数据
+        $data=$this->admin_service->checkUserMobile($data);
+        //接口返回结果
+         responseData(\StatusCode::SUCCESS,"获取成功",$data);
+
+    }
+
 
     /***
      * 新增用户 - 执行
@@ -112,18 +134,20 @@ class AdminController extends AdminBaseController
     public  function  update($uuid)
     {
         //获取请求参数
-        $data=$this->getData(["name","mobile","password","roleid"],$this->request->all());
+        $data=$this->getData(["name","nickname","mobile","password","roleid"],$this->request->all());
         //拼接验证数据集
         $validateData=array_merge(["uuid"=>$uuid],$data);
 
         //定义验证规则
         $validator = Validator::make($validateData,[
             'uuid' => 'required|max:32|min:32',
+            "nickname"=>'required|max:100|min:1',
             "name"=>'required|max:100|min:1',
             "mobile"=>'required|max:11|min:11',
             'password' => 'required',
             'roleid' => 'required|numeric',
         ],['uuid.required'=>'参数错误','uuid.max'=>'参数错误','uuid.min'=>'参数错误',
+            'nickname.required'=>'姓名不能为空','nickname.max'=>'姓名长度不能大于100个字符','nickname.min'=>'姓名长度不能小于1个字符',
             'name.required'=>'账号不能为空','name.max'=>'账号长度不能大于100个字符','name.min'=>'账号长度不能小于1个字符',
             'mobile.required'=>'手机号不能为空','mobile.max'=>'手机号不能大于11位字符','mobile.min'=>'手机号不能少于11位字符',
             'password.required'=>'密码不能为空',

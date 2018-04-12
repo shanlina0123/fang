@@ -35,6 +35,6 @@ class CacheController extends Controller
 
 
         //后台跟进客户、推荐客户
-        Cache::tags(["clientRefereeChart"])->flush();
+        Cache::tags(["clientRefereeChart"])->flush();//前台客户量统计
     }
 }
