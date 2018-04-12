@@ -220,23 +220,15 @@ class AdminService extends AdminBase
             }
 
             //检测是否存在
-            $existName = AdminUser::where("name", $data["name"])->exists();
+            $existName = AdminUser::whereRaw("id!=".$row["id"]." AND (name='".$data["name"]."' OR nickname='".$data["nickname"]."' OR mobile='".$data["mobile"]."')")
+                ->exists();
             if ($existName > 0) {
-                responseData(\StatusCode::EXIST_ERROR, "账号" . $data["name"] . "已存在");
+                responseData(\StatusCode::EXIST_ERROR, "账号姓名或手机号已存在");
             }
-
-
-            //检测手机号是否被占用
-            if ($row["mobile"] !== $data["mobile"]) {
-                $existMobile = AdminUser::where("mobile", $data["mobile"])->exists();
-                if ($existMobile > 0) {
-                    responseData(\StatusCode::EXIST_ERROR, "手机号" . $data["mobile"] . "已存在");
-                }
-            }
-
 
             //整理修改数据
             $admin["name"] = $data["name"];
+            $admin["nickname"] = $data["nickname"];
             $admin["roleid"] = $data["roleid"];
             $admin["mobile"] = $data["mobile"];
             $admin["password"] = optimizedSaltPwd("admin",$data['password']);

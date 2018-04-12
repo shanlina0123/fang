@@ -26,7 +26,6 @@ $router->group(['prefix' => 'api/admin', 'namespace' => 'Admin'], function () us
         //菜单
         $router->get('auth-menu', 'AuthController@getMenu');//获取权限菜单数据
 
-
         //默认属性管理
         $router->get('datas-default', 'DatasController@getDefault');//获取默认所有属性列表----OK
         $router->get('datas-default-one/{cateid}', 'DatasController@getDefaultOne');//获取默认单个属性列表----OK
@@ -103,6 +102,7 @@ $router->group(['prefix' => 'api/home', 'namespace' => 'Home'], function () use 
     //登录前
     $router->post('user/register', 'LoginOrRegisterController@register');//注册
     $router->post('user/login', 'LoginOrRegisterController@login');//登陆
+    $router->get('get/poc', 'PublicController@getAddress');//省市数据
 
     //首页
     $router->get('house/recommend', 'HouseController@recommend');//首页房源推荐
