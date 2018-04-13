@@ -28,7 +28,7 @@ class DatasService extends HomeBase
     public function index()
     {
         //redis缓存数据，无则执行数据库获取业务数据
-        return Cache::get('webDatasAllList', function () {
+       // return Cache::get('webDatasAllList', function () {
 
             //属性分类列表
             $objCateList = SelectCate::select("id", "name")->orderBy('id', 'asc')->get();
@@ -38,20 +38,28 @@ class DatasService extends HomeBase
             $objList = Select::where("status", 1)->select("id", "name", "cateid", "created_at")->orderBy('id', 'asc')->get();
             $objList = i_array_column($objList->toArray(), null, "id");
 
-            //整理tree
-            foreach ($objList as $k => $v) {
-                $list[$v["cateid"]]["_child"][] = $v;
+          foreach ($objList as $k => $v) {
+               $listAll[$v["cateid"]][] = $v;
+         }
+
+
+            foreach($objCateList as $k=>$v)
+            {
+                $list[$v["id"]]["_child"][]=i_array_column($listAll[$v["id"]],null,"id");
             }
-            sort($list);
+
+            //整理tree
+
+//            sort($list);
             //结果检测
             if (empty($list)) {
                 responseData(\StatusCode::EMPTY_ERROR, "无结果");
             }
             //写入redis缓存
-            Cache::put('webDatasAllList', $list, config('configure.sCache'));
+        //    Cache::put('webDatasAllList', $list, config('configure.sCache'));
             //返回数据库层查询结果
-            return $list;
-        });
+          return $list;
+        // });
     }
 
     /***
