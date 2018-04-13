@@ -67,4 +67,70 @@ class LoginService extends AdminBase
         $user->expiration = $uToken->expiration;
         return $user;
     }
+
+    /**
+     * @param $uuid
+     * @return string
+     * 绑openid
+     */
+    public function checkOpenid( $uuid )
+    {
+        $res = AdminUser::where('uuid',$uuid)->value('wechatopenid');
+        if( $res )
+        {
+            return 'success';
+        }else
+        {
+            responseData(\StatusCode::ERROR,'未绑定');
+        }
+    }
+
+
+    /**
+     * @param $data
+     * @return mixed
+     * 扫码检测状态
+     */
+    public function checkWechatbackStatus( $data )
+    {
+        $res = AdminUser::where(['name'=>$data['name'],'wechatbackstatus'=>1])->select(['name','uuid','wechatopenid','wechatbackstatus'])->first();
+        if( $res )
+        {
+            $data = $res;
+            $res->wechatbackstatus = 0;
+            $res->save();
+            return $data;
+        }else
+        {
+            responseData(\StatusCode::ERROR,'未扫码');
+        }
+    }
+
+
+    /**
+     * @param $data
+     * @return string
+     * 修改密码
+     */
+    public function modifyPass( $data )
+    {
+        $where['name'] = $data['name'];
+        $where['wechatopenid'] = $data['wechatopenid'];
+        $where['uuid'] = $data['uuid'];
+        $res = AdminUser::where( $where )->first();
+        if( $res )
+        {
+            $res->password = optimizedSaltPwd("admin",base64_decode($data['password']));
+            if( $res->save() )
+            {
+                return 'success';
+            }else
+            {
+                responseData(\StatusCode::ERROR,'修改失败');
+            }
+        }else
+        {
+            responseData(\StatusCode::ERROR,'未查询到');
+        }
+    }
 }

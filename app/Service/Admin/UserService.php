@@ -7,6 +7,7 @@
  */
 
 namespace App\Service\Admin;
+use App\Model\User\AdminUser;
 use App\Model\User\Users;
 use App\Service\AdminBase;
 use Illuminate\Support\Facades\Cache;
@@ -81,4 +82,21 @@ class UserService extends AdminBase
     }
 
 
+    /**
+     * @param $request
+     * 修改密码
+     */
+    public function updatePass( $request,$data )
+    {
+        $admin_user = $request->get('admin_user');
+        $res = AdminUser::where('id',$admin_user->id)->first();
+        $res->password = optimizedSaltPwd("admin",base64_decode($data['password']));
+        if( $res->save() )
+        {
+            return 'success';
+        }else
+        {
+            responseData(\StatusCode::ERROR,'修改失败');
+        }
+    }
 }

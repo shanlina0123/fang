@@ -255,7 +255,7 @@ class ClientService extends AdminBase
             $dynamic->followdate = date('Y-m-d H:i:s');
             $dynamic->save();
             DB::commit();
-            Cache::tags(['clientList'])->flush();
+            Cache::tags(['clientList','clientRefereeChart'])->flush();
             return 'success';
         }catch (Exception $e)
         {
@@ -299,7 +299,7 @@ class ClientService extends AdminBase
             ClientDynamic::whereIn('uuid',$data['uuid'])->update(['ownadminid'=>$data['accept']]);
             DB::commit();
             //清除缓存
-            Cache::tags(['clientList'])->flush();
+            Cache::tags(['clientList','clientRefereeChart'])->flush();
             return 'success';
         }catch (Exception $e){
             DB::rollBack();

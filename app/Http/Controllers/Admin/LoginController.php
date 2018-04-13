@@ -45,4 +45,74 @@ class LoginController extends AdminBaseController
         $res = $this->mod->checkUser( $data );
         responseData(\StatusCode::SUCCESS,'登陆成功', $res );
     }
+
+
+    /**
+     * 检测是否绑定
+     */
+    public function binding( $uuid )
+    {
+        $validator = Validator::make(
+            ['uuid'=>$uuid],
+            [
+                'uuid' => 'required|min:32|max:32',
+            ]
+        );
+        if ($validator->fails())
+        {
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',['uuid'=>'uuid不合法'] );
+        }
+        $res = $this->mod->checkOpenid();
+        responseData(\StatusCode::SUCCESS,'绑定成功', $res );
+    }
+
+
+    /**
+     * 检测号码结果
+     */
+    public function testing()
+    {
+        $data = trimValue( $this->request->all() );
+        //验证
+        $validator = Validator::make(
+            $data,
+            [
+                'name' => 'required',
+            ]
+        );
+        if ($validator->fails())
+        {
+            $messages = $validator->errors();
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages );
+        }
+        $res = $this->mod->checkWechatbackStatus( $data );
+        responseData(\StatusCode::SUCCESS,'登陆成功', $res );
+    }
+
+
+    /**
+     * 修改密码
+     */
+    public function modifyPass()
+    {
+        $data = trimValue( $this->request->all() );
+        //验证
+        $validator = Validator::make(
+            $data,
+            [
+                'name' => 'required',
+                'wechatopenid' => 'required',
+                'uuid' => 'required',
+                'password' => 'required|min:6|max:12',
+                'confirmed' => 'password_confirmation',
+            ]
+        );
+        if ($validator->fails())
+        {
+            $messages = $validator->errors();
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages );
+        }
+        $res = $this->mod->modifyPass( $data );
+        responseData(\StatusCode::SUCCESS,'修改成功', $res );
+    }
 }

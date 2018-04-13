@@ -20,12 +20,20 @@ $router->group(['prefix' => 'api/admin', 'namespace' => 'Admin'], function () us
     //登录前
     $router->post('login', 'LoginController@login');//登录
     $router->get('get/poc', 'PublicController@getAddress');//省市数据
-
+    //微信授权接口
+    $router->get('wechat/authorization', 'WechatController@authorization');
+    //忘记密码
+    $router->get('wechat/forget', 'WechatController@forget');//忘记密码扫码
+    $router->get('wechat/testing', 'LoginController@testing');//检测扫码结果
+    $router->post('user/modify-pass', 'LoginController@modifyPass');//修改密码
     //登录后
     $router->group(['middleware' => 'admin_token'], function () use ($router) {
+        //检测是否绑定
+        $router->get('user/binding', 'LoginController@binding');
+        //修改密码
+        $router->post('user/update-pass', 'UserController@update');
         //菜单
         $router->get('auth-menu', 'AuthController@getMenu');//获取权限菜单数据
-
         $router->post('admin-user-check', 'AdminController@checkUserMobile');//检测后端手机号手否于经纪人有关----OK
         $router->get('house/create', 'HouseController@create');//发房下拉数据
         $router->post('img/upload', 'PublicController@uploadImgToTemp');//图片上传到临时目录

@@ -7,5 +7,11 @@ return [
     "sPage"=>10,//每页显示条数
     "sCache"=>120,//缓存时长
     "uploads"=>"uploads",//图片文件路径
-    "temp"=>"/temp/"//图片临时目录
+    "temp"=>"/temp/",//图片临时目录
+    //微信配置
+    'wechat'=>[
+        'appid'=>'wx3536cae4b7313652',
+        'secret'=>'aafeb39d646560b3407fdeba9d779361',
+        'template_id'=>'ngqIpbwh8bUfcSsECmogfXcV14J0tQlEpBO27izEYtY'
+    ]
 ];
