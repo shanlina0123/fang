@@ -42,4 +42,27 @@ class UserController extends AdminBaseController
         //接口返回结果
         responseData(\StatusCode::SUCCESS, "获取成功", $list);
     }
+
+    /**
+     * 修改密码
+     */
+    public function update()
+    {
+        $data = trimValue( $this->request->all() );
+        //验证
+        $validator = Validator::make(
+            $data,
+            [
+                'password' => 'required|min:6|max:12',
+                'confirmed' => 'password_confirmation',
+            ]
+        );
+        if ($validator->fails())
+        {
+            $messages = $validator->errors();
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages );
+        }
+        $res = $this->mod->updatePass($this->request);
+        responseData(\StatusCode::SUCCESS, '修改成功', $res);
+    }
 }

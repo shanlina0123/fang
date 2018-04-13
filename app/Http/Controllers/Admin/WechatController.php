@@ -134,6 +134,37 @@ class WechatController extends AdminBaseController
 
 
     /**
+     * @param Request $request
+     * 忘记密码扫码
+     */
+    public function forget( Request $request )
+    {
+        $name = $request->input('name');
+        $code = $request->input('code');
+        $user = AdminUser::where('name', $name)->first();
+        if( $user )
+        {
+            if( Cache::has('authorization'.$user->id ) )
+            {
+                $data = $this->refreshToken( Cache::get('authorization'.$user->id ), $user->id );
+
+            }else
+            {
+                $data = $this->getAccessToken( $code, $user->id );
+            }
+
+            if( $data->openid == $user->wechatopenid )
+            {
+                $user->wechatbackstatus = 1;
+                $user->save();
+            }
+
+        }
+    }
+
+
+
+    /**
      * @param $url
      * @return mixed
      * curl get请求

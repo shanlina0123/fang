@@ -22,13 +22,18 @@ $router->group(['prefix' => 'api/admin', 'namespace' => 'Admin'], function () us
     $router->get('get/poc', 'PublicController@getAddress');//省市数据
     //微信授权接口
     $router->get('wechat/authorization', 'WechatController@authorization');
+    //忘记密码
+    $router->get('wechat/forget', 'WechatController@forget');//忘记密码扫码
+    $router->get('wechat/testing', 'LoginController@testing');//检测扫码结果
+    $router->post('user/modify-pass', 'LoginController@modifyPass');//修改密码
     //登录后
     $router->group(['middleware' => 'admin_token'], function () use ($router) {
         //检测是否绑定
         $router->get('user/binding', 'LoginController@binding');
+        //修改密码
+        $router->post('user/update-pass', 'UserController@update');
         //菜单
         $router->get('auth-menu', 'AuthController@getMenu');//获取权限菜单数据
-
         //默认属性管理
         $router->get('datas-default', 'DatasController@getDefault');//获取默认所有属性列表----OK
         $router->get('datas-default-one/{cateid}', 'DatasController@getDefaultOne');//获取默认单个属性列表----OK
