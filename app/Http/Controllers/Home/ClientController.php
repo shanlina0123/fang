@@ -64,8 +64,8 @@ class ClientController extends HomeBaseController
         $data=$this->getData(["name"],$this->request->all());
         //验证规则
         $validator = Validator::make($data,[
-            "name"=>'required|max:100|min:1',
-        ],[ 'name.required'=>'账号不能为空','name.max'=>'账号长度不能大于100个字符','name.min'=>'账号长度不能小于1个字符']);
+            "name"=>'present|max:100|min:1',
+        ],[ 'name.required'=>'账号参数缺少','name.max'=>'账号长度不能大于100个字符','name.min'=>'账号长度不能小于1个字符']);
         //进行验证
         if ($validator->fails()) {
             responseData(\StatusCode::PARAM_ERROR,"验证失败","",$validator->errors());
@@ -116,6 +116,17 @@ class ClientController extends HomeBaseController
         }
         //获取当前登录用户信息
         $userinfo=$this->request->get("userinfo");//对象
+
+        //判断是否内部员工
+        if($userinfo->isadminafter==1)
+        {
+            $data["companyid"]=1;//内部员工
+        }else{
+            if(empty( $data["companyid"]))
+            {
+                responseData(\StatusCode::PARAM_ERROR,"验证失败","",["companyid",["非内部员工，公司id不能为空"]]);
+            }
+        }
 
         //执行业务处理
         $this->client_service->store($userinfo->adminid,$userinfo->id,$data);

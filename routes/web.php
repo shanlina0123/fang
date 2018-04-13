@@ -139,12 +139,12 @@ $router->group(['prefix' => 'api/home', 'namespace' => 'Home'], function () use 
     $router->group(['middleware' => 'user_token'], function () use ($router) {
 
         //个人中心
-        $router->get('users', 'UsersController@index');//获取用户列表 ----OK
+        $router->get('users', 'UsersController@index');//获取用户信息 ----OK
         $router->put('users-update', 'UsersController@update');//修改用户信息 ----OK
 
         //推荐客户
         $router->post('client', 'ClientController@index');//我的推荐客户列表
-        $router->post('client-houseData', 'ClientController@houseData');//推荐客户的房源下拉框内容
+        $router->post('client-houses', 'ClientController@houseData');//推荐客户的房源下拉框内容
         $router->get('client-statistics', 'ClientController@statistics');//我的推荐客户量统计
         $router->post('client-refree', 'ClientController@store');//推荐客户
 

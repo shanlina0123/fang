@@ -95,13 +95,14 @@ class ClientService extends HomeBase
         $tagKey = base64_encode(mosaic("", $tag, $userid));
         //redis缓存返回
         return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($userid) {
-            //推荐量
-            $row["refereeCount"] = ClientReferee::where("userid", $userid)->count("id");
             $row = [
+                "refereeCount"=>0,//推荐量
                 "effectiveCount" => 0,//有效
                 "invalidCount" => 0,//无效
                 "visitCount" => 0,//已上门
             ];
+            //推荐量
+            $row["refereeCount"] = ClientReferee::where("userid", $userid)->count("id");
             //获取数量 ，有效36 无效37  已上门40
             $dynamicCount = ClientDynamic::where("refereeuserid", $userid)->whereIn("followstatusid", [36, 37, 40])->select(DB::raw('count(id) as num, followstatusid'))->groupBy("followstatusid")->get();
             ///设置统计字段
