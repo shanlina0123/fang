@@ -39,23 +39,46 @@ class UserService extends AdminBase
        return $value;
    }
 
-
     /***
-     * 获取经纪人列表
-     * @return mixed
+     * 启动禁用用户 - 执行
+     * @param $uuid
      */
-    public  function  index()
+    public function setting($uuid)
     {
-        //默认条件
-        $list=Users::select("id","nickname","isadminafter")->orderBy('id','asc')->get();
+        try {
+            //开启事务
+            DB::beginTransaction();
 
-        $list=array_to_parent($list->toArray(),"id","isadminafter");
-        //结果检测
-        if(empty($list))
-        {
-            responseData(\StatusCode::EMPTY_ERROR,"无结果");
+            //业务处理
+            //检测存在
+            $userData = Users::where("uuid", $uuid)->first();
+            if (empty($userData)) {
+                responseData(\StatusCode::NOT_EXIST_ERROR, "请求数据不存在");
+            }
+
+            //整理修改数据
+            $admin["status"] = abs($userData["status"] - 1);
+            $admin["updated_at"] = date("Y-m-d H:i:s");
+            //修改数据
+            $rs = Users::where("uuid", $uuid)->update($admin);
+
+            //结果处理
+            if ($rs !== false) {
+                DB::commit();
+                //删除缓存
+                Cache::tags(['brokerList'])->flush();
+            } else {
+                DB::rollBack();
+                responseData(\StatusCode::DB_ERROR, "设置失败");
+            }
+        } catch (\ErrorException $e) {
+            //业务执行失败
+            DB::rollBack();
+            //记录日志
+            Log::error('======UserService-setting:======' . $e->getMessage());
+            responseData(\StatusCode::CATCH_ERROR, "设置异常");
         }
-        //返回数据库层查询结果
-        return $list;
     }
+
+
 }

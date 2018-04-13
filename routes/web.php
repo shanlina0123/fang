@@ -26,37 +26,42 @@ $router->group(['prefix' => 'api/admin', 'namespace' => 'Admin'], function () us
         //菜单
         $router->get('auth-menu', 'AuthController@getMenu');//获取权限菜单数据
 
+        $router->post('admin-user-check', 'AdminController@checkUserMobile');//检测后端手机号手否于经纪人有关----OK
+        $router->get('house/create', 'HouseController@create');//发房下拉数据
+        $router->post('img/upload', 'PublicController@uploadImgToTemp');//图片上传到临时目录
         //默认属性管理
         $router->get('datas-default', 'DatasController@getDefault');//获取默认所有属性列表----OK
         $router->get('datas-default-one/{cateid}', 'DatasController@getDefaultOne');//获取默认单个属性列表----OK
         //权限后
         $router->group(['middleware' => 'admin_auth'], function () use ($router) {
             //房源
-            $router->get('house/create', 'HouseController@create');//发房下拉数据
-            $router->post('house/store', 'HouseController@store');//发布房源
             $router->get('house/index', 'HouseController@index');//房源列表
-            $router->post('house/tag', 'HouseController@storeTag');//房源标签
-            $router->post('house/img', 'HouseController@storeImg');//房源图片
-            $router->get('house/edit/{uuid}', 'HouseController@edit');//房源信息
-            $router->put('house/update/{uuid}', 'HouseController@update');//房源编辑
-            $router->post('house/recommend', 'HouseController@recommend');//房源推荐
-            $router->delete('house/delete/{uuid}', 'HouseController@destroy');//房源删除
-            $router->post('img/upload', 'PublicController@uploadImgToTemp');//图片上传到临时目录
+            $router->post('house/store', 'HouseController@store');//添加房源基本信息
+            $router->post('house/tag', 'HouseController@storeTag');//添加房源标签
+            $router->post('house/img', 'HouseController@storeImg');//添加房源图片+ 发布
+            $router->get('house/edit/{uuid}', 'HouseController@edit');//房源详情
+            $router->put('house/update/{uuid}', 'HouseController@update');//修改房源
+            $router->post('house/recommend', 'HouseController@recommend');//推荐房源
+            $router->delete('house/delete/{uuid}', 'HouseController@destroy');//删除房源
+
             //公司
-            $router->get('company/index', 'CompanyController@index');//公司列表
-            $router->post('company/store', 'CompanyController@store');//添加公司
-            $router->get('company/edit/{uuid}', 'CompanyController@edit');//公司修改信息
-            $router->put('company/update/{uuid}', 'CompanyController@update');//公司修改信息
-            $router->delete('company/delete/{uuid}', 'CompanyController@destroy');//公司删除
-            $router->get('user/broker', 'UserController@broker');//经纪人
+            $router->get('company/index', 'CompanyController@index');//列表
+            $router->post('company/store', 'CompanyController@store');//添加
+            $router->get('company/edit/{uuid}', 'CompanyController@edit');//详情
+            $router->put('company/update/{uuid}', 'CompanyController@update');//修改
+            $router->delete('company/delete/{uuid}', 'CompanyController@destroy');//删除
+
+            //经纪人管理
+            $router->get('user/broker', 'UserController@broker');//经纪人列表
+            $router->put('setting/{uuid}', 'UserController@setting');//禁用启用
             //客户
             $router->get('client/index', 'ClientController@index');//客户列表
-            $router->delete('client/delete/{uuid}', 'ClientController@destroy');//客户删除
-            $router->get('client/edit/{uuid}', 'ClientController@edit');//客户编辑信息
-            $router->put('client/update/{uuid}', 'ClientController@update');//客户编辑信息
-            $router->get('client-follow/edit/{client}', 'ClientController@followEdit');//客户跟进
-            $router->put('client-follow/store', 'ClientController@followStore');//客户跟进保存
+            $router->get('client/edit/{uuid}', 'ClientController@edit');//客户详情
+            $router->put('client/update/{uuid}', 'ClientController@update');//客户修改
+            $router->get('client-follow/edit/{client}', 'ClientController@followEdit');//跟进详情
+            $router->put('client-follow/store', 'ClientController@followStore');//跟进修改
             $router->post('client-transfer/update', 'ClientController@transferUpdate');//客户移交
+            $router->delete('client/delete/{uuid}', 'ClientController@destroy');//客户删除
             //角色
             $router->get('roles', 'RolesController@index');//获取角色列表 ----OK
             $router->get('roles/{uuid}', 'RolesController@edit');//角色详情  ----OK
@@ -74,7 +79,7 @@ $router->group(['prefix' => 'api/admin', 'namespace' => 'Admin'], function () us
             $router->post('admin', 'AdminController@store');//添加用户----OK
             $router->put('admin/{uuid}', 'AdminController@update');//修改用户----OK
             $router->put('admin-setting/{uuid}', 'AdminController@setting');//禁用启用用户----OK
-            $router->post('admin-user-check', 'AdminController@checkUserMobile');//检测后端手机号手否于经纪人有关----OK
+
 
             //自定义属性管理
             $router->get('datas', 'DatasController@index');//获取自定义所有属性列表----OK
@@ -86,7 +91,7 @@ $router->group(['prefix' => 'api/admin', 'namespace' => 'Admin'], function () us
 
             //数据分析
             $router->post('chart', 'ChartController@index');//客户分析----OK
-            $router->get('user', 'UserController@index');//前端经纪人/业务员列表----OK
+            $router->get('user', 'ChartController@getUsers');//前端经纪人/业务员列表----OK
         });
 
 

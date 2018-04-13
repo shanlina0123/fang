@@ -38,7 +38,7 @@ class CheckAdminAuth
     {
         //当前访问模块
         $route = getControllerOrFunctionName();
-        $authFunc = Functions::where(["level" => 3, "controller" => $route["controller"], "action" => $route["action"], "method" => $route["method"]])->select("id")->first();
+        $authFunc = Functions::where(["level" => 2, "controller" => $route["controller"], "action" => $route["action"], "method" => $route["method"]])->select("id")->first();
         //未定义该功能
         if (empty($authFunc)) {
             responseData(\StatusCode::AUTH_NOT_DEFINED_ERROR, "未定义暂未开放");

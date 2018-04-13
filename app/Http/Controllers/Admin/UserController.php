@@ -32,14 +32,27 @@ class UserController extends AdminBaseController
         responseData(\StatusCode::SUCCESS, '经纪人列表', $res);
     }
 
-    /*
-     * 获取所有经纪人
+
+    /***
+     * 禁用/启用
      */
-    public function index()
+    public function  setting($uuid)
     {
+        //定义验证规则
+        $validator = Validator::make(["uuid"=>$uuid],[
+            'uuid' => 'required|max:32|min:32',
+        ],['uuid.required'=>'参数错误','uuid.max'=>'参数错误','uuid.min'=>'参数错误']);
+
+        //进行验证
+        if ($validator->fails()) {
+            responseData(\StatusCode::PARAM_ERROR,"参数错误");
+        }
         //获取业务数据
-        $list = $this->mod->index();
+        $this->mod->setting($uuid);
         //接口返回结果
-        responseData(\StatusCode::SUCCESS, "获取成功", $list);
+        responseData(\StatusCode::SUCCESS,"设置成功");
     }
+
+
+
 }

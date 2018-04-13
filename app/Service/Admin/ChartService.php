@@ -8,6 +8,7 @@
 
 namespace App\Service\Admin;
 use App\Model\Client\ClientDynamic;
+use App\Model\User\Users;
 use App\Service\AdminBase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -56,6 +57,26 @@ class ChartService extends AdminBase
            });
 
 
+    }
+
+
+    /***
+     * 获取经纪人列表
+     * @return mixed
+     */
+    public  function  getUsers()
+    {
+        //默认条件
+        $list=Users::select("id","nickname","isadminafter")->orderBy('id','asc')->get();
+
+        $list=array_to_parent($list->toArray(),"id","isadminafter");
+        //结果检测
+        if(empty($list))
+        {
+            responseData(\StatusCode::EMPTY_ERROR,"无结果");
+        }
+        //返回数据库层查询结果
+        return $list;
     }
 
 }

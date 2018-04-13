@@ -62,4 +62,17 @@ class ChartController extends AdminBaseController
         responseData(\StatusCode::SUCCESS,"获取成功",$list);
     }
 
+
+   /*
+   * 获取所有经纪人 下拉框
+   */
+    public function getUsers()
+    {
+        //获取业务数据
+        $list = $this->chart_service->getUsers();
+        //接口返回结果
+        responseData(\StatusCode::SUCCESS, "获取成功", $list);
+    }
+
+
 }

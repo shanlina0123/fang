@@ -155,10 +155,10 @@ class AuthService extends AdminBase
         //定义tag的key
         $tagKey = base64_encode(mosaic("", $tag, $adminid));
         //redis缓存返回
-        //return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($adminid, $roleFunids) {
+        return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($adminid, $roleFunids) {
 
-            //获取惨淡列表
-            $queryModel= Functions::select("id", "name", "pid", "level","url")
+            //获取菜单列表
+            $queryModel= Functions::select("id", "menuname", "pid", "level","url")
                 ->where("ismenu",1)
                 ->where("level","<=",2)
                 ->where("status",1)
@@ -181,7 +181,7 @@ class AuthService extends AdminBase
             Cache::put('menuList', $list, config('configure.sCache'));
             //返回数据库层查询结果
             return $list;
-     //   });
+       });
     }
 
 }
