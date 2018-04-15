@@ -76,7 +76,9 @@ class HouseService extends HomeBase
                     $sql->whereRaw( $priceWhere );
                 }
             }
-            return $sql->paginate(config('configure.sPage'));
+            return $sql->with(['houseToTag'=>function($query){
+                        $query->select('tagid','houseid');
+                    }])->paginate(config('configure.sPage'));
         });
         return $value;
     }
