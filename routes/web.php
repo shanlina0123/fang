@@ -15,7 +15,7 @@
  * 后台
  */
 //$router->get('api-test','Admin\TestController@index');
-$router->group(['prefix' => 'api/admin', 'namespace' => 'Admin'], function () use ($router) {
+$router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($router) {
 
     //登录前
     $router->post('login', 'LoginController@login');//登录
@@ -110,7 +110,7 @@ $router->group(['prefix' => 'api/admin', 'namespace' => 'Admin'], function () us
 /**
  * 前台手机端
  */
-$router->group(['prefix' => 'api/home', 'namespace' => 'Home'], function () use ($router) {
+$router->group(['prefix' => 'home', 'namespace' => 'Home'], function () use ($router) {
 
     //登录前
     $router->post('user/register', 'LoginOrRegisterController@register');//注册
