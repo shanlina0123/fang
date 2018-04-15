@@ -40,13 +40,14 @@ class DatasService extends HomeBase
 
           foreach ($objList as $k => $v) {
                $listAll[$v["cateid"]][] = $v;
-         }
+          }
 
 
             foreach($objCateList as $k=>$v)
             {
-                $list[$v["id"]]["_child"][]=i_array_column($listAll[$v["id"]],null,"id");
+                $list[$v["id"]]["_child"]=i_array_column($listAll[$v["id"]],null,"id");
             }
+
 
             //整理tree
 
@@ -75,7 +76,11 @@ class DatasService extends HomeBase
         }
 
         //默认条件
-        $list = Select::where(["cateid" => $cateid, "status" => 1])->select("id", "name", "cateid", "created_at")->orderBy('id', 'asc')->get();
+        $list = Select::where(["cateid" => $cateid, "status" => 1])->select("id", "name", "cateid", "created_at")->orderBy('id', 'asc')->get()->toArray();
+
+
+        $list=i_array_column($list,null,"id");
+
         //结果检测
         if (empty($list)) {
             responseData(\StatusCode::EMPTY_ERROR, "无结果");
@@ -130,9 +135,22 @@ class DatasService extends HomeBase
             $objList = i_array_column($objList->toArray(), null, "id");
             //整理tree
             foreach ($objList as $k => $v) {
-                $list[$v["cateid"]]["_child"][] = $v;
+                $listAll[$v["cateid"]][] = $v;
             }
-            sort($list);
+
+
+            foreach($objCateList as $k=>$v)
+            {
+                $list[$v["id"]]["_child"]=i_array_column($listAll[$v["id"]],null,"id");
+            }
+
+
+
+
+//            foreach ($objList as $k => $v) {
+//                $list[$v["cateid"]]["_child"][] = $v;
+//            }
+//            sort($list);
             //结果检测
             if (empty($list)) {
                 responseData(\StatusCode::EMPTY_ERROR, "无结果");
@@ -161,7 +179,8 @@ class DatasService extends HomeBase
             }
 
             //默认条件
-            $list = SelectDefault::where("cateid", $cateid)->select("id", "name", "status", "cateid", "created_at")->orderBy('id', 'asc')->get();
+            $list = SelectDefault::where("cateid", $cateid)->select("id", "name", "status", "cateid", "created_at")->orderBy('id', 'asc')->get()->toArray();
+            $list=i_array_column($list,null,"id");
             //结果检测
             if (empty($list)) {
                 responseData(\StatusCode::EMPTY_ERROR, "无结果");

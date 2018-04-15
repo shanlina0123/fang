@@ -20,6 +20,7 @@ class HouseService extends HomeBase
      */
     public function getList( $request )
     {
+        Cache::tags(['HomeHouseList'])->flush();
         $tag = 'HomeHouseList';
         $where = $request->input('page').$request->input('typeid').$request->input('name').$request->input('roomtypeid').$request->input('price');
         $where = base64_encode($where);
@@ -87,14 +88,19 @@ class HouseService extends HomeBase
      */
     public function getRecommend()
     {
+        Cache::tags(['HomeRecommend'])->flush();
         $tag = 'HomeRecommend';
         $value = Cache::tags($tag)->remember( $tag,config('configure.sCache'), function(){
             $RecommendID = HouseHome::orderBy('id','desc')->take(8)->pluck('houseid');
-            $res = House::whereIn('id',$RecommendID)->take(8)->get()->toArray();
+            $res = House::whereIn('id',$RecommendID)->take(8)->with(['houseToTag'=>function($query){
+                $query->select('tagid','houseid');
+            }])->get()->toArray();
             if( count($res) < 8  )
             {
                 $num = 8-count($res);
-                $defRes = House::orderBy('id','desc')->whereNotIn('id',$RecommendID)->take($num)->get()->toArray();
+                $defRes = House::orderBy('id','desc')->whereNotIn('id',$RecommendID)->take($num)->with(['houseToTag'=>function($query){
+                    $query->select('tagid','houseid');
+                }])->get()->toArray();
                 return array_merge_recursive($res,$defRes);
             }else
             {
