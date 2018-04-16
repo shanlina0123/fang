@@ -13,5 +13,11 @@ return [
         'appid'=>'wx3536cae4b7313652',
         'secret'=>'aafeb39d646560b3407fdeba9d779361',
         'template_id'=>'ngqIpbwh8bUfcSsECmogfXcV14J0tQlEpBO27izEYtY'
-    ]
+    ],
+    //允许访问接口的域名
+    "allow"=>[  'http://local.renrenmobile.com',
+                 'http://dev.renrenmobile.com',
+                 'http://wx.rrzhaofang.com'
+              ]
+
 ];
