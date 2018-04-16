@@ -44,6 +44,10 @@ class ClientController extends HomeBaseController
         if ($validator->fails()) {
             responseData(\StatusCode::PARAM_ERROR,"验证失败","",$validator->errors());
         }
+        if(strlen($data["followstatusid"])>0&&$data["followstatusid"]==0)
+        {
+            responseData(\StatusCode::PARAM_ERROR,"验证失败","",["followstatusid"=>["客户状态值不能为空"]]);
+        }
         //获取请求页码
         $page=$this->request->input("page");
 
@@ -103,12 +107,12 @@ class ClientController extends HomeBaseController
             "name"=>'required|max:100|min:1',
             "mobile"=>'required|max:11|min:11',
             "houseid"=>'required|numeric',
-            'companyid' => 'present',
+            'companyid' => 'present|numeric',
             'remark' => 'present',
         ],[ 'name.required'=>'账号不能为空','name.max'=>'账号长度不能大于100个字符','name.min'=>'账号长度不能小于1个字符',
             'mobile.required'=>'手机号不能为空','mobile.max'=>'手机号不能大于11位字符','mobile.min'=>'手机号不能少于11位字符',
             'houseid.required'=>'楼盘id不能为空','houseid.numeric'=>'楼盘id只能是int类型',
-            'companyid.present'=>'公司id参数缺少',
+            'companyid.present'=>'公司id参数缺少','companyid.numeric'=>'公司id只能是int类型',
             'remark.present'=>'备注参数缺少']);
         //进行验证
         if ($validator->fails()) {
@@ -134,4 +138,40 @@ class ClientController extends HomeBaseController
         responseData(\StatusCode::SUCCESS,"推荐成功");
     }
 
+    /***
+     * 修改客户级别和状态
+     */
+    public  function  update($uuid)
+    {
+        //获取请求参数
+        $data=$this->getData(["levelid","followstatusid"],$this->request->all());
+        //拼接验证数据集
+        $validateData=array_merge(["uuid"=>$uuid],$data);
+        //定义验证规则
+        $validator = Validator::make($validateData,[
+            'uuid' => 'required|max:32|min:32',
+            "levelid"=>'present|numeric',
+            "followstatusid"=>'present|numeric'
+        ],['uuid.required'=>'参数错误','uuid.max'=>'参数错误','uuid.min'=>'参数错误',
+            'levelid.present'=>'级别id参数缺少','levelid.numeric'=>'级别只能是int类型',
+            'followstatusid.present'=>'客户状态id参数缺少','followstatusid.numeric'=>'客户状态id只能是int类型'
+          ]);
+
+        //进行验证
+        if ($validator->fails()) {
+            responseData(\StatusCode::PARAM_ERROR,"验证失败","",$validator->errors());
+        }
+        //至少一项不为空
+        if(empty($data["levelid"])&&empty($data["followstatusid"]))
+        {
+            responseData(\StatusCode::PARAM_ERROR,"验证失败","",["levelid"=>["客户级别和客户状态至少一项不为空"],"followstatusid"=>["客户级别和客户状态至少一项不为空"]]);
+        }
+        //获取当前登录用户信息
+        $userinfo=$this->request->get("userinfo");//对象
+
+        //获取业务数据
+        $this->client_service->update($uuid,$userinfo->id,$data);
+        //接口返回结果
+        responseData(\StatusCode::SUCCESS,"修改成功");
+    }
 }

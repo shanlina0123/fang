@@ -117,6 +117,7 @@ $router->group(['prefix' => 'home', 'namespace' => 'Home'], function () use ($ro
     //跨域访问
     $router->group(['middleware' => 'cors_ware'], function () use ($router) {
         $router->options("datas-default-user-one/{cateid}", function () {});//特殊需要指定
+        $router->options("client-update/{uuid}", function () {});//特殊需要指定
         //跨域访问设置
         $router->options("{all}", function () {});
         //登录前
@@ -159,6 +160,8 @@ $router->group(['prefix' => 'home', 'namespace' => 'Home'], function () use ($ro
             $router->post('client-houses', 'ClientController@houseData');//推荐客户的房源下拉框内容
             $router->get('client-statistics', 'ClientController@statistics');//我的推荐客户量统计
             $router->post('client-refree', 'ClientController@store');//推荐客户
+            $router->put('client-update/{uuid}', 'ClientController@update');//修改客户
+
 
         });
 
