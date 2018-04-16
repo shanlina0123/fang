@@ -111,43 +111,51 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
  * 前台手机端
  */
 $router->group(['prefix' => 'home', 'namespace' => 'Home'], function () use ($router) {
+    //跨域访问
+   $router->group(['middleware' => 'cors_ware'], function () use ($router) {
+       //跨域访问设置
+       $router->options("{all}",function(){});
 
-    //登录前
-    $router->post('user/register', 'LoginOrRegisterController@register');//注册
-    $router->post('user/login', 'LoginOrRegisterController@login');//登陆
-    $router->get('get/poc', 'PublicController@getAddress');//省市数据
+       //登录前
+       $router->post('user/register', 'LoginOrRegisterController@register');//注册
+       $router->post('user/login', 'LoginOrRegisterController@login');//登陆
+       $router->get('get/poc', 'PublicController@getAddress');//省市数据
 
-    //首页
-    $router->get('house/recommend', 'HouseController@recommend');//首页房源推荐
+       //首页
+       $router->get('house/recommend', 'HouseController@recommend');//首页房源推荐
 
-    //房源
-    $router->get('house/list', 'HouseController@index');//房源列表
-    $router->get('house/info/{id}', 'HouseController@info');//房源详情
+       //房源
+       $router->get('house/list', 'HouseController@index');//房源列表
+       $router->get('house/info/{id}', 'HouseController@info');//房源详情
 
-    //自定义属性管理
-    $router->get('datas', 'DatasController@index');//获取自定义所有属性列表----OK
-    $router->get('datas-one/{cateid}', 'DatasController@getOne');//获取单个属性列表----OK
+       //自定义属性管理
+       $router->get('datas', 'DatasController@index');//获取自定义所有属性列表----OK
+       $router->get('datas-one/{cateid}', 'DatasController@getOne');//获取单个属性列表----OK
 
-    //默认属性管理
-    $router->get('datas-default', 'DatasController@getDefault');//获取默认所有属性列表----OK
-    $router->get('datas-default-one/{cateid}', 'DatasController@getDefaultOne');//获取默认单个属性列表----OK
+       //默认属性管理
+       $router->get('datas-default', 'DatasController@getDefault');//获取默认所有属性列表----OK
+       $router->get('datas-default-one/{cateid}', 'DatasController@getDefaultOne');//获取默认单个属性列表----OK
 
-    //配置
-    $router->get('conf', 'ConfController@index');//获取web手机端配置列表 ----OK
+       //配置
+       $router->get('conf', 'ConfController@index');//获取web手机端配置列表 ----OK
 
-    //登录后
-    $router->group(['middleware' => 'user_token'], function () use ($router) {
 
-        //个人中心
-        $router->get('users', 'UsersController@index');//获取用户信息 ----OK
-        $router->put('users-update', 'UsersController@update');//修改用户信息 ----OK
+        //登录后
+        $router->group(['middleware' => 'user_token'], function () use ($router) {
+            //个人中心
+            $router->get('users', 'UsersController@index');//获取用户信息 ----OK
+            $router->put('users-update', 'UsersController@update');//修改用户信息 ----OK
 
-        //推荐客户
-        $router->post('client', 'ClientController@index');//我的推荐客户列表
-        $router->post('client-houses', 'ClientController@houseData');//推荐客户的房源下拉框内容
-        $router->get('client-statistics', 'ClientController@statistics');//我的推荐客户量统计
-        $router->post('client-refree', 'ClientController@store');//推荐客户
+            //推荐客户
+            $router->post('client', 'ClientController@index');//我的推荐客户列表
+            $router->post('client-houses', 'ClientController@houseData');//推荐客户的房源下拉框内容
+            $router->get('client-statistics', 'ClientController@statistics');//我的推荐客户量统计
+            $router->post('client-refree', 'ClientController@store');//推荐客户
 
-    });
+        });
+
+  });
+
+
 
 });

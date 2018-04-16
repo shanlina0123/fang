@@ -167,10 +167,12 @@ class DatasService extends HomeBase
      * 获取数据源列表-默认数据
      * @return mixed
      */
-    public function getDefaultOne($cateid)
+    public function getDefaultOne($cateid,$tag="webDatasDefaultList")
     {
-        //redis缓存数据，无则执行数据库获取业务数据
-        return Cache::get('webDatasDefaultList', function ()  use ($cateid){
+        //定义tag的key
+        $tagKey = base64_encode(mosaic("", $tag, $cateid));
+        //redis缓存返回
+        return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($cateid) {
 
             //检测cateid是否存在
             $cateExists = SelectCateDefault::where("id", $cateid)->exists();
@@ -185,8 +187,6 @@ class DatasService extends HomeBase
             if (empty($list)) {
                 responseData(\StatusCode::EMPTY_ERROR, "无结果");
             }
-            //写入redis缓存
-            Cache::put('webDatasDefaultList', $list, config('configure.sCache'));
             //返回数据库层查询结果
             return $list;
         });

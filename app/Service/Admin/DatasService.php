@@ -282,10 +282,12 @@ class DatasService extends AdminBase
      * 获取数据源列表-默认数据
      * @return mixed
      */
-    public function getDefaultOne($cateid)
+    public function getDefaultOne($cateid,$tag="datasDefaultList")
     {
-        //redis缓存数据，无则执行数据库获取业务数据
-        return Cache::get('datasDefaultList', function () use ($cateid) {
+        //定义tag的key
+        $tagKey = base64_encode(mosaic("", $tag, $cateid));
+        //redis缓存返回
+        return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($cateid) {
 
             //检测cateid是否存在
             $cateExists = SelectCateDefault::where("id", $cateid)->exists();

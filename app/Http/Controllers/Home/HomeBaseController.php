@@ -9,7 +9,7 @@
 namespace App\Http\Controllers\Home;
 
 use App\Http\Controllers\Controller;
-header('Access-Control-Allow-Origin: http://wx.rrzhaofang.com');
+
 class HomeBaseController extends  Controller
 {
 

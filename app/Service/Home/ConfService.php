@@ -25,18 +25,29 @@ class ConfService extends HomeBase
     public function index()
     {
         //redis缓存数据，无则执行数据库获取业务数据
-        return Cache::get('confList', function () {
+      // return Cache::get('confList', function () {
             //列表
             $objList = WebConf::where("status", 1)->select("id", "name", "content", "pid", "created_at")->orderBy('id', 'asc')->get();
-            $list = list_to_tree($objList->toArray());
+            foreach($objList->toArray() as $k=>$v)
+            {
+                if($v["pid"]>0)
+                {
+                    $list[$v["pid"]]["_child"][$v["id"]]=$v;
+                }
+
+                if($v["pid"]==0)
+                {
+                    $list[$v["id"]]=$v;
+                }
+            }
             //结果检测
             if (empty($list)) {
                 responseData(\StatusCode::EMPTY_ERROR, "无结果");
             }
             //写入redis缓存
-            Cache::put('confList', $list, config('configure.sCache'));
+        //    Cache::put('confList', $list, config('configure.sCache'));
             //返回数据库层查询结果
             return $list;
-        });
+     //   });
     }
 }
