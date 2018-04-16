@@ -64,7 +64,7 @@ class LoginOrRegisterController extends HomeBaseController
         );
         if ($validator->fails())
         {
-            $messages = $validator->errors()->first();
+            $messages = $validator->errors();
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages );
         }
         $res = $this->mod->checkUser( $data );
