@@ -255,7 +255,7 @@ class ClientService extends AdminBase
             $dynamic->followdate = date('Y-m-d H:i:s');
             $dynamic->save();
             DB::commit();
-            Cache::tags(['clientList','clientRefereeChart'])->flush();
+            Cache::tags(['clientList','clientRefereeChart','HomeClientList'])->flush();
             return 'success';
         }catch (Exception $e)
         {

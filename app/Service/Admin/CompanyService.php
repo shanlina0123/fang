@@ -91,7 +91,7 @@ class CompanyService extends AdminBase
         $obj->addr = $data['addr'];
         if( $obj->save() )
         {
-            Cache::tags(['companyList'])->flush();
+            Cache::tags(['companyList','HomeRecommend'])->flush();
             return 'success';
         }else
         {

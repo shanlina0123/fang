@@ -153,6 +153,8 @@ $router->group(['prefix' => 'home', 'namespace' => 'Home'], function () use ($ro
             $router->post('client-houses', 'ClientController@houseData');//推荐客户的房源下拉框内容
             $router->get('client-statistics', 'ClientController@statistics');//我的推荐客户量统计
             $router->post('client-refree', 'ClientController@store');//推荐客户
+            //公司信息
+            $router->get('company', 'CompanyController@index');
 
         });
 

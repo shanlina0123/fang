@@ -20,7 +20,7 @@ class HouseService extends HomeBase
      */
     public function getList( $request )
     {
-        Cache::tags(['HomeHouseList'])->flush();
+        //Cache::tags(['HomeHouseList'])->flush();
         $tag = 'HomeHouseList';
         $where = $request->input('page').$request->input('typeid').$request->input('name').$request->input('roomtypeid').$request->input('price');
         $where = base64_encode($where);
@@ -90,7 +90,7 @@ class HouseService extends HomeBase
      */
     public function getRecommend()
     {
-        Cache::tags(['HomeRecommend'])->flush();
+        //Cache::tags(['HomeRecommend'])->flush();
         $tag = 'HomeRecommend';
         $value = Cache::tags($tag)->remember( $tag,config('configure.sCache'), function(){
             $RecommendID = HouseHome::orderBy('id','desc')->take(8)->pluck('houseid');
@@ -121,6 +121,8 @@ class HouseService extends HomeBase
         $tag = 'HomeInfo';
         $value = Cache::tags($tag)->remember( $tag.$id,config('configure.sCache'), function() use( $id ){
             $res = House::where('id',$id)->first();
+            $res->created_at = $res->created_at?date("Y-m-d",strtotime($res->created_at)):'';
+            $res->opendate = $res->opendate?date("Y-m-d",strtotime($res->opendate)):'';
             $res->image = $res->houseToImage()->select('url')->get();
             $res->tags = $res->houseToTag()->select('tagid')->get();
             return $res;
