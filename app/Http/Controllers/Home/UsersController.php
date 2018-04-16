@@ -28,7 +28,7 @@ class UsersController extends HomeBaseController
 
 
     /***
-     * 获取用户列表
+     * 获取用户信息
      */
     public function  index()
     {
