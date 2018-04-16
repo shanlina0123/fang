@@ -31,6 +31,7 @@ class StatusCode
     const EXIST_NOT_DELETE=14;//存在不能删除的数据
     const ROLE_ERROR=15;//角色无权限
     const AUTH_ERROR=16;//无权限
+    const TOKEN_EMPTY=17;//token为空
     const AUTH_NOT_DEFINED_ERROR=17;//未定义暂未开放
     const CHECK_FROM = 100100100; //表单数据验证失败
     const USER_LOCKING = 100100101; //用户锁定

@@ -26,22 +26,22 @@ class ClientService extends HomeBase
      * 获取我的客户列表
      * @return mixed
      */
-    public function index($userid, $adminid, $data, $page, $tag = "HomeClientList")
+    public function index($userid,$isadminafter, $adminid, $data, $page, $tag = "HomeClientList")
     {
         //定义tag的key
-        $tagKey = base64_encode(mosaic("", $tag, $userid,$adminid, $page, $data["name"], $data["followstatusid"]));
+        $tagKey = base64_encode(mosaic("", $tag, $userid,$isadminafter,$adminid, $page, $data["name"], $data["followstatusid"]));
         //redis缓存返回
-       return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($userid, $adminid, $data) {
+       return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($userid, $isadminafter, $data) {
             //操作数据库
             $sql = DB::table("client_referee");
             //字段 业务员可以
-            if ($adminid > 0) {
+            if ($isadminafter > 0) {
                 $sql->select("client_referee.userid", "client_referee.clientid", "client_referee.houseid", "client_referee.housename", "client_referee.name", "client_referee.mobile", "client_referee.mobile", "client_referee.created_at",
                     "client_dynamic.levelid", "client_dynamic.followstatusid", "client_dynamic.makedate");
             } else {
-                //无客户状态
+                //无客户等级
                 $sql->select("client_referee.userid", "client_referee.clientid", "client_referee.houseid", "client_referee.housename", "client_referee.name", "client_referee.mobile", "client_referee.mobile", "client_referee.created_at",
-                    "client_dynamic.levelid", "client_dynamic.makedate");
+                    "client_dynamic.followstatusid","client_dynamic.makedate");
             }
             //innerjoin
             $sql->join('client_dynamic', 'client_referee.clientid', '=', 'client_dynamic.clientid')
@@ -51,7 +51,7 @@ class ClientService extends HomeBase
                 $sql->where("name", "like", "%" . $data["name"] . "%");
             }
             //业务员可以
-            if ($adminid > 0) {
+            if ($isadminafter > 0) {
                 //状态搜索 - 搜索条件
                 if (!empty($data["followstatusid"])) {
                     $sql->where("followstatusid", $data["followstatusid"]);

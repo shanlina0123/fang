@@ -116,6 +116,7 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
 $router->group(['prefix' => 'home', 'namespace' => 'Home'], function () use ($router) {
     //跨域访问
     $router->group(['middleware' => 'cors_ware'], function () use ($router) {
+        $router->options("datas-default-user-one/{cateid}", function () {});//特殊需要指定
         //跨域访问设置
         $router->options("{all}", function () {});
         //登录前
@@ -144,9 +145,14 @@ $router->group(['prefix' => 'home', 'namespace' => 'Home'], function () use ($ro
 
         //登录后
         $router->group(['middleware' => 'user_token'], function () use ($router) {
+
             //个人中心
             $router->get('users', 'UsersController@index');//获取用户信息 ----OK
             $router->put('users-update', 'UsersController@update');//修改用户信息 ----OK
+
+            //默认属性管理-区分内外部人员
+            $router->get('datas-default-user', 'DatasController@getDefaultUser');//获取自定义所有属性列表区分内部和外部人员----OK
+            $router->get('datas-default-user-one/{cateid}', 'DatasController@getDefaultUserOne');//获取自定义单个分类的属性列表区分内部和外部人员----OK
 
             //推荐客户
             $router->post('client', 'ClientController@index');//我的推荐客户列表

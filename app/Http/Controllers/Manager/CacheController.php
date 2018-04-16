@@ -19,7 +19,7 @@ class CacheController extends Controller
         //数据源data_select_cate_default 、  renren_data_select_default  增删改的时候手动更新缓存
         Cache::forget("webDatasDefaultAllList");
         Cache::forget("webDatasDefaultList");
-
+        Cache::forget("webDatasDefaultByUserAllList");
         //配置文件web_conf 变化，需手动更新缓存
          Cache::forget("confList");
     }
@@ -36,5 +36,7 @@ class CacheController extends Controller
 
         //后台跟进客户、推荐客户
         Cache::tags(["clientRefereeChart"])->flush();//前台客户量统计
+        Cache::tags(["HomeClientList"])->flush();//前台客户列表
+
     }
 }

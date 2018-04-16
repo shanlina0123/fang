@@ -117,6 +117,99 @@ class DatasService extends HomeBase
         }
     }
 
+
+    /***
+     * 获取默认列表-token验证区分内外部人源客户状态不同
+     * @param $isadminafter
+     * @return mixed
+     */
+    public function getDefaultUser($isadminafter)
+    {
+        //redis缓存数据，无则执行数据库获取业务数据
+       // return Cache::get('webDatasDefaultByUserAllList', function () use($isadminafter){
+
+            //属性分类列表
+
+            $objCateList = SelectCateDefault::select("id", "name")->orderBy('id', 'asc')->get();
+            $list = i_array_column($objCateList->toArray(), null, "id");
+            //列表
+            $objList = SelectDefault::select("id", "name", "status", "cateid", "created_at")->orderBy('id', 'asc')->get();
+            $objList = i_array_column($objList->toArray(), null, "id");
+
+            //整理tree
+            foreach ($objList as $k => $v) {
+                //外部经纪人
+                if($isadminafter==0&&$v["cateid"]==8)
+                {
+                    if(in_array($v["id"],[36,37,40]))
+                    {
+                        $listAll[$v["cateid"]][] = $v;
+                    }
+                }else{
+                    $listAll[$v["cateid"]][] = $v;
+                }
+            }
+            foreach($objCateList as $k=>$v)
+            {
+                $list[$v["id"]]["_child"]=i_array_column($listAll[$v["id"]],null,"id");
+            }
+
+//            foreach ($objList as $k => $v) {
+//                $list[$v["cateid"]]["_child"][] = $v;
+//            }
+//            sort($list);
+            //结果检测
+            if (empty($list)) {
+                responseData(\StatusCode::EMPTY_ERROR, "无结果");
+            }
+            //写入redis缓存
+          //  Cache::put('webDatasDefaultByUserAllList', $list, config('configure.sCache'));
+            //返回数据库层查询结果
+            return $list;
+       // });
+    }
+
+
+    /***
+     * 获取单个默认列表-token验证区分内外部人源客户状态不同
+     * @return mixed
+     */
+    public function getDefaultUserOne($cateid,$userid,$isadminafter,$tag="webDatasDefaulUsertList")
+    {
+        //定义tag的key
+        $tagKey = base64_encode(mosaic("", $tag, $cateid,$userid));
+        //redis缓存返回
+      //  return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($cateid,$isadminafter) {
+
+            //检测cateid是否存在
+            $cateExists = SelectCateDefault::where("id", $cateid)->exists();
+            if ($cateExists == 0) {
+                responseData(\StatusCode::EMPTY_ERROR, "属性分类不存在");
+            }
+
+            //默认条件
+            if($cateid==8&&$isadminafter==0){
+                $list = SelectDefault::where("cateid", $cateid)
+                    ->whereIn("id", [36,37,40])
+                    ->select("id", "name", "status", "cateid", "created_at")
+                    ->orderBy('id', 'asc')
+                    ->get()
+                    ->toArray();
+            }else{
+                $list = SelectDefault::where("cateid", $cateid)->select("id", "name", "status", "cateid", "created_at")->orderBy('id', 'asc')->get()->toArray();
+            }
+            $list=i_array_column($list,null,"id");
+
+            //结果检测
+            if (empty($list)) {
+                responseData(\StatusCode::EMPTY_ERROR, "无结果");
+            }
+            //返回数据库层查询结果
+            return $list;
+      //  });
+    }
+
+
     /***
      * 获取数据源默认数据列表 所有
      * @return mixed
@@ -124,12 +217,12 @@ class DatasService extends HomeBase
     public function getDefault()
     {
         //redis缓存数据，无则执行数据库获取业务数据
-        return Cache::get('webDatasDefaultAllList', function () {
+        return Cache::get('webDatasDefaultAllList', function () use($isadminafter){
 
             //属性分类列表
+
             $objCateList = SelectCateDefault::select("id", "name")->orderBy('id', 'asc')->get();
             $list = i_array_column($objCateList->toArray(), null, "id");
-
             //列表
             $objList = SelectDefault::select("id", "name", "status", "cateid", "created_at")->orderBy('id', 'asc')->get();
             $objList = i_array_column($objList->toArray(), null, "id");
@@ -138,15 +231,10 @@ class DatasService extends HomeBase
                 $listAll[$v["cateid"]][] = $v;
             }
 
-
             foreach($objCateList as $k=>$v)
             {
                 $list[$v["id"]]["_child"]=i_array_column($listAll[$v["id"]],null,"id");
             }
-
-
-
-
 //            foreach ($objList as $k => $v) {
 //                $list[$v["cateid"]]["_child"][] = $v;
 //            }
