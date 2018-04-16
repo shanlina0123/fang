@@ -14,6 +14,10 @@ class CheckUserToken
     public function handle($request, Closure $next)
     {
         $token = $request->header('Authorization');
+        if(empty($token))
+        {
+            responseData(\StatusCode::TOKEN_EMPTY,"token为空");
+        }
         $res = UserToken::where('token',$token)->with('tokenToUser')->first();
         if( $res )
         {

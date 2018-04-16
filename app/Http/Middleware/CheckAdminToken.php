@@ -19,6 +19,10 @@ class CheckAdminToken
     public function handle($request, Closure $next)
     {
         $token = $request->header('Authorization');
+        if(empty($token))
+        {
+            responseData(\StatusCode::TOKEN_EMPTY,"token为空");
+        }
         $res = AdminToken::where('token', $token)->with('tokenToAdminUser')->first();
         if ($res) {
             $admin = $res->tokenToAdminUser;

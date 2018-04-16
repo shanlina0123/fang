@@ -13,6 +13,8 @@ use App\Model\Client\ClientDispatch;
 use App\Model\Client\ClientDynamic;
 use App\Model\Client\ClientReferee;
 use App\Model\Company\Company;
+use App\Model\Data\Select;
+use App\Model\Data\SelectDefault;
 use App\Model\House\House;
 use App\Model\User\AdminUser;
 use App\Service\HomeBase;
@@ -26,22 +28,22 @@ class ClientService extends HomeBase
      * 获取我的客户列表
      * @return mixed
      */
-    public function index($userid, $adminid, $data, $page, $tag = "HomeClientList")
+    public function index($userid,$isadminafter, $adminid, $data, $page, $tag = "HomeClientList")
     {
         //定义tag的key
-        $tagKey = base64_encode(mosaic("", $tag, $userid,$adminid, $page, $data["name"], $data["followstatusid"]));
+        $tagKey = base64_encode(mosaic("", $tag, $userid,$isadminafter,$adminid, $page, $data["name"], $data["followstatusid"]));
         //redis缓存返回
-       return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($userid, $adminid, $data) {
+       return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($userid, $isadminafter, $data) {
             //操作数据库
             $sql = DB::table("client_referee");
             //字段 业务员可以
-            if ($adminid > 0) {
-                $sql->select("client_referee.userid", "client_referee.clientid", "client_referee.houseid", "client_referee.housename", "client_referee.name", "client_referee.mobile", "client_referee.mobile", "client_referee.created_at",
+            if ($isadminafter > 0) {
+                $sql->select("client_dynamic.uuid","client_referee.userid", "client_referee.clientid", "client_referee.houseid", "client_referee.housename", "client_referee.name", "client_referee.mobile", "client_referee.mobile", "client_referee.created_at",
                     "client_dynamic.levelid", "client_dynamic.followstatusid", "client_dynamic.makedate");
             } else {
-                //无客户状态
-                $sql->select("client_referee.userid", "client_referee.clientid", "client_referee.houseid", "client_referee.housename", "client_referee.name", "client_referee.mobile", "client_referee.mobile", "client_referee.created_at",
-                    "client_dynamic.levelid", "client_dynamic.makedate");
+                //无客户等级
+                $sql->select("client_dynamic.uuid","client_referee.userid", "client_referee.clientid", "client_referee.houseid", "client_referee.housename", "client_referee.name", "client_referee.mobile", "client_referee.mobile", "client_referee.created_at",
+                    "client_dynamic.followstatusid","client_dynamic.makedate");
             }
             //innerjoin
             $sql->join('client_dynamic', 'client_referee.clientid', '=', 'client_dynamic.clientid')
@@ -51,7 +53,7 @@ class ClientService extends HomeBase
                 $sql->where("name", "like", "%" . $data["name"] . "%");
             }
             //业务员可以
-            if ($adminid > 0) {
+            if ($isadminafter > 0) {
                 //状态搜索 - 搜索条件
                 if (!empty($data["followstatusid"])) {
                     $sql->where("followstatusid", $data["followstatusid"]);
@@ -60,7 +62,7 @@ class ClientService extends HomeBase
 
             return $sql->paginate(config('configure.sPage'));
 
-      });
+       });
     }
 
     /****
@@ -94,7 +96,8 @@ class ClientService extends HomeBase
         //定义tag的key
         $tagKey = base64_encode(mosaic("", $tag, $userid));
         //redis缓存返回
-        return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($userid) {
+        Cache::tags($tag)->flush();
+       // return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($userid) {
             $row = [
                 "refereeCount"=>0,//推荐量
                 "effectiveCount" => 0,//有效
@@ -118,7 +121,7 @@ class ClientService extends HomeBase
             //返回数据库层查询结果
             return $row;
 
-        });
+       // });
     }
 
     /***
@@ -222,7 +225,69 @@ class ClientService extends HomeBase
             Log::error('======ClientService-store:======' . $e->getMessage());
             responseData(\StatusCode::CATCH_ERROR, "推荐异常");
         }
+    }
 
+    /***
+     * 修改级别和客户状态
+     */
+    public  function  update($uuid,$userid,$data)
+    {
+        try {
+            //开启事务
+            DB::beginTransaction();
 
+            //业务处理
+            //检查为空
+            $row = ClientDynamic::where("uuid", $uuid)->first();
+            if (empty($row)) {
+                responseData(\StatusCode::NOT_EXIST_ERROR, "请求数据不存在");
+            }else{
+                //检查客户是否是自己的
+                if($userid!==$row["refereeuserid"])
+                {
+                    responseData(\StatusCode::NOT_EXIST_ERROR, "该客户不是您的客户，不能进行操作");
+                }
+            }
+
+            //检查levelid是否存在
+            if($data["levelid"])
+            {
+                $levelExist=Select::where(["cateid"=>4,"id"=>$data["levelid"]])->exists();
+                if($levelExist==0)
+                {
+                    responseData(\StatusCode::NOT_EXIST_ERROR, "请求的客户等级数据不存在");
+                }
+            }
+            //检查客户状态是否存在
+            if($data["followstatusid"])
+            {
+                $statusExist=SelectDefault::where(["cateid"=>8,"id"=>$data["followstatusid"]])->exists();
+                if($statusExist==0)
+                {
+                    responseData(\StatusCode::NOT_EXIST_ERROR, "请求的客户状态数据不存在");
+                }
+            }
+            //整理修改数据
+            $data["levelid"]?$client["levelid"] = $data["levelid"]:"";
+            $data["followstatusid"]?$client["followstatusid"] = $data["followstatusid"]:"";
+            $client["updated_at"] = date("Y-m-d H:i:s");
+            //修改数据
+            $rs = ClientDynamic::where("uuid", $uuid)->update($client);
+            //结果处理
+            if ($rs !== false) {
+                DB::commit();
+                //删除缓存
+                Cache::tags(["clientList", "HomeClientList", "clientRefereeChart"])->flush();
+            } else {
+                DB::rollBack();
+                responseData(\StatusCode::DB_ERROR, "修改失败");
+            }
+        } catch (\ErrorException $e) {
+            //业务执行失败
+            DB::rollBack();
+            //记录日志
+            Log::error('======ClientService-update:======' . $e->getMessage());
+            responseData(\StatusCode::CATCH_ERROR, "修改异常");
+        }
     }
 }

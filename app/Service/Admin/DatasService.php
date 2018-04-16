@@ -231,6 +231,7 @@ class DatasService extends AdminBase
                 Cache::forget("datasAllList");
                 //删除Home下缓存
                 Cache::forget("webDatasAllList");
+
             } else {
                 DB::rollBack();
                 responseData(\StatusCode::DB_ERROR, "设置失败");

@@ -94,6 +94,46 @@ class DatasController extends HomeBaseController
 
 
     /***
+     * 根据业务员和外部经纪人区别
+     * 获取数据源列表-默认数据 所有
+     */
+    public function  getDefaultUser()
+    {
+        //获取当前登录用户信息
+        $userinfo=$this->request->get("userinfo");//对象
+
+        //获取业务数据
+        $list=$this->datas_service->getDefaultUser($userinfo->isadminafter);
+        //接口返回结果
+        responseData(\StatusCode::SUCCESS,"获取成功",$list);
+    }
+
+    /***
+     * 单个分类-根据业务员和外部经纪人区别
+     * 获取数据源列表-默认数据 所有
+     */
+    public function  getDefaultUserOne($cateid)
+    {
+        //验证规则
+        $validator = Validator::make(["cateid"=>$cateid],[
+            'cateid' => 'required|numeric'
+        ],['cateid.required'=>'参数错误','cateid.numeric'=>'参数错误']);
+
+        //进行验证
+        if ($validator->fails()) {
+            responseData(\StatusCode::PARAM_ERROR,"参数错误");
+        }
+
+        //获取当前登录用户信息
+        $userinfo=$this->request->get("userinfo");//对象
+
+        //获取业务数据
+        $list=$this->datas_service->getDefaultUserOne($cateid,$userinfo->id,$userinfo->isadminafter);
+        //接口返回结果
+        responseData(\StatusCode::SUCCESS,"获取成功",$list);
+    }
+
+    /***
      * 获取数据源列表-默认数据 具体分类对应
      */
     public function  getDefaultOne($cateid)
