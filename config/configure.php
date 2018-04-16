@@ -14,10 +14,17 @@ return [
         'secret'=>'aafeb39d646560b3407fdeba9d779361',
         'template_id'=>'ngqIpbwh8bUfcSsECmogfXcV14J0tQlEpBO27izEYtY'
     ],
-    //允许访问接口的域名
-    "allow"=>[  'http://local.renrenmobile.com',
-                 'http://dev.renrenmobile.com',
-                 'http://wx.rrzhaofang.com'
-              ]
+    //跨域-手机端，允许访问接口的域名
+    "allow"=>[
+        'http://local.renrenmobile.com',
+        'http://dev.renrenmobile.com',
+        'http://wx.rrzhaofang.com',
+    ],
+    //跨域-PC端，允许访问接口的域名
+    "allow_admin"=>[
+        'http://local.renrenpc.com',
+        'http://dev.renrenpc.com',
+        'http://admin.rrzhaofang.com',
+    ],
 
 ];
