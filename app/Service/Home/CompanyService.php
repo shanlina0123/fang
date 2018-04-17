@@ -21,7 +21,7 @@ class CompanyService extends HomeBase
     {
         $tag = 'HomeCompanyList';
         $value = Cache::tags($tag)->remember( $tag,config('configure.sCache'), function(){
-            return Company::orderBy('id','asc')->select('id','name')->get();
+           return Company::where("isdefault",0)->orderBy('id','desc')->select('id','name')->get();
         });
         return $value;
     }

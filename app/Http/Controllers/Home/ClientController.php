@@ -65,11 +65,15 @@ class ClientController extends HomeBaseController
     public  function  houseData()
     {
         //获取请求参数
-        $data=$this->getData(["name"],$this->request->all());
+        $data=$this->getData(["name","typeid","uuid"],$this->request->all());
         //验证规则
         $validator = Validator::make($data,[
             "name"=>'present|max:100|min:1',
-        ],[ 'name.required'=>'账号参数缺少','name.max'=>'账号长度不能大于100个字符','name.min'=>'账号长度不能小于1个字符']);
+            "typeid"=>'present|numeric',
+            "uuid"=>'present|max:32|min:32',
+        ],[ 'name.required'=>'账号参数缺少','name.max'=>'账号长度不能大于100个字符','name.min'=>'账号长度不能小于1个字符',
+            'typeid.required'=>'房源类型参数缺少','typeid.numeric'=>'房源类型只能是int类型',
+            'uuid.required'=>'uuid参数缺少','uuid.max'=>'uuid长度不能大于32个字符','uuid.min'=>'uuid长度不能小于32个字符',]);
         //进行验证
         if ($validator->fails()) {
             responseData(\StatusCode::PARAM_ERROR,"验证失败","",$validator->errors());
@@ -125,6 +129,7 @@ class ClientController extends HomeBaseController
         if($userinfo->isadminafter==1)
         {
             $data["companyid"]=1;//内部员工
+            $data["remark"]="公司内部员工推荐";
         }else{
             if(empty( $data["companyid"]))
             {

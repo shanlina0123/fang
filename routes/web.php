@@ -10,7 +10,7 @@
 | and give it the Closure to call when that URI is requested.
 |
 */
-
+$router->get('/', 'IndexController@index'); //入口
 /**
  * 后台
  */
@@ -31,6 +31,7 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
         $router->post('user/modify-pass', 'LoginController@modifyPass');//修改密码
         //登录后
         $router->group(['middleware' => 'admin_token'], function () use ($router) {
+            $router->get('token', 'TokenController@index');//检查已有token
             //检测是否绑定
             $router->get('user/binding', 'LoginController@binding');
             //修改密码
@@ -146,6 +147,8 @@ $router->group(['prefix' => 'home', 'namespace' => 'Home'], function () use ($ro
 
         //登录后
         $router->group(['middleware' => 'user_token'], function () use ($router) {
+
+            $router->get('token', 'TokenController@index');//检查已有token
 
             //个人中心
             $router->get('users', 'UsersController@index');//获取用户信息 ----OK

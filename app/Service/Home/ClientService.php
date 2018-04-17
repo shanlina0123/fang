@@ -60,7 +60,7 @@ class ClientService extends HomeBase
                 }
             }
 
-            return $sql->paginate(config('configure.sPage'));
+            return $sql->orderBy("created_at","desc")->paginate(config('configure.sPage'));
 
        });
     }
@@ -72,9 +72,22 @@ class ClientService extends HomeBase
     {
         try {
             //获取详情数据
-            $row = House::select("id", "name", "addr")->where("name", "like", "%" . $data["name"] . "%")->get();
-            if (empty($row)) {
-                responseData(\StatusCode::NOT_EXIST_ERROR, "请求数据不存在");
+            $queryModel = House::select("id", "name", "addr");
+            if($data["name"])
+            {
+                $queryModel->where("name", "like", "%" . $data["name"] . "%");
+            }
+            if($data["typeid"])
+            {
+                $queryModel->where("typeid", $data["typeid"]);
+            }
+            if($data["uuid"])
+            {
+                $queryModel->where("uuid", $data["uuid"]);
+            }
+            $row=$queryModel->get();
+            if (empty($row->toArray())) {
+                responseData(\StatusCode::EMPTY_ERROR, "无结果");
             }
 
         } catch (\ErrorException $e) {
