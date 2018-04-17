@@ -125,7 +125,7 @@ $router->group(['prefix' => 'home', 'namespace' => 'Home'], function () use ($ro
         $router->post('user/register', 'LoginOrRegisterController@register');//注册
         $router->post('user/login', 'LoginOrRegisterController@login');//登陆
         $router->get('get/poc', 'PublicController@getAddress');//省市数据
-        $router->get('get-openid/{code}', 'LoginOrRegisterController@getOpenid');//获取openid
+        $router->get('get-openid/{code}', 'LoginOrRegisterController@wxOpenid');//获取openid
         //首页
         $router->get('house/recommend', 'HouseController@recommend');//首页房源推荐
 

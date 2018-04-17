@@ -74,11 +74,41 @@ class LoginOrRegisterController extends HomeBaseController
     /**
      * 获取openid
      */
-    public function getOpenid( $code )
+    public function wxOpenid( $code )
     {
-        $res = new \WeChat();
-        $res = $res->getWxOpenid($code);
-        responseData(\StatusCode::SUCCESS,'获取openid',$res);
+        $wechatConfig = config('configure.wechat');
+        $url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid='.$wechatConfig['appid'].'&secret='.$wechatConfig['secret'].'&code='.$code.'&grant_type=authorization_code';
+        $data = $this->curlGetDate( $url );
+        if( $data )
+        {
+            if( empty($data->errcode) )
+            {
+                return $data;
+
+            }else
+            {
+                responseData(\StatusCode::ERROR,'获取openid失败');
+            }
+        }else
+        {
+            responseData(\StatusCode::ERROR,'获取openid失败');
+        }
+    }
+
+    /**
+     * @param $url
+     * @return mixed
+     * curl get请求
+     */
+    public function curlGetDate( $url )
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        return json_decode($output);
     }
 
 }
