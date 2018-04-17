@@ -6,6 +6,7 @@
  * Time: 9:59
  */
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Http\Request;
 class WeChat
 {
 
@@ -19,32 +20,42 @@ class WeChat
         $this->appid = $wechatConfig['appid'];
         $this->secret = $wechatConfig['secret'];
         $this->template_id = $wechatConfig['template_id'];
+        $this->url = $wechatConfig['url'];
         $this->access_token = $this->getAccessToken();
     }
 
-
     /**
-     * @param $openid
-     * @param $url
+     * @param $openid openid
+     * @param $username 用户名
+     * @param $phone
+     * @param $name
+     * @param null $url
      * @return bool
      * 发送模板消息
      */
-    public function sendNotice( $openid,$url=null )
+    public function sendNotice( $openid, $username, $phone, $name )
     {
         $url = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token='.$this->access_token;
+        $time = date("Y年m月d日");
+        $contrnt = '客户'.$username.'在'.$time.'预约了'.$name;
         $data = array(
             'touser'=>$openid,
             'template_id'=>$this->template_id,
-            'url'=>$url,
+            'url'=>$this->url,
             'data'=>array(
-                'first'=>['value'=>'','color'=>'']
+                'first'=>['value'=>'客户预约提醒'],
+                'keyword1'=>['value'=>$username],//客户姓名
+                'keyword2'=>['value'=>$phone],//客户电话
+                'keyword3'=>['value'=>$time],
+                'keyword4'=>['value'=>$contrnt],
+                'remark'=>['value'=>'点击查看详情'],
             )
         );
-        $data = $this->curl_request( $url , $data );
-        if( $data )
+        $res = $this->curl_request( $url , urldecode(json_encode($data)) );
+        if( $res )
         {
-            $data = json_decode($data);
-            if( isset($data->errcode) == 0 )
+            $res = json_decode($res);
+            if( empty($res->errcode) )
             {
                 return true;
             }else
@@ -74,24 +85,29 @@ class WeChat
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    /**
+     * @param Request $request
+     * openid
+     */
+    function getOpenid( $code)
+    {
+        $url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid='.$this->appid.'&secret='.$this->secret.'&code='.$code.'&grant_type=authorization_code';
+        $data = $this->curl_request( $url );
+        if( $data )
+        {
+            $data = json_decode($data);
+            if( !empty($data->errcode) )
+            {
+                return $data;
+            }else
+            {
+                return false;
+            }
+        }else
+        {
+            return false;
+        }
+    }
 
 
 
@@ -148,7 +164,7 @@ class WeChat
         if($post)
         {
             curl_setopt($curl, CURLOPT_POST, 1);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($post));
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $post);
         }
         if($cookie)
         {

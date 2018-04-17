@@ -36,7 +36,7 @@ class LoginOrRegisterController extends HomeBaseController
                 'nickname' => 'required|max:100',
                 'mobile' => 'required|regex:/^1[345789][0-9]{9}$/|unique:user',
                 'economictid'=>'required|numeric',
-                'wechatopenid'=> 'present'
+                'wechatopenid'=> 'required|unique:user'
             ]
         );
         if ($validator->fails())
@@ -70,4 +70,14 @@ class LoginOrRegisterController extends HomeBaseController
         $res = $this->mod->checkUser( $data );
         responseData(\StatusCode::SUCCESS,'用户信息', $res );
     }
+
+    /**
+     * 获取openid
+     */
+    public function getOpenid( $code )
+    {
+        $res =  (new \WeChat())->getOpenid( $code );
+        responseData(\StatusCode::USER_LOCKING,'获取openid',$res);
+    }
+
 }

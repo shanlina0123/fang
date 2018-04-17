@@ -76,7 +76,7 @@ class WechatController extends AdminBaseController
     {
         $url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid='.$this->appid.'&secret='.$this->secret.'&code='.$code.'&grant_type=authorization_code';
         $data = $this->curlGetDate( $url );
-        if( isset($data->errcode) == false )
+        if( !empty($data->errcode) )
         {
             //存储token信息
             Cache::put('authorization'.$uid, $data, 43200);

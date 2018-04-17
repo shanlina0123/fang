@@ -10,9 +10,10 @@ return [
     "temp"=>"/temp/",//图片临时目录
     //微信配置
     'wechat'=>[
-        'appid'=>'wx3536cae4b7313652',
-        'secret'=>'aafeb39d646560b3407fdeba9d779361',
-        'template_id'=>'ngqIpbwh8bUfcSsECmogfXcV14J0tQlEpBO27izEYtY'
+        'appid'=>'wxbe1cdb19d2290193',
+        'secret'=>'01b3d066ca1181a7f5d1aed2b1f4baae',
+        'template_id'=>'fgPw0n6T2g4DlASSKAU4om66xyDxuG8e_Zy3hp6oKic',
+        'url'=>'http://wx.rrzhaofang.com/pages/my.html'
     ],
     //跨域-手机端，允许访问接口的域名
     "allow"=>[
@@ -21,6 +22,7 @@ return [
         'http://wx.rrzhaofang.com',
         'http://local.fang.com',
         'http://dev.renren.com',
+        'http://api.rrzhaofang.com',
     ],
     //跨域-PC端，允许访问接口的域名
     "allow_admin"=>[

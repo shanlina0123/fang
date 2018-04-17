@@ -217,7 +217,7 @@ class DatasService extends HomeBase
     public function getDefault()
     {
         //redis缓存数据，无则执行数据库获取业务数据
-        return Cache::get('webDatasDefaultAllList', function () use($isadminafter){
+        return Cache::get('webDatasDefaultAllList', function (){
 
             //属性分类列表
 

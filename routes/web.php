@@ -14,7 +14,7 @@
 /**
  * 后台
  */
-//$router->get('api-test','Admin\TestController@index');
+$router->get('api-test','Admin\TestController@index');
 $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($router) {
     //PC端跨域访问
     $router->group(['middleware' => 'cors_admin_ware'], function () use ($router) {
@@ -124,7 +124,7 @@ $router->group(['prefix' => 'home', 'namespace' => 'Home'], function () use ($ro
         $router->post('user/register', 'LoginOrRegisterController@register');//注册
         $router->post('user/login', 'LoginOrRegisterController@login');//登陆
         $router->get('get/poc', 'PublicController@getAddress');//省市数据
-
+        $router->get('get/openid/{code}', 'LoginOrRegisterController@getOpenid');//获取openid
         //首页
         $router->get('house/recommend', 'HouseController@recommend');//首页房源推荐
 

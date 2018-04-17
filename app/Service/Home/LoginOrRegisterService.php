@@ -75,4 +75,5 @@ class LoginOrRegisterService extends HomeBase
         $user->expiration = $uToken->expiration;
         return $user;
     }
+
 }
