@@ -125,6 +125,7 @@ class ClientController extends HomeBaseController
         if($userinfo->isadminafter==1)
         {
             $data["companyid"]=1;//内部员工
+            $data["remark"]="公司内部员工推荐";
         }else{
             if(empty( $data["companyid"]))
             {

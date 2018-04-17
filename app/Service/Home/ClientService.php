@@ -60,7 +60,7 @@ class ClientService extends HomeBase
                 }
             }
 
-            return $sql->paginate(config('configure.sPage'));
+            return $sql->orderBy("created_at","desc")->paginate(config('configure.sPage'));
 
        });
     }
