@@ -6,7 +6,6 @@
  * Time: 9:59
  */
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Http\Request;
 class WeChat
 {
 
@@ -89,23 +88,24 @@ class WeChat
      * @param Request $request
      * openid
      */
-    function getOpenid( $code)
+    public function getWxOpenid( $code )
     {
         $url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid='.$this->appid.'&secret='.$this->secret.'&code='.$code.'&grant_type=authorization_code';
         $data = $this->curl_request( $url );
         if( $data )
         {
             $data = json_decode($data);
-            if( !empty($data->errcode) )
+            if( empty($data->errcode) )
             {
                 return $data;
+
             }else
             {
-                return false;
+                responseData(\StatusCode::ERROR,'获取openid失败');
             }
         }else
         {
-            return false;
+            responseData(\StatusCode::ERROR,'获取openid失败');
         }
     }
 
