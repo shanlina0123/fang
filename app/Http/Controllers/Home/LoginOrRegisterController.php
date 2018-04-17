@@ -77,7 +77,7 @@ class LoginOrRegisterController extends HomeBaseController
     public function getOpenid( $code )
     {
         $res =  (new \WeChat())->getOpenid( $code );
-        responseData(\StatusCode::USER_LOCKING,'获取openid',$res);
+        responseData(\StatusCode::SUCCESS,'获取openid',$res);
     }
 
 }
