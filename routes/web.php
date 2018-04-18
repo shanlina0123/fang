@@ -163,10 +163,12 @@ $router->group(['prefix' => 'home', 'namespace' => 'Home'], function () use ($ro
             $router->post('client-houses', 'ClientController@houseData');//推荐客户的房源下拉框内容
             $router->get('client-statistics', 'ClientController@statistics');//我的推荐客户量统计
             $router->post('client-refree', 'ClientController@store');//推荐客户
+            $router->put('client-update/{uuid}', 'ClientController@update');//修改客户
+            $router->post('user-updateinfo', 'UsersController@updateInfo');//修改用户信息
 
             //公司信息
             $router->get('company', 'CompanyController@index');
-            $router->put('client-update/{uuid}', 'ClientController@update');//修改客户
+
         });
 
     });

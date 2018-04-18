@@ -71,5 +71,31 @@ class UsersController extends HomeBaseController
         responseData(\StatusCode::SUCCESS,"修改成功");
     }
 
+    /***
+     * 修改用户电话
+     */
+    public  function  updateInfo()
+    {
+        //获取请求参数
+        $data=$this->getData(["mobile"],$this->request->all());
+
+        //定义验证规则
+        $validator = Validator::make($data,[
+            "mobile"=>'required|max:11|min:11',
+        ],[ 'mobile.required'=>'手机号不能为空','mobile.max'=>'手机号不能大于11位字符','mobile.min'=>'手机号不能少于11位字符']);
+
+        //进行验证
+        if ($validator->fails()) {
+            responseData(\StatusCode::PARAM_ERROR,"验证失败","",$validator->errors());
+        }
+
+        //获取当前登录用户信息
+        $userinfo=$this->request->get("userinfo");//对象
+
+        //获取业务数据
+        $this->users_service->updateInfo($userinfo->id,$userinfo->mobile,$data);
+        //接口返回结果
+        responseData(\StatusCode::SUCCESS,"修改成功");
+    }
 
 }

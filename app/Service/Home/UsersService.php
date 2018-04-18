@@ -77,4 +77,50 @@ class UsersService extends HomeBase
             responseData(\StatusCode::CATCH_ERROR,"修改异常");
         }
     }
+
+    /***
+     * 修改用户电话
+     * @param $data
+     */
+    public  function  updateInfo($id,$mobile,$data)
+    {
+        try {
+            //开启事务
+            DB::beginTransaction();
+
+            //业务处理
+
+            //检查mobile是否存在
+
+            $mobileExist=Users::where("mobile",$data["mobile"])->exists();
+            if($mobileExist>0)
+            {
+                 responseData(\StatusCode::EXIST_ERROR, "手机号已存在");
+            }
+            if($mobile==$data["mobile"])
+            {
+                responseData(\StatusCode::EXIST_ERROR, "手机号无变化");
+            }
+            //整理修改数据
+            $client["mobile"] = $data["mobile"];
+            $client["updated_at"] = date("Y-m-d H:i:s");
+            //修改数据
+            $rs = Users::where("id", $id)->update($client);
+            //结果处理
+            if ($rs !== false) {
+                DB::commit();
+                //删除缓存
+                Cache::tags(["clientList", "HomeClientList", "clientRefereeChart"])->flush();
+            } else {
+                DB::rollBack();
+                responseData(\StatusCode::DB_ERROR, "修改失败");
+            }
+        } catch (\ErrorException $e) {
+            //业务执行失败
+            DB::rollBack();
+            //记录日志
+            Log::error('======UserService-updateInfo:======' . $e->getMessage());
+            responseData(\StatusCode::CATCH_ERROR, "修改异常");
+        }
+    }
 }
