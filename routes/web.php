@@ -120,7 +120,7 @@ $router->group(['prefix' => 'home', 'namespace' => 'Home'], function () use ($ro
         $router->options("datas-default-user-one/{cateid}", function () {});//特殊需要指定
         $router->options("client-update/{uuid}", function () {});//特殊需要指定
         //跨域访问设置
-        //$router->options("{all}", function () {});
+        $router->options("{all}", function () {});
         //登录前
         $router->post('user/register', 'LoginOrRegisterController@register');//注册
         $router->post('user/login', 'LoginOrRegisterController@login');//登陆
