@@ -42,18 +42,31 @@ class LoginOrRegisterService extends HomeBase
      * @param $data
      * 登陆
      */
-    public function checkUser( $data )
+    public function checkUser( $data, $openid=null )
     {
-        $where['nickname'] = $data['nickname'];
-        $where['mobile'] = $data['mobile'];
-        $user = Users::where( $where )->select('id','uuid','companyid','nickname','name','mobile','economictid','isadminafter','wechatopenid','status')->first();
-        if( $user == false )
+        if( $openid )
         {
-            responseData(\StatusCode::LOGIN_FAILURE,'用户名密码错误');
-        }
-        if( $user->status != 1 )
+            $user = Users::where( 'wechatopenid',$openid )->select('id','uuid','companyid','nickname','name','mobile','economictid','isadminafter','wechatopenid','status')->first();
+            if( $user )
+            {
+                if( $user->status != 1 )
+                {
+                    return '';
+                }
+            }else return '';
+        }else
         {
-            responseData(\StatusCode::USER_LOCKING,'用户锁定');
+            $where['nickname'] = $data['nickname'];
+            $where['mobile'] = $data['mobile'];
+            $user = Users::where( $where )->select('id','uuid','companyid','nickname','name','mobile','economictid','isadminafter','wechatopenid','status')->first();
+            if( $user == false )
+            {
+                responseData(\StatusCode::LOGIN_FAILURE,'用户名密码错误');
+            }
+            if( $user->status != 1 )
+            {
+                responseData(\StatusCode::USER_LOCKING,'用户锁定');
+            }
         }
         $tWhere['userid'] = $user->id;
         $uToken = UserToken::where( $tWhere )->first();

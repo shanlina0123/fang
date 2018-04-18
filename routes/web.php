@@ -14,7 +14,7 @@ $router->get('/', 'IndexController@index'); //入口
 /**
  * 后台
  */
-$router->get('api-test','Admin\TestController@index');
+//$router->get('api-test','Admin\TestController@index');
 $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($router) {
     //PC端跨域访问
     $router->group(['middleware' => 'cors_admin_ware'], function () use ($router) {
@@ -120,7 +120,7 @@ $router->group(['prefix' => 'home', 'namespace' => 'Home'], function () use ($ro
         $router->options("datas-default-user-one/{cateid}", function () {});//特殊需要指定
         $router->options("client-update/{uuid}", function () {});//特殊需要指定
         //跨域访问设置
-        $router->options("{all}", function () {});
+        //$router->options("{all}", function () {});
         //登录前
         $router->post('user/register', 'LoginOrRegisterController@register');//注册
         $router->post('user/login', 'LoginOrRegisterController@login');//登陆

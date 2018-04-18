@@ -83,8 +83,10 @@ class LoginOrRegisterController extends HomeBaseController
         {
             if( empty($data->errcode) )
             {
-                return $data;
-
+                $obj = new \stdClass();
+                $obj->openid = $data->openid;
+                $obj->users = $this->mod->checkUser([],$data->openid);
+                responseData(\StatusCode::SUCCESS,'openid',$obj);
             }else
             {
                 responseData(\StatusCode::ERROR,'获取openid失败');
