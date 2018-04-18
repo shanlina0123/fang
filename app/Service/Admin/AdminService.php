@@ -168,6 +168,7 @@ class AdminService extends AdminBase
             }else{
                 //TODO::更新
                 $userUpdateData["name"] = $data["name"];
+                $userUpdateData["companyid"] = 1;
                 $userUpdateData["nickname"] = $data["nickname"];
                 $userUpdateData["adminid"] = $adminid;//后端用户id
                 $userUpdateData["isadminafter"] = 1;//后端
