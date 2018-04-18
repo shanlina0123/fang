@@ -203,6 +203,7 @@ class ClientService extends HomeBase
             $clientDynamic["refereeuserid"] = $userid;// 推荐人id
             $clientDynamic["followadminid"] = $adminid;//后台跟进者id
             $clientDynamic["ownadminid"] = $adminid;//后台客户归属者id
+            $clientDynamic["makedate"] = date("Y-m-d H:i:s");//预约时间
             $clientDynamic["created_at"] = date("Y-m-d H:i:s");
             $rsClientDynamic = ClientDynamic::create($clientDynamic);
             $clientDynamicid = $rsClientDynamic->id;
