@@ -31,6 +31,7 @@ class ClientService extends HomeBase
      */
     public function index($userid,$isadminafter, $adminid, $data, $page, $tag = "HomeClientList")
     {
+        Cache::tags($tag)->flush();
         //定义tag的key
         $tagKey = base64_encode(mosaic("", $tag, $userid,$isadminafter,$adminid, $page, $data["name"], $data["followstatusid"]));
         //redis缓存返回
