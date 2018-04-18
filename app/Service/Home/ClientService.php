@@ -37,19 +37,22 @@ class ClientService extends HomeBase
         //redis缓存返回
        return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($userid, $isadminafter, $data) {
             //操作数据库
-            $sql = DB::table("client_referee");
+           $pre=getenv("DB_PREFIX")?getenv("DB_PREFIX"):config("configure.DB_PREFIX");
+           $aliasA=$pre."a";
+           $aliasB=$pre."b";
+           $sql = DB::table("client_referee as a");
             //字段 业务员可以
             if ($isadminafter > 0) {
-                $sql->select("client_dynamic.uuid","client_referee.userid", "client_referee.clientid", "client_referee.houseid", "client_referee.housename", "client_referee.name", "client_referee.mobile", "client_referee.mobile", "client_referee.created_at",
-                    "client_dynamic.levelid", "client_dynamic.followstatusid", "client_dynamic.makedate");
+                $sql->select(DB::raw("$aliasB.uuid,$aliasA.userid,$aliasA.clientid,$aliasA.houseid,$aliasA.housename,$aliasA.name,$aliasA.mobile,$aliasA.created_at,
+                    $aliasB.levelid,$aliasB.followstatusid,FROM_UNIXTIME(UNIX_TIMESTAMP($aliasB.makedate),'%m-%d %H:%i') as makedate"));
             } else {
                 //无客户等级
-                $sql->select("client_dynamic.uuid","client_referee.userid", "client_referee.clientid", "client_referee.houseid", "client_referee.housename", "client_referee.name", "client_referee.mobile", "client_referee.mobile", "client_referee.created_at",
-                    "client_dynamic.followstatusid","client_dynamic.makedate");
+                $sql->select(DB::raw("$aliasB.uuid,$aliasA.userid,$aliasA.clientid,$aliasA.houseid,$aliasA.housename,$aliasA.name,$aliasA.mobile,$aliasA.created_at,
+                    $aliasB.followstatusid,FROM_UNIXTIME(UNIX_TIMESTAMP($aliasB.makedate),'%m-%d %H:%i') as makedate"));
             }
-            //innerjoin
-            $sql->join('client_dynamic', 'client_referee.clientid', '=', 'client_dynamic.clientid')
-                ->where("userid", $userid);
+               //innerjoin
+           $sql->join("client_dynamic as b", "a.clientid", '=', "b.clientid")
+               ->where("userid", $userid);
             //客户名称 - 搜索条件
             if (!empty($data["name"])) {
                 $sql->where("name", "like", "%" . $data["name"] . "%");
