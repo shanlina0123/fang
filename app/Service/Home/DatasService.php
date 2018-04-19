@@ -138,16 +138,16 @@ class DatasService extends HomeBase
 
             //整理tree
             foreach ($objList as $k => $v) {
-                //外部经纪人
-                if($isadminafter==0&&$v["cateid"]==8)
-                {
-                    if(in_array($v["id"],[36,37,40]))
-                    {
-                        $listAll[$v["cateid"]][] = $v;
-                    }
-                }else{
+                //外部经纪人--产品定义暂时屏蔽
+//                if($isadminafter==0&&$v["cateid"]==8)
+//                {
+//                    if(in_array($v["id"],[36,37,40]))
+//                    {
+//                        $listAll[$v["cateid"]][] = $v;
+//                    }
+//                }else{
                     $listAll[$v["cateid"]][] = $v;
-                }
+               // }
             }
             foreach($objCateList as $k=>$v)
             {
@@ -187,17 +187,17 @@ class DatasService extends HomeBase
                 responseData(\StatusCode::EMPTY_ERROR, "属性分类不存在");
             }
 
-            //默认条件
-            if($cateid==8&&$isadminafter==0){
-                $list = SelectDefault::where("cateid", $cateid)
-                    ->whereIn("id", [36,37,40])
-                    ->select("id", "name", "status", "cateid", "created_at")
-                    ->orderBy('id', 'asc')
-                    ->get()
-                    ->toArray();
-            }else{
+            //默认条件 --产品定义暂时屏蔽
+//            if($cateid==8&&$isadminafter==0){
+//                $list = SelectDefault::where("cateid", $cateid)
+//                    ->whereIn("id", [36,37,40])
+//                    ->select("id", "name", "status", "cateid", "created_at")
+//                    ->orderBy('id', 'asc')
+//                    ->get()
+//                    ->toArray();
+//            }else{
                 $list = SelectDefault::where("cateid", $cateid)->select("id", "name", "status", "cateid", "created_at")->orderBy('id', 'asc')->get()->toArray();
-            }
+          //  }
             $list=i_array_column($list,null,"id");
 
             //结果检测

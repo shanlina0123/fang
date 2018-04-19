@@ -31,25 +31,25 @@ class ClientService extends HomeBase
      */
     public function index($userid,$isadminafter, $adminid, $data, $page, $tag = "HomeClientList")
     {
-        Cache::tags($tag)->flush();
+       // Cache::tags($tag)->flush();
         //定义tag的key
         $tagKey = base64_encode(mosaic("", $tag, $userid,$isadminafter,$adminid, $page, $data["name"], $data["followstatusid"]));
         //redis缓存返回
-       return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($userid, $isadminafter, $data) {
+      // return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($userid, $isadminafter, $data) {
             //操作数据库
            $pre=getenv("DB_PREFIX")?getenv("DB_PREFIX"):config("configure.DB_PREFIX");
            $aliasA=$pre."a";
            $aliasB=$pre."b";
            $sql = DB::table("client_referee as a");
-            //字段 业务员可以
-            if ($isadminafter > 0) {
+            //字段 业务员可以--- 产品意思暂时屏蔽
+           // if ($isadminafter > 0) {
                 $sql->select(DB::raw("$aliasB.uuid,$aliasA.userid,$aliasA.clientid,$aliasA.houseid,$aliasA.housename,$aliasA.name,$aliasA.mobile,$aliasA.created_at,
                     $aliasB.levelid,$aliasB.followstatusid,FROM_UNIXTIME(UNIX_TIMESTAMP($aliasB.makedate),'%m-%d %H:%i') as makedate"));
-            } else {
+          //  } else {
                 //无客户等级
-                $sql->select(DB::raw("$aliasB.uuid,$aliasA.userid,$aliasA.clientid,$aliasA.houseid,$aliasA.housename,$aliasA.name,$aliasA.mobile,$aliasA.created_at,
-                    $aliasB.followstatusid,FROM_UNIXTIME(UNIX_TIMESTAMP($aliasB.makedate),'%m-%d %H:%i') as makedate"));
-            }
+            //    $sql->select(DB::raw("$aliasB.uuid,$aliasA.userid,$aliasA.clientid,$aliasA.houseid,$aliasA.housename,$aliasA.name,$aliasA.mobile,$aliasA.created_at,
+                //    $aliasB.followstatusid,FROM_UNIXTIME(UNIX_TIMESTAMP($aliasB.makedate),'%m-%d %H:%i') as makedate"));
+           // }
                //innerjoin
            $sql->join("client_dynamic as b", "a.clientid", '=', "b.clientid")
                ->where("userid", $userid);
@@ -57,17 +57,17 @@ class ClientService extends HomeBase
             if (!empty($data["name"])) {
                 $sql->where("name", "like", "%" . $data["name"] . "%");
             }
-            //业务员可以
-            if ($isadminafter > 0) {
-                //状态搜索 - 搜索条件
-                if (!empty($data["followstatusid"])) {
-                    $sql->where("followstatusid", $data["followstatusid"]);
-                }
-            }
+           //业务员可以
+           // if ($isadminafter > 0) {
+           //状态搜索 - 搜索条件
+           if (!empty($data["followstatusid"])) {
+               $sql->where("followstatusid", $data["followstatusid"]);
+           }
+           //   }
 
-            return $sql->orderBy("created_at","desc")->paginate(config('configure.sPage'));
+           return $sql->orderBy("created_at","desc")->paginate(config('configure.sPage'));
 
-       });
+       //});
     }
 
     /****
