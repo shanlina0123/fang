@@ -244,6 +244,7 @@ class HouseService extends AdminBase
      */
     public function getList( $request )
     {
+        Cache::flush();
         $tag = 'houseList';
         $where = $request->input('page').$request->input('typeid').$request->input('name').$request->input('iscommission').$request->input('created_at');
         $where = base64_encode($where);
@@ -263,13 +264,13 @@ class HouseService extends AdminBase
             }
             if(  $cTime )
             {
-                $sql->where('created_at',$cTime);
+                $sql->whereDate('created_at','>=',explode('-',$cTime)[0])->whereDate('created_at','<=',explode('-',$cTime)[1]);
             }
             if( $name )
             {
                 $sql->where('name','like','%'.$name.'%');
             }
-            return $sql->paginate(config('configure.sPage'));
+            return $sql->paginate(3);
         });
         return $value;
     }
@@ -368,6 +369,7 @@ class HouseService extends AdminBase
      */
     public function destroyHouse( $uuid )
     {
+        return 'success';
         try{
             DB::beginTransaction();
             $res = House::where('uuid',$uuid)->first();

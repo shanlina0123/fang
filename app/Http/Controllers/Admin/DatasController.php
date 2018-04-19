@@ -59,6 +59,18 @@ class DatasController extends AdminBaseController
         responseData(\StatusCode::SUCCESS,"获取成功",$list);
     }
 
+
+    /**
+     * 获取数据源列表
+     */
+    public function getall()
+    {
+        //获取业务数据
+        $list = $this->datas_service->getall();
+        //接口返回结果
+        responseData(\StatusCode::SUCCESS,"获取成功",$list);
+    }
+
     /***
      * 数据源详情
      * @param $uuid

@@ -20,6 +20,13 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
     $router->group(['middleware' => 'cors_admin_ware'], function () use ($router) {
         //跨域访问设置
         $router->options("{all}", function () {});
+        $router->options('house/index',  function () {});
+        $router->options('datas-default-one/{cateid}',  function () {});
+        $router->options('datas-one/{cateid}',  function () {});
+        $router->options('house/delete/{uuid}',  function () {});
+        $router->options('house/create',  function () {});
+
+
         //登录前
         $router->post('login', 'LoginController@login');//登录
         $router->get('get/poc', 'PublicController@getAddress');//省市数据
@@ -95,6 +102,7 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
 
                 //自定义属性管理
                 $router->get('datas', 'DatasController@index');//获取自定义所有属性列表----OK
+                $router->get('datas-all', 'DatasController@getall');//获取全部自定义属性
                 $router->get('datas-one/{cateid}', 'DatasController@getOne');//获取单个属性列表----OK
                 $router->get('datas-detail/{uuid}', 'DatasController@edit');//属性详情----OK
                 $router->post('datas', 'DatasController@store');//添加属性----OK
@@ -120,7 +128,7 @@ $router->group(['prefix' => 'home', 'namespace' => 'Home'], function () use ($ro
         $router->options("datas-default-user-one/{cateid}", function () {});//特殊需要指定
         $router->options("client-update/{uuid}", function () {});//特殊需要指定
         //跨域访问设置
-        //$router->options("{all}", function () {});
+        $router->options("{all}", function () {});
         //登录前
         $router->post('user/register', 'LoginOrRegisterController@register');//注册
         $router->post('user/login', 'LoginOrRegisterController@login');//登陆

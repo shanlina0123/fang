@@ -65,13 +65,46 @@ class DatasService extends AdminBase
         }
 
         //默认条件
-        $list = Select::where("cateid", $cateid)->select("id","uuid", "name", "status", "cateid", "created_at")->orderBy('id', 'asc')->get();
+        $list = Select::where("cateid", $cateid)->select("id","uuid", "name", "status", "cateid", "created_at")->orderBy('id', 'asc')->get()->toArray();
         //结果检测
         if (empty($list)) {
             responseData(\StatusCode::EMPTY_ERROR, "无结果");
         }
+        $list=i_array_column($list,null,"id");
         //返回数据库层查询结果
         return $list;
+    }
+
+    /***
+     * 获取数据源列表 所有
+     * @return mixed
+     */
+    public function getall()
+    {
+        //redis缓存数据，无则执行数据库获取业务数据
+        return Cache::get('datasWebAllList', function () {
+            //属性分类列表
+            $objCateList = SelectCate::select("id", "name")->orderBy('id', 'asc')->get();
+            $list = i_array_column($objCateList->toArray(), null, "id");
+            //结果检测
+            if (empty($list)) {
+                responseData(\StatusCode::EMPTY_ERROR, "无结果");
+            }
+            //列表
+            $objList = Select::select("id", "name", "cateid", "created_at")->orderBy('id', 'asc')->get();
+            $objList = i_array_column($objList->toArray(), null, "id");
+            foreach ($objList as $k => $v) {
+                $listAll[$v["cateid"]][] = $v;
+            }
+            foreach($objCateList as $k=>$v)
+            {
+                $list[$v["id"]]["_child"]=i_array_column($listAll[$v["id"]],null,"id");
+            }
+            //写入redis缓存
+            Cache::put('datasWebAllList', $list, config('configure.sCache'));
+            //返回数据库层查询结果
+            return $list;
+        });
     }
 
     /***
@@ -262,11 +295,14 @@ class DatasService extends AdminBase
             //列表
             $objList = SelectDefault::select("id", "name", "status", "cateid", "created_at")->orderBy('id', 'asc')->get();
             $objList = i_array_column($objList->toArray(), null, "id");
-            //整理tree
             foreach ($objList as $k => $v) {
-                $list[$v["cateid"]]["_child"][] = $v;
+                $listAll[$v["cateid"]][] = $v;
             }
-            sort($list);
+
+            foreach($objCateList as $k=>$v)
+            {
+                $list[$v["id"]]["_child"]=i_array_column($listAll[$v["id"]],null,"id");
+            }
             //结果检测
             if (empty($list)) {
                 responseData(\StatusCode::EMPTY_ERROR, "无结果");
@@ -285,6 +321,7 @@ class DatasService extends AdminBase
      */
     public function getDefaultOne($cateid,$tag="datasDefaultList")
     {
+
         //定义tag的key
         $tagKey = base64_encode(mosaic("", $tag, $cateid));
         //redis缓存返回
@@ -295,13 +332,14 @@ class DatasService extends AdminBase
             if ($cateExists == 0) {
                 responseData(\StatusCode::EMPTY_ERROR, "属性分类不存在");
             }
-
             //默认条件
-            $list = SelectDefault::where("cateid", $cateid)->select("id", "name", "status", "cateid", "created_at")->orderBy('id', 'asc')->get();
+            $list = SelectDefault::where("cateid", $cateid)->select("id", "name", "status", "cateid", "created_at")->orderBy('id', 'asc')->get()->toArray();
+
             //结果检测
             if (empty($list)) {
                 responseData(\StatusCode::EMPTY_ERROR, "无结果");
             }
+            $list=i_array_column($list,null,"id");
             //写入redis缓存
             Cache::put('datasDefaultList', $list, config('configure.sCache'));
             //返回数据库层查询结果
