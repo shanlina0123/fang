@@ -31,39 +31,43 @@ class ClientService extends HomeBase
      */
     public function index($userid,$isadminafter, $adminid, $data, $page, $tag = "HomeClientList")
     {
+       // Cache::tags($tag)->flush();
         //定义tag的key
         $tagKey = base64_encode(mosaic("", $tag, $userid,$isadminafter,$adminid, $page, $data["name"], $data["followstatusid"]));
         //redis缓存返回
-       return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($userid, $isadminafter, $data) {
+      // return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($userid, $isadminafter, $data) {
             //操作数据库
-            $sql = DB::table("client_referee");
-            //字段 业务员可以
-            if ($isadminafter > 0) {
-                $sql->select("client_dynamic.uuid","client_referee.userid", "client_referee.clientid", "client_referee.houseid", "client_referee.housename", "client_referee.name", "client_referee.mobile", "client_referee.mobile", "client_referee.created_at",
-                    "client_dynamic.levelid", "client_dynamic.followstatusid", "client_dynamic.makedate");
-            } else {
+           $pre=getenv("DB_PREFIX")?getenv("DB_PREFIX"):config("configure.DB_PREFIX");
+           $aliasA=$pre."a";
+           $aliasB=$pre."b";
+           $sql = DB::table("client_referee as a");
+            //字段 业务员可以--- 产品意思暂时屏蔽
+           // if ($isadminafter > 0) {
+                $sql->select(DB::raw("$aliasB.uuid,$aliasA.userid,$aliasA.clientid,$aliasA.houseid,$aliasA.housename,$aliasA.name,$aliasA.mobile,$aliasA.created_at,
+                    $aliasB.levelid,$aliasB.followstatusid,FROM_UNIXTIME(UNIX_TIMESTAMP($aliasB.makedate),'%m-%d %H:%i') as makedate"));
+          //  } else {
                 //无客户等级
-                $sql->select("client_dynamic.uuid","client_referee.userid", "client_referee.clientid", "client_referee.houseid", "client_referee.housename", "client_referee.name", "client_referee.mobile", "client_referee.mobile", "client_referee.created_at",
-                    "client_dynamic.followstatusid","client_dynamic.makedate");
-            }
-            //innerjoin
-            $sql->join('client_dynamic', 'client_referee.clientid', '=', 'client_dynamic.clientid')
-                ->where("userid", $userid);
+            //    $sql->select(DB::raw("$aliasB.uuid,$aliasA.userid,$aliasA.clientid,$aliasA.houseid,$aliasA.housename,$aliasA.name,$aliasA.mobile,$aliasA.created_at,
+                //    $aliasB.followstatusid,FROM_UNIXTIME(UNIX_TIMESTAMP($aliasB.makedate),'%m-%d %H:%i') as makedate"));
+           // }
+               //innerjoin
+           $sql->join("client_dynamic as b", "a.clientid", '=', "b.clientid")
+               ->where("userid", $userid);
             //客户名称 - 搜索条件
             if (!empty($data["name"])) {
                 $sql->where("name", "like", "%" . $data["name"] . "%");
             }
-            //业务员可以
-            if ($isadminafter > 0) {
-                //状态搜索 - 搜索条件
-                if (!empty($data["followstatusid"])) {
-                    $sql->where("followstatusid", $data["followstatusid"]);
-                }
-            }
+           //业务员可以
+           // if ($isadminafter > 0) {
+           //状态搜索 - 搜索条件
+           if (!empty($data["followstatusid"])) {
+               $sql->where("followstatusid", $data["followstatusid"]);
+           }
+           //   }
 
-            return $sql->orderBy("created_at","desc")->paginate(config('configure.sPage'));
+           return $sql->orderBy("created_at","desc")->paginate(config('configure.sPage'));
 
-       });
+       //});
     }
 
     /****
@@ -203,6 +207,7 @@ class ClientService extends HomeBase
             $clientDynamic["refereeuserid"] = $userid;// 推荐人id
             $clientDynamic["followadminid"] = $adminid;//后台跟进者id
             $clientDynamic["ownadminid"] = $adminid;//后台客户归属者id
+            $clientDynamic["makedate"] = date("Y-m-d H:i:s");//预约时间
             $clientDynamic["created_at"] = date("Y-m-d H:i:s");
             $rsClientDynamic = ClientDynamic::create($clientDynamic);
             $clientDynamicid = $rsClientDynamic->id;
