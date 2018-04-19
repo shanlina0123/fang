@@ -18,11 +18,13 @@ return [
     //跨域-手机端，允许访问接口的域名
     "allow"=>[
         'http://local.renrenmobile.com',
+        'http://local.renrenpc.com',
         'http://dev.renrenmobile.com',
         'http://wx.rrzhaofang.com',
         'http://local.fang.com',
         'http://dev.renren.com',
         'http://api.rrzhaofang.com',
+        'http://admin.rrzhaofang.com',
     ],
     //跨域-PC端，允许访问接口的域名
     "allow_admin"=>[
@@ -31,6 +33,7 @@ return [
         'http://local.renrenpc.com',
         'http://dev.renrenpc.com',
         'http://admin.rrzhaofang.com',
+        'http://local.renrenpc.com',
     ],
 
 ];
