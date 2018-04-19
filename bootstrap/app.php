@@ -66,12 +66,16 @@ $app->singleton(
 // $app->routeMiddleware([
 //     'auth' => App\Http\Middleware\Authenticate::class,
 // ]);
+
+
+$app->middleware([
+    \App\Http\Middleware\CorsMiddleware::class,
+]);
+
 $app->routeMiddleware([
     'admin_token' => App\Http\Middleware\CheckAdminToken::class,
     'user_token' => App\Http\Middleware\CheckUserToken::class,
     'admin_auth' => App\Http\Middleware\CheckAdminAuth::class,
-    'cors_ware' =>App\Http\Middleware\CorsMiddleware::class,
-    'cors_admin_ware' =>App\Http\Middleware\CorsAdminMiddleware::class
 ]);
 
 /*

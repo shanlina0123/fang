@@ -16,10 +16,6 @@ $router->get('/', 'IndexController@index'); //入口
  */
 //$router->get('api-test','Admin\TestController@index');
 $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($router) {
-    //PC端跨域访问
-    $router->group(['middleware' => 'cors_admin_ware'], function () use ($router) {
-        //跨域访问设置
-        $router->options("{all}", function () {});
         //登录前
         $router->post('login', 'LoginController@login');//登录
         $router->get('get/poc', 'PublicController@getAddress');//省市数据
@@ -107,7 +103,7 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
             });
         });
 
-    });
+
 });
 
 
@@ -115,12 +111,6 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
  * 前台手机端
  */
 $router->group(['prefix' => 'home', 'namespace' => 'Home'], function () use ($router) {
-    //跨域访问
-    $router->group(['middleware' => 'cors_ware'], function () use ($router) {
-        $router->options("datas-default-user-one/{cateid}", function () {});//特殊需要指定
-        $router->options("client-update/{uuid}", function () {});//特殊需要指定
-        //跨域访问设置
-        $router->options("{all}", function () {});
         //登录前
         $router->post('user/register', 'LoginOrRegisterController@register');//注册
         $router->post('user/login', 'LoginOrRegisterController@login');//登陆
@@ -170,8 +160,4 @@ $router->group(['prefix' => 'home', 'namespace' => 'Home'], function () use ($ro
             $router->get('company', 'CompanyController@index');
 
         });
-
-    });
-
-
 });
