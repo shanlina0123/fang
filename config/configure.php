@@ -53,9 +53,6 @@ return [
         //生产 - 域名
         'http://api.rrzhaofang.com',//接口
         'http://wx.rrzhaofang.com',//手机
-    ],
-    //跨域-PC端，允许访问接口的域名
-    "allow_admin"=>[
 
         //local - 单莉娜 - 域名
         'http://local.fang.com', //接口
@@ -66,7 +63,7 @@ return [
 
         //local - 舒全刚- 域名
         'http://local.fang.com', //接口
-        'http://local.renrenpc.com',//PC
+        'http://admin.renrenpc.com',//PC
         //local - 舒全刚- IP
         'http://192.168.15.30:8081', //接口
         "http://192.168.15.30:8083",//PC
