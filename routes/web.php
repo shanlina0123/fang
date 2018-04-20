@@ -111,7 +111,7 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
 
                 //数据分析
                 $router->post('chart', 'ChartController@index');//客户分析----OK
-                $router->get('user', 'ChartController@getUsers');//前端经纪人/业务员列表----OK
+                $router->get('chart-user', 'ChartController@getUsers');//前端经纪人/业务员列表----OK
             });
         });
 
