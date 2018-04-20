@@ -38,6 +38,4 @@ class PublicController extends HomeBaseController
         }
         responseData(\StatusCode::SUCCESS,'省市信息',$arr);
     }
-
-
 }

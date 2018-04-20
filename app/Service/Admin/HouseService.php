@@ -28,26 +28,26 @@ class HouseService extends AdminBase
     {
         $rules = [
             'name' => 'required',
-            'iscommission' =>'required|numeric',
-            'commissionid' =>'required|numeric',
-            'ishome' =>'numeric',
+            'iscommission' =>'sometimes|required|numeric',
+            'commissionid' =>'sometimes|required|numeric',
+            'ishome' =>'sometimes|numeric',
             'provinceid' =>'numeric',
             'cityid' =>'numeric',
             'stree' =>'present',
             'addr' =>'required|string',
             'fulladdr' =>'required|string',
-            'floorpostionid' =>'numeric',
-            'floor' =>'required|max',
+            'floorpostionid' =>'sometimes|numeric',
+            'floor' =>'sometimes|required|max',
             'orientationid' =>'numeric',
             'purposeid' =>'numeric',
             'area' =>'required',
-            'created_at' =>'date',
-            'iselevator' =>'numeric',
-            'years' =>'required',
-            'decoratestyleid' =>'required|numeric',
+            'created_at' =>'sometimes|date',
+            'iselevator' =>'sometimes|numeric',
+            'years' =>'sometimes|required',
+            'decoratestyleid' =>'sometimes|required|numeric',
             'ownershipid' =>'required|numeric',
-            'hasdoublegas' =>'required|numeric',
-            'propertyfee' =>'required|string|max:30',
+            'hasdoublegas' =>'sometimes|required|numeric',
+            'propertyfee' =>'sometimes|required|string|max:30',
         ];
         return $rules;
     }
@@ -59,10 +59,10 @@ class HouseService extends AdminBase
     public function getNewRules()
     {
         $rules = [
-            'salestatusid' =>'required|numeric',
-            'opendate' =>'date',
-            'price' =>'required',
-            'roomtypeid' =>'required|numeric',
+            'salestatusid' =>'sometimes|required|numeric',
+            'opendate' =>'sometimes|date',
+            'price' =>'sometimes|required',
+            'roomtypeid' =>'sometimes|required|numeric',
         ];
         return $rules;
     }
@@ -176,8 +176,9 @@ class HouseService extends AdminBase
      * @return mixed
      * 发布房源
      */
-    public function storeHouse( $data )
+    public function storeHouse( $data, $adminid )
     {
+
         try{
             $arr['uuid'] = create_uuid();//楼盘名称
             $arr['name'] = $data['name'];//楼盘名称
@@ -194,18 +195,22 @@ class HouseService extends AdminBase
             $arr['orientationid'] = $data['orientationid'];//朝向
             $arr['purposeid'] = $data['purposeid'];//用途
             $arr['area'] = $data['area'];//面积
-            $arr['created_at'] = $data['created_at'];//发布时间
+            $arr['created_at'] = date('Y-m-d H:i:s');//发布时间
+
             $arr['iselevator'] = $data['iselevator'];//电梯
             $arr['years'] = $data['years'];//年代
+
             $arr['decoratestyleid'] = $data['decoratestyleid'];//装修
             $arr['ownershipid'] = $data['ownershipid'];//权属
             $arr['hasdoublegasid'] = $data['hasdoublegasid'];//双气
             $arr['propertyfee'] = $data['propertyfee'];//物业费
+
             $arr['typeid'] = (int)$data['typeid'];
             $arr['status'] = 0;
             $arr['lng'] = $data['lng'];
             $arr['lat'] = $data['lat'];
-            $arr['userid'] = 1;
+            $arr['adminid'] = $adminid;
+
             switch ( (int)$data['typeid'] )
             {
                 case 1:
@@ -229,9 +234,10 @@ class HouseService extends AdminBase
                     $arr['wide'] = $data['wide'];//面宽
                     break;
             }
+
             $res = House::insertGetId( $arr );
             Cache::tags(['houseList','HomeHouseList'])->flush();
-            return $res;
+            return base64_encode($res);
         }catch (Exception $e){
             responseData(\StatusCode::ERROR,'基本信息发布失败',$data);
         }
@@ -270,7 +276,7 @@ class HouseService extends AdminBase
             {
                 $sql->where('name','like','%'.$name.'%');
             }
-            return $sql->paginate(3);
+            return $sql->paginate(config('configure.sPage'));
         });
         return $value;
     }
@@ -284,17 +290,17 @@ class HouseService extends AdminBase
     {
         try{
             $arr = array();
-            foreach ( $request['tagid'] as $row )
+            foreach ( $request['tagid'] as $key=>$row )
             {
-                $arr[]['uuid'] = create_uuid();
-                $arr[]['tagid'] = $row;
-                $arr[]['houseid'] = $request['houseid'];
+                $arr[$key]['uuid'] = create_uuid();
+                $arr[$key]['tagid'] = $row;
+                $arr[$key]['houseid'] = $request['houseid'];
             }
             $obj = HouseTag::insert( $arr );
             if( $obj )
             {
                 Cache::tags(['houseList','HomeHouseList','HomeRecommend','HomeInfo'])->flush();
-                return $request['houseid'];
+                return base64_encode($request['houseid']);
             }else
             {
                 responseData(\StatusCode::ERROR,'写入失败');

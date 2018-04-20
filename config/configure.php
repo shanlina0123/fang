@@ -89,6 +89,7 @@ return [
         //生产 - 域名
         'http://api.rrzhaofang.com',//接口
         'http://admin.rrzhaofang.com',//PC
+        'https://apis.map.qq.com'
     ],
 
 ];

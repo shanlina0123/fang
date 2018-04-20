@@ -47,7 +47,7 @@ class HouseController extends AdminBaseController
     {
         $data = trimValue( $this->request->all() );
         //公用验证规则
-        $rulesPublic = $this->house->getRules();
+        $rulesPublic = $this->house->getRules( $data );
         switch ( (int)$data['typeid'] )
         {
             case 1:
@@ -74,7 +74,8 @@ class HouseController extends AdminBaseController
             $messages = $validator->errors();
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
         }
-        $res = $this->house->storeHouse( $data );
+        $adminid = $this->request->get('admin_user')->id;
+        $res = $this->house->storeHouse( $data, $adminid );
         responseData(\StatusCode::SUCCESS,'写入成功',$res);
     }
 
