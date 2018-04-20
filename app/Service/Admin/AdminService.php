@@ -20,7 +20,7 @@ class AdminService extends AdminBase
 {
 
     /***
-     * 获取角色列表
+     * 获取管理员列表
      * @return mixed
      */
     public function index()
@@ -28,7 +28,7 @@ class AdminService extends AdminBase
         //redis缓存数据，无则执行数据库获取业务数据
         return Cache::get('adminList', function () {
             //默认条件
-            $list = AdminUser::select("uuid", "nickname", "name", "roleid", "mobile", "isadmin", "status")->orderBy('id', 'asc')->get();
+            $list = AdminUser::select("id","uuid", "nickname", "name", "roleid", "mobile", "isadmin", "status")->orderBy('id', 'asc')->get();
             //结果检测
             if (empty($list)) {
                 responseData(\StatusCode::EMPTY_ERROR, "无结果");
