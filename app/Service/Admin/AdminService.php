@@ -30,7 +30,10 @@ class AdminService extends AdminBase
         return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () {
             //默认条件
             $list = AdminUser::select("id","uuid", "nickname", "name", "roleid", "mobile", "isadmin", "status")
-                ->with("dynamicToRole")
+                ->with(["dynamicToRole" => function ($query){
+                    //部分字段
+                    $query->select("id","uuid", "name");
+                }])
                 ->orderBy('id', 'asc')
                 ->paginate(config('configure.sPage'));
             //结果检测
