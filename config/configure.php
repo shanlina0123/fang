@@ -52,7 +52,7 @@ return [
 
         //dev - 域名
         'http://dev.renren.com',//接口
-        'http://dev.renremobile.com',//手机
+        'http://dev.renrenmobile.com',//手机
         'http://dev.renrenpc.com',//PC
         //dev - IP
         "http://192.168.15.13:8081",//接口
