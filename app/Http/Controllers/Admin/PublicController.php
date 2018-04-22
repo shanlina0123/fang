@@ -19,15 +19,17 @@ class PublicController extends AdminBaseController
      */
     public function uploadImgToTemp(Request $request)
     {
-        if( $request->file('file') == false ) return '';
-        try {
-            $res = $request->file('file')->store('temp', 'temp');
-            $name = explode('/',$res)[1];
+
+        if ($request->hasFile('file'))
+        {
+            $file = $request->file('file');
+            $name = md5(uniqid()).'.'.$file->getClientOriginalExtension();
+            $request->file('file')->move('temp/',$name);
             $src = new \stdClass();
             $src->src = "http://".$_SERVER['HTTP_HOST'].'/temp/'.$name;
             $src->name = $name;
             responseData(\StatusCode::SUCCESS,'上传成功',$src);
-        } catch (Exception $e)
+        }else
         {
             responseData(\StatusCode::ERROR,'上传失败');
         }
@@ -57,6 +59,42 @@ class PublicController extends AdminBaseController
         }
         responseData(\StatusCode::SUCCESS,'省市信息',$arr);
     }
+
+    /**
+     *  获取腾讯地图搜索的地址
+     */
+    public function getMapAddress( Request $request )
+    {
+        $keyword = $request->input('keyword');
+        if( $keyword )
+        {
+            $url = 'https://apis.map.qq.com/ws/place/v1/suggestion/?region=西安&filter%3Dcategory%3D%E5%B0%8F%E5%8C%BA&keyword='.$keyword.'&key=N6LBZ-XRSWP-NM5DY-LW7S6-GCKO7-WBFF7';
+            $data = $this->curlGetDate($url);
+            responseData(\StatusCode::SUCCESS,'地址',$data);
+
+        }else
+        {
+            responseData(\StatusCode::ERROR,'查询失败');
+        }
+    }
+
+    /**
+     * @param $url
+     * @return mixed
+     * curl get请求
+     */
+    public function curlGetDate( $url )
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        return json_decode($output);
+    }
+
+
 
 
 }

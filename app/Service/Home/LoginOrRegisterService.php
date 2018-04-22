@@ -31,8 +31,25 @@ class LoginOrRegisterService extends HomeBase
         $obj->faceimg = $faceimg->headimgurl;
         if( $obj->save() )
         {
-            return 'success';
-
+            $tWhere['userid'] = $obj->id;
+            $uToken = UserToken::where( $tWhere )->first();
+            if( $uToken )
+            {
+                $uToken->token = str_random(60);
+                $uToken->expiration = time()+7200;
+                $uToken->save();
+            }else
+            {
+                $uToken = new UserToken();
+                $uToken->uuid = create_uuid();
+                $uToken->token = str_random(60);
+                $uToken->expiration = time()+7200;
+                $uToken->userid = $obj->id;
+                $uToken->save();
+            }
+            $obj->token = $uToken->token;
+            $obj->expiration = $uToken->expiration;
+            return $obj;
         }else
         {
             responseData(\StatusCode::SUCCESS,'注册失败' );
@@ -60,7 +77,7 @@ class LoginOrRegisterService extends HomeBase
         {
             $where['nickname'] = $data['nickname'];
             $where['mobile'] = $data['mobile'];
-            $user = Users::where( $where )->select('id','uuid','companyid','nickname','name','mobile','economictid','isadminafter','wechatopenid','status')->first();
+            $user = Users::where( $where )->select('id','uuid','companyid','nickname','name','mobile','economictid','isadminafter','wechatopenid','status','faceimg')->first();
             if( $user == false )
             {
                 responseData(\StatusCode::LOGIN_FAILURE,'用户名密码错误');

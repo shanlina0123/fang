@@ -63,6 +63,7 @@ return [
         'http://api.rrzhaofang.com',//接口
         'http://wx.rrzhaofang.com',//手机
         'http://admin.rrzhaofang.com',//PC
+        'https://apis.map.qq.com'
     ],
 
 ];

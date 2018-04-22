@@ -26,7 +26,7 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
         $router->options('datas-one/{cateid}',  function () {});
         $router->options('house/delete/{uuid}',  function () {});
         $router->options('house/create',  function () {});*/
-
+        $router->get('get/map/address', 'PublicController@getMapAddress');//腾旭地址
         //登录前
         $router->post('login', 'LoginController@login');//登录
         $router->get('get/poc', 'PublicController@getAddress');//省市数据
@@ -39,6 +39,7 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
         //登录后
         $router->group(['middleware' => 'admin_token'], function () use ($router) {
             $router->get('token', 'TokenController@index');//检查已有token
+
             //检测是否绑定
             $router->get('user/binding', 'LoginController@binding');
             //修改密码
