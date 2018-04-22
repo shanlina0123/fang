@@ -27,24 +27,28 @@ class ClientService extends AdminBase
     public function getList( $request )
     {
         $tag = 'clientList';
-        $adminID = $request->get('admin_user')->id;
-        $where = $adminID.$request->input('page').$request->input('followstatusid').$request->input('housename').$request->input('levelid').$request->input('ownuserid');
+        //用户信息
+        $admin_user = $request->get('admin_user');
+        $adminID = $admin_user->id;
+        $isAdmin=$admin_user->isadmin;
+        $where = $adminID.$isAdmin.$request->input('page').$request->input('followstatusid').$request->input('housename').$request->input('levelid').$request->input('ownuserid');
         $where = base64_encode($where);
-      $value = Cache::tags($tag)->remember( $tag.$where,config('configure.sCache'), function() use( $request ){
-            //用户信息
-            $admin_user = $request->get('admin_user');
+       $value = Cache::tags($tag)->remember( $tag.$where,config('configure.sCache'), function() use( $request,$admin_user ){
+
             $sql = ClientDynamic::orderBy('id','desc')->with('dynamicToClient');
+
             //管理员
-            if(  $admin_user->isadmin == 1 )
+            if($admin_user->isadmin == 1 )
             {
                 if( $request->input('ownadminid') )
                 {
-                    $sql->where('ownadminid',$request->input('ownuserid'));
+                    $sql->where('ownadminid',$request->input('ownadminid'));
                 }
             }else
             {
                 $sql->where('ownadminid', $admin_user->id);
             }
+
             //客户跟进状态
             if( $request->input('followstatusid') )
             {
@@ -61,7 +65,7 @@ class ClientService extends AdminBase
                 $sql->where('housename','like',$request->input('housename'));
             }
             return  $sql->with("dynamicToCompany","dynamicToUser")->paginate(config('configure.sPage'));
-      });
+         });
         return $value;
     }
 

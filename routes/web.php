@@ -75,7 +75,7 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
                 $router->get('user/broker', 'UserController@broker');//经纪人列表
                 $router->put('setting/{uuid}', 'UserController@setting');//禁用启用
                 //客户
-                $router->get('client/index', 'ClientController@index');//客户列表
+                $router->post('client/index', 'ClientController@index');//客户列表
                 $router->get('client/edit/{uuid}', 'ClientController@edit');//客户详情
                 $router->put('client/update/{uuid}', 'ClientController@update');//客户修改
                 $router->get('client-follow/edit/{client}', 'ClientController@followEdit');//跟进详情
