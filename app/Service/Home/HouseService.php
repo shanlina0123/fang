@@ -20,7 +20,7 @@ class HouseService extends HomeBase
      */
     public function getList( $request )
     {
-        //Cache::tags(['HomeHouseList'])->flush();
+        Cache::tags(['HomeHouseList'])->flush();
         $tag = 'HomeHouseList';
         $where = $request->input('page').$request->input('typeid').$request->input('name').$request->input('roomtypeid').$request->input('price');
         $where = base64_encode($where);
@@ -53,13 +53,11 @@ class HouseService extends HomeBase
                 {
                     case 1:
                         //新房
+                        $priceType = 'price';
                     case 3:
+                    case 2:
                         //商铺
                         $priceType = 'total';
-                        break;
-                    case 2:
-                        //二手房
-                        $priceType = 'price';
                         break;
                     default:
                         $priceType = 'total';

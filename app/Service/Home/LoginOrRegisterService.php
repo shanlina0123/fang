@@ -19,6 +19,7 @@ class LoginOrRegisterService extends HomeBase
      */
     public function registerUser( $data )
     {
+
         $faceimg = (new \WeChat())->getyWechatUserInfo($data['wechatopenid']);
         $obj = new Users();
         $obj->uuid = create_uuid();
@@ -28,7 +29,7 @@ class LoginOrRegisterService extends HomeBase
         $obj->isadminafter = 0;
         $obj->wechatopenid = $data['wechatopenid'];
         $obj->status = 1;
-        $obj->faceimg = $faceimg->headimgurl;
+        $obj->faceimg = $faceimg?$faceimg->headimgurl:'';
         if( $obj->save() )
         {
             $tWhere['userid'] = $obj->id;
