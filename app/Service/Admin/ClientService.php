@@ -60,7 +60,7 @@ class ClientService extends AdminBase
             {
                 $sql->where('housename','like',$request->input('housename'));
             }
-            return  $sql->with("dynamicToCompany")->paginate(config('configure.sPage'));
+            return  $sql->with("dynamicToCompany","dynamicToUser")->paginate(config('configure.sPage'));
       });
         return $value;
     }

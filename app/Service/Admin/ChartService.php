@@ -8,6 +8,7 @@
 
 namespace App\Service\Admin;
 use App\Model\Client\ClientDynamic;
+use App\Model\User\AdminUser;
 use App\Model\User\Users;
 use App\Service\AdminBase;
 use Illuminate\Support\Facades\Cache;
@@ -70,6 +71,25 @@ class ChartService extends AdminBase
         $list=Users::select("id","nickname","isadminafter")->orderBy('id','asc')->get();
 
         $list=array_to_parent($list->toArray(),"id","isadminafter");
+        //结果检测
+        if(empty($list))
+        {
+            responseData(\StatusCode::EMPTY_ERROR,"无结果");
+        }
+        //返回数据库层查询结果
+        return $list;
+    }
+
+
+
+    /***
+     * 获取业务员列表
+     * @return mixed
+     */
+    public  function  getAdmins()
+    {
+        //默认条件
+        $list=AdminUser::select("id","uuid","nickname")->orderBy('id','asc')->get();
         //结果检测
         if(empty($list))
         {

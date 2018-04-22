@@ -73,6 +73,17 @@ class ChartController extends AdminBaseController
         //接口返回结果
         responseData(\StatusCode::SUCCESS, "获取成功", $list);
     }
+    /*
+      * 获取所有业务员 下拉框
+      */
+    public function getAdmins()
+    {
+        //获取业务数据
+        $list = $this->chart_service->getAdmins();
+        //接口返回结果
+        responseData(\StatusCode::SUCCESS, "获取成功", $list);
+    }
+
 
 
 }

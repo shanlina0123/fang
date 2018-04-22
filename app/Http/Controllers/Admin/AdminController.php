@@ -186,5 +186,4 @@ class AdminController extends AdminBaseController
         responseData(\StatusCode::SUCCESS,"设置成功");
     }
 
-
 }
