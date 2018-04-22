@@ -83,7 +83,7 @@ class WeChat
             $data = json_decode($data,true);
             if( !array_has($data,'errcode') )
             {
-               return json_encode($data);
+               return $data;
 
             }else
             {

@@ -29,7 +29,7 @@ class LoginOrRegisterService extends HomeBase
         $obj->isadminafter = 0;
         $obj->wechatopenid = $data['wechatopenid'];
         $obj->status = 1;
-        $obj->faceimg = $faceimg?$faceimg->headimgurl:'';
+        $obj->faceimg = $faceimg?$faceimg['headimgurl']:'';
         if( $obj->save() )
         {
             $tWhere['userid'] = $obj->id;
