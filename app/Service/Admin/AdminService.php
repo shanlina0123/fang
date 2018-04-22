@@ -23,18 +23,20 @@ class AdminService extends AdminBase
      * 获取管理员列表
      * @return mixed
      */
-    public function index()
+    public function index($page,$tag="adminList")
     {
-        //redis缓存数据，无则执行数据库获取业务数据
-        return Cache::get('adminList', function () {
+        $tagKey = base64_encode(mosaic("", $tag, $page));
+        //redis缓存返回
+        return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () {
             //默认条件
-            $list = AdminUser::select("id","uuid", "nickname", "name", "roleid", "mobile", "isadmin", "status")->orderBy('id', 'asc')->get();
+            $list = AdminUser::select("id","uuid", "nickname", "name", "roleid", "mobile", "isadmin", "status")
+                ->with("dynamicToRole")
+                ->orderBy('id', 'asc')
+                ->paginate(config('configure.sPage'));
             //结果检测
             if (empty($list)) {
                 responseData(\StatusCode::EMPTY_ERROR, "无结果");
             }
-            //写入redis缓存
-            Cache::put('adminList', $list, config('configure.sCache'));
             //返回数据库层查询结果
             return $list;
         });

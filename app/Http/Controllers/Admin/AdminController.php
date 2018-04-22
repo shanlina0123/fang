@@ -31,8 +31,11 @@ class AdminController extends AdminBaseController
      */
     public function  index()
     {
+        //获取请求页码
+        $page=$this->request->input("page");
+
         //获取业务数据
-        $list=$this->admin_service->index();
+        $list=$this->admin_service->index($page);
         //接口返回结果
         responseData(\StatusCode::SUCCESS,"获取成功",$list);
     }

@@ -18,4 +18,14 @@ class AdminUser extends Model
     protected $hidden = [
         'password','created_at','updated_at'
     ];
+
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * 关联角色
+     */
+    public function dynamicToRole()
+    {
+        return $this->belongsTo('App\Model\Roles\Role','roleid','id');
+    }
 }
