@@ -147,18 +147,25 @@ class AdminController extends AdminBaseController
             "nickname"=>'required|max:100|min:1',
             "name"=>'required|max:100|min:1',
             "mobile"=>'required|max:11|min:11',
-            'password' => 'required',
+            'password' => 'present',
             'roleid' => 'required|numeric',
         ],['uuid.required'=>'参数错误','uuid.max'=>'参数错误','uuid.min'=>'参数错误',
             'nickname.required'=>'姓名不能为空','nickname.max'=>'姓名长度不能大于100个字符','nickname.min'=>'姓名长度不能小于1个字符',
             'name.required'=>'账号不能为空','name.max'=>'账号长度不能大于100个字符','name.min'=>'账号长度不能小于1个字符',
             'mobile.required'=>'手机号不能为空','mobile.max'=>'手机号不能大于11位字符','mobile.min'=>'手机号不能少于11位字符',
-            'password.required'=>'密码不能为空',
+            'password.present'=>'密码参数缺少',
             'roleid.required'=>'角色不能为空','roleid.numeric'=>'角色只能是数字格式']);
 
         //进行验证
         if ($validator->fails()) {
             responseData(\StatusCode::PARAM_ERROR,"验证失败","",$validator->errors());
+        }
+        if($data["password"])
+        {
+            if(!checkStringIsBase64($data["password"]))
+            {
+                responseData(\StatusCode::PARAM_ERROR,"验证失败","",["password"=>["密码定义错误"]]);
+            }
         }
         //获取业务数据
         $this->admin_service->update($uuid,$data);
