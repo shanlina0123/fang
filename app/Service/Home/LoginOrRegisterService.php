@@ -19,7 +19,7 @@ class LoginOrRegisterService extends HomeBase
      */
     public function registerUser( $data )
     {
-
+        
         $faceimg = (new \WeChat())->getyWechatUserInfo($data['wechatopenid']);
         $obj = new Users();
         $obj->uuid = create_uuid();

@@ -53,7 +53,6 @@ class WeChat
         $res = $this->curl_request( $url , urldecode(json_encode($data)) );
         if( $res )
         {
-            $res = json_decode($res);
             if( empty($res->errcode) )
             {
                 return true;
@@ -76,10 +75,10 @@ class WeChat
         $data = $this->curl_request( $url );
         if( $data )
         {
-            $data = json_decode($data);
             if( empty($data->errcode) )
             {
                 return $data;
+
             }else
             {
                 return false;
@@ -114,7 +113,6 @@ class WeChat
             $data = $this->curl_request( $url );
             if( $data )
             {
-                $data = json_decode($data);
                 if( empty($data->errcode) )
                 {
                     Cache::put('access_token',$data->access_token,$data->expires_in/60);
@@ -170,16 +168,7 @@ class WeChat
             return '';
         }
         curl_close($curl);
-        if($returnCookie)
-        {
-            list($header, $body) = explode("\r\n\r\n", $data, 2);
-            preg_match_all("/Set\-Cookie:([^;]*);/", $header, $matches);
-            $info['cookie']  = substr($matches[1][0], 1);
-            $info['content'] = $body;
-            return $info;
-        }else
-        {
-            return $data;
-        }
+
+        return json_decode($data);
     }
 }
