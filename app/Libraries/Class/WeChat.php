@@ -77,7 +77,13 @@ class WeChat
         if( $data )
         {
             $data = json_decode($data);
-            return $data;
+            if( empty($data->errcode) )
+            {
+                return $data;
+            }else
+            {
+                return false;
+            }
         }else
         {
             return false;
@@ -98,6 +104,7 @@ class WeChat
      */
     public function getAccessToken()
     {
+
         if( Cache::has('access_token') )
         {
             $access_token = Cache::get('access_token');
@@ -108,8 +115,14 @@ class WeChat
             if( $data )
             {
                 $data = json_decode($data);
-                Cache::put('access_token',$data->access_token,$data->expires_in/60);
-                $access_token = $data->access_token;
+                if( empty($data->errcode) )
+                {
+                    Cache::put('access_token',$data->access_token,$data->expires_in/60);
+                    $access_token = $data->access_token;
+                }else
+                {
+                    $access_token = '';
+                }
             }else
             {
                 $access_token = '';
