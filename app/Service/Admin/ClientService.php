@@ -30,7 +30,7 @@ class ClientService extends AdminBase
         $adminID = $request->get('admin_user')->id;
         $where = $adminID.$request->input('page').$request->input('followstatusid').$request->input('housename').$request->input('levelid').$request->input('ownuserid');
         $where = base64_encode($where);
-        $value = Cache::tags($tag)->remember( $tag.$where,config('configure.sCache'), function() use( $request ){
+      $value = Cache::tags($tag)->remember( $tag.$where,config('configure.sCache'), function() use( $request ){
             //用户信息
             $admin_user = $request->get('admin_user');
             $sql = ClientDynamic::orderBy('id','desc')->with('dynamicToClient');
@@ -60,8 +60,8 @@ class ClientService extends AdminBase
             {
                 $sql->where('housename','like',$request->input('housename'));
             }
-            return  $sql->paginate(config('configure.sPage'));
-        });
+            return  $sql->with("dynamicToCompany")->paginate(config('configure.sPage'));
+      });
         return $value;
     }
 
