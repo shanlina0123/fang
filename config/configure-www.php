@@ -20,14 +20,10 @@ return [
     //跨域-手机端，允许访问接口的域名
     "allow"=>[
         //生产 - 域名
-        //'http://api.rrzhaofang.com',//接口
+        'http://api.rrzhaofang.com',//接口
         'http://wx.rrzhaofang.com',//手机
-    ],
-    //跨域-PC端，允许访问接口的域名
-    "allow_admin"=>[
-        //生产 - 域名
-        //'http://api.rrzhaofang.com',//接口
         'http://admin.rrzhaofang.com',//PC
     ],
+
 
 ];
