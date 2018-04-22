@@ -76,17 +76,18 @@ class WechatController extends AdminBaseController
     {
         $url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid='.$this->appid.'&secret='.$this->secret.'&code='.$code.'&grant_type=authorization_code';
         $data = $this->curlGetDate( $url );
-        if( !empty($data->errcode) )
+        if( !array_has($data,'errcode') )
         {
+            $data = json_encode( $data );
             //存储token信息
             Cache::put('authorization'.$uid, $data, 43200);
             //获取用户信息
             return $this->getUserInfo( $data );
+
         }else
         {
             return false;
         }
-
     }
 
 
@@ -99,12 +100,14 @@ class WechatController extends AdminBaseController
         try{
             $res_url = 'https://api.weixin.qq.com/sns/oauth2/refresh_token?appid='.$this->appid.'&grant_type=refresh_token&refresh_token='.$data->refresh_token;
             $data = $this->curlGetDate( $res_url );
-            if( isset($data->errcode) == false )
+            if( !array_has($data,'errcode') )
             {
+                $data = json_encode( $data );
                 //存储token信息
                 Cache::put('authorization'.$uid, $data, 43200);
                 //获取用户信息
                 return $this->getUserInfo( $data );
+
             }else
             {
                 return false;

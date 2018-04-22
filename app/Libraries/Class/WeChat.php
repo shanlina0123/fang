@@ -53,12 +53,16 @@ class WeChat
         $res = $this->curl_request( $url , urldecode(json_encode($data)) );
         if( $res )
         {
-            $res = json_decode($res);
-            if( empty($res->errcode) )
+            $res = json_decode($res,true);
+            if( !array_has($res,'errcode') )
             {
                 return true;
+
             }else
+            {
                 return false;
+            }
+
         }else
         {
            return false;
@@ -76,10 +80,11 @@ class WeChat
         $data = $this->curl_request( $url );
         if( $data )
         {
-            $data = json_decode($data);
-            if( empty($data->errcode) )
+            $data = json_decode($data,true);
+            if( !array_has($data,'errcode') )
             {
-                return $data;
+               return $data;
+
             }else
             {
                 return false;
@@ -114,11 +119,11 @@ class WeChat
             $data = $this->curl_request( $url );
             if( $data )
             {
-                $data = json_decode($data);
-                if( empty($data->errcode) )
+                $data = json_decode($data,true);
+                if( !array_has($data,'errcode') )
                 {
-                    Cache::put('access_token',$data->access_token,$data->expires_in/60);
-                    $access_token = $data->access_token;
+                    Cache::put('access_token',$data['access_token'],$data['expires_in']/60);
+                    $access_token = $data['access_token'];
                 }else
                 {
                     $access_token = '';
