@@ -50,4 +50,14 @@ class ClientDynamic extends Model
     {
         return $this->belongsTo('App\Model\User\AdminUser','followadminid','id');
     }
+
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * 关联归属者
+     */
+    public function dynamicToAdminOwn()
+    {
+        return $this->belongsTo('App\Model\User\AdminUser','ownadminid','id');
+    }
 }

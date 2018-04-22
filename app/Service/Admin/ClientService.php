@@ -33,7 +33,7 @@ class ClientService extends AdminBase
         $isAdmin=$admin_user->isadmin;
         $where = $adminID.$isAdmin.$request->input('page').$request->input('followstatusid').$request->input('housename').$request->input('levelid').$request->input('ownuserid');
         $where = base64_encode($where);
-       $value = Cache::tags($tag)->remember( $tag.$where,config('configure.sCache'), function() use( $request,$admin_user ){
+      // $value = Cache::tags($tag)->remember( $tag.$where,config('configure.sCache'), function() use( $request,$admin_user ){
 
             $sql = ClientDynamic::orderBy('id','desc')->with('dynamicToClient');
 
@@ -59,13 +59,18 @@ class ClientService extends AdminBase
             {
                 $sql->where('levelid',$request->input('levelid'));
             }
+            $housename=searchFilter($request->input('housename'));
             //楼盘名称
             if( $request->input('housename') )
             {
-                $sql->where('housename','like',$request->input('housename'));
+                $sql->where('housename','like',"%".$housename."%");
             }
+
+
+
+
             return  $sql->with("dynamicToCompany","dynamicToUser")->paginate(config('configure.sPage'));
-         });
+       //  });
         return $value;
     }
 

@@ -334,3 +334,16 @@ function mosaic($segmentation="")
     unset($params[0]);
     return implode($segmentation,$params);
 }
+
+/****
+ * 过滤下划线和%
+ * @param $str
+ * @return mixed|string
+ */
+function searchFilter($str)
+{
+    $search = addslashes($str);
+    $search = str_replace('_',"\\_",$search);
+    $search = str_replace('%',"\\%",$search);
+    return $search;
+}

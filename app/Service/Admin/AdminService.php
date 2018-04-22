@@ -237,6 +237,10 @@ class AdminService extends AdminBase
             $admin["nickname"] = $data["nickname"];
             $admin["roleid"] = $data["roleid"];
             $admin["mobile"] = $data["mobile"];
+            if($data["status"])
+            {
+                $admin["status"] = $data["status"];
+            }
             if($data['password'])
                 $admin["password"] = optimizedSaltPwd("admin",base64_decode($data['password']));
             $admin["updated_at"] = date("Y-m-d H:i:s");

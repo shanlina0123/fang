@@ -149,12 +149,14 @@ class AdminController extends AdminBaseController
             "mobile"=>'required|max:11|min:11',
             'password' => 'present',
             'roleid' => 'required|numeric',
+            "status"=>'present|numeric',
         ],['uuid.required'=>'参数错误','uuid.max'=>'参数错误','uuid.min'=>'参数错误',
             'nickname.required'=>'姓名不能为空','nickname.max'=>'姓名长度不能大于100个字符','nickname.min'=>'姓名长度不能小于1个字符',
             'name.required'=>'账号不能为空','name.max'=>'账号长度不能大于100个字符','name.min'=>'账号长度不能小于1个字符',
             'mobile.required'=>'手机号不能为空','mobile.max'=>'手机号不能大于11位字符','mobile.min'=>'手机号不能少于11位字符',
             'password.present'=>'密码参数缺少',
-            'roleid.required'=>'角色不能为空','roleid.numeric'=>'角色只能是数字格式']);
+            'roleid.required'=>'角色不能为空','roleid.numeric'=>'角色只能是数字格式',
+            'status.present'=>'状态参数缺少','status.numeric'=>'状态只能是数字格式']);
 
         //进行验证
         if ($validator->fails()) {
@@ -165,6 +167,14 @@ class AdminController extends AdminBaseController
             if(!checkStringIsBase64($data["password"]))
             {
                 responseData(\StatusCode::PARAM_ERROR,"验证失败","",["password"=>["密码定义错误"]]);
+            }
+        }
+
+        if($data["status"])
+        {
+           if(!in_array($data["status"],[0,1]))
+            {
+                responseData(\StatusCode::PARAM_ERROR,"验证失败","",["status"=>["状态只能设置为有效和无效，不能进行其他设置"]]);
             }
         }
         //获取业务数据
