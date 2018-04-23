@@ -55,9 +55,9 @@ return [
         'http://dev.renrenmobile.com',//手机
         'http://dev.renrenpc.com',//PC
         //dev - IP
-        "http://192.168.15.13:8081",//接口
-        "http://192.168.15.13:8082",//手机
-        "http://192.168.15.13:8083",//PC
+        "http://192.168.15.222:8081",//接口
+        "http://192.168.15.222:8082",//手机
+        "http://192.168.15.222:8083",//PC
 
         //生产 - 域名
         'http://api.rrzhaofang.com',//接口
