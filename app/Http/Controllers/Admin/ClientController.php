@@ -80,7 +80,7 @@ class ClientController extends AdminBaseController
 
     /**
      * @param $uuid
-     * 修改用户信息
+     * 修改客户信息
      */
     public function update( $uuid )
     {
@@ -95,6 +95,7 @@ class ClientController extends AdminBaseController
                 'followstatusid'=>'required|numeric',
                 'dealdate'=>'required|date',
                 'levelid'=>'required|numeric',
+                'houseid'=>'required|numeric',
             ]
         );
         if ($validator->fails())
@@ -138,7 +139,7 @@ class ClientController extends AdminBaseController
         //验证
         $validator = Validator::make(
             $data,[
-                'content'=>'required',
+                'content'=>'present',
                 'followstatusid'=>'required|numeric',
                 'clientid'=>'required|numeric',
             ]
@@ -177,5 +178,16 @@ class ClientController extends AdminBaseController
         }
         $res = $this->client->transferSave( $data, $this->request );
         responseData(\StatusCode::SUCCESS,'移交成功',$res);
+    }
+
+    /****
+     * 获取房源列表--推荐房源时候模糊搜索的下拉框内容
+     */
+    public  function  houseData()
+    {
+        //获取业务数据
+        $list=$this->client->houseData();
+        //接口返回结果
+        responseData(\StatusCode::SUCCESS,"获取成功",$list);
     }
 }

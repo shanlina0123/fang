@@ -35,7 +35,7 @@ class ClientService extends HomeBase
         //定义tag的key
         $tagKey = base64_encode(mosaic("", $tag, $userid,$isadminafter,$adminid, $page, $data["name"], $data["followstatusid"]));
         //redis缓存返回
-      // return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($userid, $isadminafter, $data) {
+       return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($userid, $isadminafter, $data) {
             //操作数据库
            $pre=getenv("DB_PREFIX")?getenv("DB_PREFIX"):config("configure.DB_PREFIX");
            $aliasA=$pre."a";
@@ -67,7 +67,7 @@ class ClientService extends HomeBase
 
            return $sql->orderBy("created_at","desc")->paginate(config('configure.sPage'));
 
-       //});
+      });
     }
 
     /****

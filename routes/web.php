@@ -82,6 +82,7 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
                 $router->put('client-follow/store', 'ClientController@followStore');//跟进修改
                 $router->post('client-transfer/update', 'ClientController@transferUpdate');//客户移交
                 $router->delete('client/delete/{uuid}', 'ClientController@destroy');//客户删除
+                $router->get('client-houses', 'ClientController@houseData');//客户房源列表
                 //角色
                 $router->get('roles', 'RolesController@index');//获取角色列表 ----OK
                 $router->get('roles/{uuid}', 'RolesController@edit');//角色详情  ----OK
