@@ -37,7 +37,8 @@ class LoginService extends AdminBase
             $where['name'] = $data['name'];
         }
         $where['password'] = optimizedSaltPwd("admin",base64_decode($data['password']));
-        $user = AdminUser::where( $where )->select('id','uuid','name','isadmin','mobile','status')->first();
+        $user = AdminUser::where( $where )->select('id','uuid','name',"nickname", 'isadmin','mobile','status')->first();
+
         if( $user == false )
         {
             responseData(\StatusCode::LOGIN_FAILURE,'用户名密码错误');

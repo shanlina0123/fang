@@ -2,4 +2,8 @@
 Homestead.json
 Homestead.yaml
 .env
-public/
+Homestead.yaml
+public/temp/*
+public/upload/*
+storage/logs/*
+

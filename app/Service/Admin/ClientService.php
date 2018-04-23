@@ -12,6 +12,7 @@ use App\Model\Client\ClientDispatch;
 use App\Model\Client\ClientDynamic;
 use App\Model\Client\ClientFollow;
 use App\Model\Client\ClientTransfer;
+use App\Model\House\House;
 use App\Service\AdminBase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -27,24 +28,28 @@ class ClientService extends AdminBase
     public function getList( $request )
     {
         $tag = 'clientList';
-        $adminID = $request->get('admin_user')->id;
-        $where = $adminID.$request->input('page').$request->input('followstatusid').$request->input('housename').$request->input('levelid').$request->input('ownuserid');
+        //用户信息
+        $admin_user = $request->get('admin_user');
+        $adminID = $admin_user->id;
+        $isAdmin=$admin_user->isadmin;
+        $where = $adminID.$isAdmin.$request->input('page').$request->input('followstatusid').$request->input('housename').$request->input('levelid').$request->input('ownuserid');
         $where = base64_encode($where);
-      $value = Cache::tags($tag)->remember( $tag.$where,config('configure.sCache'), function() use( $request ){
-            //用户信息
-            $admin_user = $request->get('admin_user');
+      // $value = Cache::tags($tag)->remember( $tag.$where,config('configure.sCache'), function() use( $request,$admin_user ){
+
             $sql = ClientDynamic::orderBy('id','desc')->with('dynamicToClient');
+
             //管理员
-            if(  $admin_user->isadmin == 1 )
+            if($admin_user->isadmin == 1 )
             {
                 if( $request->input('ownadminid') )
                 {
-                    $sql->where('ownadminid',$request->input('ownuserid'));
+                    $sql->where('ownadminid',$request->input('ownadminid'));
                 }
             }else
             {
                 $sql->where('ownadminid', $admin_user->id);
             }
+
             //客户跟进状态
             if( $request->input('followstatusid') )
             {
@@ -55,13 +60,18 @@ class ClientService extends AdminBase
             {
                 $sql->where('levelid',$request->input('levelid'));
             }
+            $housename=searchFilter($request->input('housename'));
             //楼盘名称
             if( $request->input('housename') )
             {
-                $sql->where('housename','like',$request->input('housename'));
+                $sql->where('housename','like',"%".$housename."%");
             }
+
+
+
+
             return  $sql->with("dynamicToCompany","dynamicToUser")->paginate(config('configure.sPage'));
-      });
+       //  });
         return $value;
     }
 
@@ -113,26 +123,26 @@ class ClientService extends AdminBase
      * @param $uuid
      * 客户信息编辑页
      */
-    public function editClient( $uuid, $request )
+    public function editClient( $clientid, $request )
     {
         $admin_user = $request->get('admin_user');
         if(  $admin_user->isadmin == 1 )
         {
-            $where['uuid'] = $uuid;
+            $where['clientid'] = $clientid;
         }else
         {
-            $where['uuid'] = $uuid;
+            $where['clientid'] = $clientid;
             $where['ownadminid'] = $admin_user->id;
         }
-        $res = ClientDynamic::orderBy('id','desc')->with('dynamicToClient')->first();
+        $res = ClientDynamic::where($where)->orderBy('id','desc')->with('dynamicToClient')->first();
         if( $res )
         {
             $obj = new \stdClass();
             $obj->uuid = $res->uuid;
             $obj->name = $res->dynamicToClient?$res->dynamicToClient->name:'';
             $obj->mobile = $res->dynamicToClient?$res->dynamicToClient->mobile:'';
-            $obj->makedate = $res->makedate;
-            $obj->comedate = $res->comedate;
+            $obj->makedate =$res->makedate?date("Y-m-d",strtotime($res->makedate)):"";
+            $obj->comedate =$res->makedate?date("Y-m-d",strtotime($res->comedate)):"";
             $obj->followstatusid = $res->followstatusid;
             $company = $res->companyid;
             if( $company )
@@ -145,9 +155,12 @@ class ClientService extends AdminBase
             }
             $obj->refereeusername = $res->dynamicToUser?$res->dynamicToUser->nickname:'';//经纪人
             $obj->followname = $res->dynamicToAdminUser?$res->dynamicToAdminUser->nickname:'';//跟进人名称
+            $obj->houseid=$res->houseid;
+            $obj->housename=$res->housename;
             $obj->followcount = $res->followcount;
-            $obj->followdate = $res->followdate;
-            $obj->dealdate = $res->dealdate;
+            $obj->followdate =$res->followdate?date("Y-m-d",strtotime($res->followdate)):date("Y-m-d");
+            $obj->dealdate =$res->dealdate?date("Y-m-d",strtotime($res->dealdate)):"";
+
             $obj->levelid = $res->levelid;
             return $obj;
         }else
@@ -163,6 +176,14 @@ class ClientService extends AdminBase
      */
     public function updateClient( $data, $request )
     {
+
+        //检测楼盘id是否存在
+        $houseData=House::where("id",$data["houseid"])->first();
+        if(empty($houseData))
+        {
+            responseData(\StatusCode::NOT_EXIST_ERROR,'楼盘信息不存在' );
+        }
+
         $admin_user = $request->get('admin_user');
         if(  $admin_user->isadmin == 1 )
         {
@@ -172,7 +193,7 @@ class ClientService extends AdminBase
             $where['uuid'] = $data['uuid'];
             $where['ownadminid'] = $admin_user->id;
         }
-        $obj = ClientDynamic::orderBy('id','desc')->with('dynamicToClient')->first();
+        $obj = ClientDynamic::where($where)->orderBy('id','desc')->with('dynamicToClient')->first();
         if( $obj )
         {
             try{
@@ -180,6 +201,8 @@ class ClientService extends AdminBase
                 $obj->comedate = $data['comedate'];
                 $obj->dealdate = $data['dealdate'];
                 $obj->levelid =  $data['levelid'];
+                $obj->houseid =  $houseData['id'];
+                $obj->housename =  $houseData['name'];
                 $obj->save();
                 $obj->dynamicToClient->update(['name'=>$data['name']]);
                 DB::commit();
@@ -199,15 +222,15 @@ class ClientService extends AdminBase
     /**
      * 跟进客户
      */
-    public function followEditInfo( $client, $request  )
+    public function followEditInfo( $uuid, $request  )
     {
         $admin_user = $request->get('admin_user');
         if(  $admin_user->isadmin == 1 )
         {
-            $where['uuid'] = $client;
+            $where['uuid'] = $uuid;
         }else
         {
-            $where['uuid'] = $client;
+            $where['uuid'] = $uuid;
             $where['ownadminid'] = $admin_user->id;
         }
         $obj = ClientFollow::orderBy('id','desc')->with('followToAdminUser')->get();
@@ -256,7 +279,7 @@ class ClientService extends AdminBase
             $dynamic->save();
             DB::commit();
             Cache::tags(['clientList','clientRefereeChart','HomeClientList'])->flush();
-            return 'success';
+            return array_merge($data,["time"=> $dynamic->followdate]);
         }catch (Exception $e)
         {
             DB::rollBack();
@@ -306,4 +329,53 @@ class ClientService extends AdminBase
             responseData(\StatusCode::ERROR,'编辑失败');
         }
     }
+
+    /****
+     * 获取房源列表--推荐房源时候模糊搜索的下拉框内容
+     */
+    public function houseData()
+    {
+        try {
+            //获取详情数据
+            $row = House::select("id", "name", "addr")->get();
+            if (empty($row->toArray())) {
+                responseData(\StatusCode::EMPTY_ERROR, "无结果");
+            }
+
+        } catch (\ErrorException $e) {
+            //记录日志
+            Log::error('======ClientService-houseData:======' . $e->getMessage());
+            //业务执行失败
+            responseData(\StatusCode::CATCH_ERROR, "获取异常");
+        } finally {
+            //返回处理结果数据
+            return $row;
+        }
+    }
+    /***
+     * 获取业务员的所有客户
+     */
+    public function  getAdminClient($adminid)
+    {
+        try {
+            //获取详情数据
+            $list = ClientDynamic::where("ownadminid",$adminid)
+                ->with(["dynamicToClient" => function ($query) {
+                $query->select("id", "name", "mobile");
+            }])->select( "uuid","ownadminid","clientid")->get();
+            if (empty($list)) {
+                responseData(\StatusCode::EMPTY_ERROR, "无结果");
+            }
+
+        } catch (\ErrorException $e) {
+            //记录日志
+            Log::error('======ClientService-getAdminClient:======' . $e->getMessage());
+            //业务执行失败
+            responseData(\StatusCode::CATCH_ERROR, "获取异常");
+        } finally {
+            //返回处理结果数据
+            return $list;
+        }
+    }
+
 }

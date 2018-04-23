@@ -69,8 +69,6 @@ class ChartService extends AdminBase
     {
         //默认条件
         $list=Users::select("id","nickname","isadminafter")->orderBy('id','asc')->get();
-
-        $list=array_to_parent($list->toArray(),"id","isadminafter");
         //结果检测
         if(empty($list))
         {

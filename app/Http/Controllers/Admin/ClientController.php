@@ -61,27 +61,26 @@ class ClientController extends AdminBaseController
      * @param $uuid
      * 客户信息编辑
      */
-    public function edit( $uuid )
+    public function edit( $clientid )
     {
-        $data['uuid'] = $uuid;
+        $data['clientid'] = $clientid;
         //验证
         $validator = Validator::make(
             $data,[
-                'uuid'=>'required|min:32|max:32',
+                'clientid'=>'required|numeric',
             ]
         );
         if ($validator->fails())
         {
-            $messages = ['uuid'=>'uuid不合法'];
-            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',["clientid"=>["clientid不合法"]]);
         }
-        $res = $this->client->editClient( $uuid, $this->request );
+        $res = $this->client->editClient( $clientid, $this->request );
         responseData(\StatusCode::SUCCESS,'客户信息',$res);
     }
 
     /**
      * @param $uuid
-     * 修改用户信息
+     * 修改客户信息
      */
     public function update( $uuid )
     {
@@ -96,6 +95,7 @@ class ClientController extends AdminBaseController
                 'followstatusid'=>'required|numeric',
                 'dealdate'=>'required|date',
                 'levelid'=>'required|numeric',
+                'houseid'=>'required|numeric',
             ]
         );
         if ($validator->fails())
@@ -111,13 +111,13 @@ class ClientController extends AdminBaseController
      * @param $client
      * 跟进客户记录
      */
-    public function followEdit( $client )
+    public function followEdit( $uuid )
     {
-        $data['client'] = $client;
+        $data['uuid'] = $uuid;
         //验证
         $validator = Validator::make(
             $data,[
-                'client'=>'required|numeric',
+                'uuid'=>'required|max:32|min:32',
             ]
         );
         if ($validator->fails())
@@ -125,7 +125,7 @@ class ClientController extends AdminBaseController
             $messages = $validator->errors();
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
         }
-        $res = $this->client->followEditInfo( $client, $this->request );
+        $res = $this->client->followEditInfo( $uuid, $this->request );
         responseData(\StatusCode::SUCCESS,'跟进记录',$res);
     }
 
@@ -139,7 +139,7 @@ class ClientController extends AdminBaseController
         //验证
         $validator = Validator::make(
             $data,[
-                'content'=>'required',
+                'content'=>'present',
                 'followstatusid'=>'required|numeric',
                 'clientid'=>'required|numeric',
             ]
@@ -178,5 +178,35 @@ class ClientController extends AdminBaseController
         }
         $res = $this->client->transferSave( $data, $this->request );
         responseData(\StatusCode::SUCCESS,'移交成功',$res);
+    }
+
+    /****
+     * 获取房源列表--推荐房源时候模糊搜索的下拉框内容
+     */
+    public  function  houseData()
+    {
+        //获取业务数据
+        $list=$this->client->houseData();
+        //接口返回结果
+        responseData(\StatusCode::SUCCESS,"获取成功",$list);
+    }
+
+    /***
+     * 获取业务员的所有客户
+     */
+    public  function  getAdminClient($adminid)
+    {
+        //验证规则
+        $validator = Validator::make(["adminid"=>$adminid],[
+            "adminid"=>'required|numeric',
+        ],[ 'adminid.required'=>'移交人不能为空','adminid.numeric'=>'移交人只能是int类型',]);
+        //进行验证
+        if ($validator->fails()) {
+            responseData(\StatusCode::PARAM_ERROR,"验证失败","",$validator->errors());
+        }
+
+        $list=$this->client->getAdminClient($adminid);
+        //接口返回结果
+        responseData(\StatusCode::SUCCESS,"获取成功",$list);
     }
 }

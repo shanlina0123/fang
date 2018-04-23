@@ -237,7 +237,12 @@ class AdminService extends AdminBase
             $admin["nickname"] = $data["nickname"];
             $admin["roleid"] = $data["roleid"];
             $admin["mobile"] = $data["mobile"];
-            $admin["password"] = optimizedSaltPwd("admin",$data['password']);
+            if($data["status"])
+            {
+                $admin["status"] = $data["status"];
+            }
+            if($data['password'])
+                $admin["password"] = optimizedSaltPwd("admin",base64_decode($data['password']));
             $admin["updated_at"] = date("Y-m-d H:i:s");
             //修改Admin数据
             $rs = AdminUser::where("uuid", $uuid)->update($admin);
