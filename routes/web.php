@@ -78,7 +78,7 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
                 $router->post('client/index', 'ClientController@index');//客户列表
                 $router->get('client/edit/{uuid}', 'ClientController@edit');//客户详情
                 $router->put('client/update/{uuid}', 'ClientController@update');//客户修改
-                $router->get('client-follow/edit/{uuid}', 'ClientController@followEdit');//跟进详情
+                $router->get('client-follow/edit/{clientid}', 'ClientController@followEdit');//跟进详情
                 $router->put('client-follow/store', 'ClientController@followStore');//跟进修改
                 $router->post('client-transfer/update', 'ClientController@transferUpdate');//客户移交
                 $router->delete('client/delete/{uuid}', 'ClientController@destroy');//客户删除

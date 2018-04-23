@@ -61,21 +61,20 @@ class ClientController extends AdminBaseController
      * @param $uuid
      * 客户信息编辑
      */
-    public function edit( $uuid )
+    public function edit( $clientid )
     {
-        $data['uuid'] = $uuid;
+        $data['clientid'] = $clientid;
         //验证
         $validator = Validator::make(
             $data,[
-                'uuid'=>'required|min:32|max:32',
+                'clientid'=>'required|numeric',
             ]
         );
         if ($validator->fails())
         {
-            $messages = ['uuid'=>'uuid不合法'];
-            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',["clientid"=>["clientid不合法"]]);
         }
-        $res = $this->client->editClient( $uuid, $this->request );
+        $res = $this->client->editClient( $clientid, $this->request );
         responseData(\StatusCode::SUCCESS,'客户信息',$res);
     }
 

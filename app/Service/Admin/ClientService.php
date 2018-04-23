@@ -122,26 +122,26 @@ class ClientService extends AdminBase
      * @param $uuid
      * 客户信息编辑页
      */
-    public function editClient( $uuid, $request )
+    public function editClient( $clientid, $request )
     {
         $admin_user = $request->get('admin_user');
         if(  $admin_user->isadmin == 1 )
         {
-            $where['uuid'] = $uuid;
+            $where['clientid'] = $clientid;
         }else
         {
-            $where['uuid'] = $uuid;
+            $where['clientid'] = $clientid;
             $where['ownadminid'] = $admin_user->id;
         }
-        $res = ClientDynamic::orderBy('id','desc')->with('dynamicToClient')->first();
+        $res = ClientDynamic::where("clientid",$clientid)->orderBy('id','desc')->with('dynamicToClient')->first();
         if( $res )
         {
             $obj = new \stdClass();
             $obj->uuid = $res->uuid;
             $obj->name = $res->dynamicToClient?$res->dynamicToClient->name:'';
             $obj->mobile = $res->dynamicToClient?$res->dynamicToClient->mobile:'';
-            $obj->makedate = $res->makedate;
-            $obj->comedate = $res->comedate;
+            $obj->makedate =date("Y-m-d",strtotime($res->makedate));
+            $obj->comedate =date("Y-m-d",strtotime($res->comedate));
             $obj->followstatusid = $res->followstatusid;
             $company = $res->companyid;
             if( $company )
@@ -154,9 +154,11 @@ class ClientService extends AdminBase
             }
             $obj->refereeusername = $res->dynamicToUser?$res->dynamicToUser->nickname:'';//经纪人
             $obj->followname = $res->dynamicToAdminUser?$res->dynamicToAdminUser->nickname:'';//跟进人名称
+            $obj->housename=$res->housename;
             $obj->followcount = $res->followcount;
-            $obj->followdate = $res->followdate;
-            $obj->dealdate = $res->dealdate;
+            $obj->followdate =date("Y-m-d",strtotime($res->followdate));
+            $obj->dealdate =date("Y-m-d",strtotime($res->dealdate));
+
             $obj->levelid = $res->levelid;
             return $obj;
         }else
@@ -228,7 +230,7 @@ class ClientService extends AdminBase
                 $rowObj = new \stdClass();
                 $rowObj->followstatusid = $row->followstatusid;
                 $rowObj->content = $row->content;
-                $rowObj->time = $row->created_at?date_format($row->created_at,date("Y-m-d H:i:s")):'';
+                $rowObj->time = $row->created_at?date_format($row->created_at,date("Y-m-d")):'';
                 $rowObj->username = $row->followToAdminUser?$row->followToAdminUser->nickname:'';
                 $arr[] = $rowObj;
             }
