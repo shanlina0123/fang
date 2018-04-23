@@ -7,7 +7,7 @@ return [
     "DB_PREFIX"=>"renren_", //防止获取不到env的DB_PREFIX
     "sPage"=>10,//每页显示条数
     "sCache"=>120,//缓存时长
-    "uploads"=>"uploads",//图片文件路径
+    "uploads"=>"upload",//图片文件路径
     "temp"=>"/temp/",//图片临时目录
     //微信配置
     'wechat'=>[

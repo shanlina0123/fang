@@ -360,7 +360,6 @@ class ComposerStaticIniteeb9bbeef625ab98ac9dcfb45d61b1cd
         'App\\Http\\Middleware\\CheckAdminAuth' => __DIR__ . '/../..' . '/app/Http/Middleware/CheckAdminAuth.php',
         'App\\Http\\Middleware\\CheckAdminToken' => __DIR__ . '/../..' . '/app/Http/Middleware/CheckAdminToken.php',
         'App\\Http\\Middleware\\CheckUserToken' => __DIR__ . '/../..' . '/app/Http/Middleware/CheckUserToken.php',
-        'App\\Http\\Middleware\\CorsAdminMiddleware' => __DIR__ . '/../..' . '/app/Http/Middleware/CorsAdminMiddleware.php',
         'App\\Http\\Middleware\\CorsMiddleware' => __DIR__ . '/../..' . '/app/Http/Middleware/CorsMiddleware.php',
         'App\\Http\\Middleware\\ExampleMiddleware' => __DIR__ . '/../..' . '/app/Http/Middleware/ExampleMiddleware.php',
         'App\\Jobs\\ExampleJob' => __DIR__ . '/../..' . '/app/Jobs/ExampleJob.php',

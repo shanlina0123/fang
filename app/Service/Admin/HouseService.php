@@ -89,9 +89,9 @@ class HouseService extends AdminBase
     {
         $rules = [
             'total' =>'required',
-            'depth' =>'required|max:50',
-            'storey' =>'required|max:50',
-            'wide' =>'required|max:100',
+            'depth' =>'sometimes|required|max:50',
+            'storey' =>'sometimes|required|max:50',
+            'wide' =>'sometimes|required|max:100',
         ];
         return $rules;
     }
@@ -250,7 +250,6 @@ class HouseService extends AdminBase
      */
     public function getList( $request )
     {
-        Cache::flush();
         $tag = 'houseList';
         $where = $request->input('page').$request->input('typeid').$request->input('name').$request->input('iscommission').$request->input('created_at');
         $where = base64_encode($where);
@@ -362,6 +361,8 @@ class HouseService extends AdminBase
         {
 
             $res->images = $res->houseToImage()->select('uuid','url')->get();
+            $house_tag = $res->houseToTag()->select('tagid')->get()->toArray();
+            $res->house_tag = i_array_column($house_tag,null,'tagid');
             return $res;
         }else
         {
@@ -375,7 +376,6 @@ class HouseService extends AdminBase
      */
     public function destroyHouse( $uuid )
     {
-        return 'success';
         try{
             DB::beginTransaction();
             $res = House::where('uuid',$uuid)->first();
@@ -385,15 +385,16 @@ class HouseService extends AdminBase
                  HouseTag::where('houseid',$houseID)->delete();
                  HouseImage::where('houseid',$houseID)->delete();
                  HouseHome::where('houseid',$houseID)->delete();
+                 $res->delete();
 
             }else
             {
                 responseData(\StatusCode::ERROR,'未查询到数据');
             }
-            DB::commit();
             Cache::tags(['houseList','HomeHouseList','HomeRecommend'])->flush();
             //删除图片
             (new \Upload())->delDir('house',$houseID);
+            DB::commit();
             return 'success';
         }catch (Exception $e){
             DB::rollBack();
@@ -485,26 +486,28 @@ class HouseService extends AdminBase
             }
             //上传图片
             $upload = new \Upload();
-            if( array_has($data,'images') && is_array( $data['images'] ) )
+            if( array_has($data,'images') && $data['images'])
             {
                 //上传
-                foreach ( $data['images'] as $row )
+                foreach ( explode(',',$data['images']) as $row )
                 {
-                    $res = $upload->uploadProductImage( $data['houseid'], $row, 'house' );
+
+                    $res = $upload->uploadProductImage( $obj->id, $row, 'house' );
                     if( $res )
                     {
                         $arr['uuid'] = create_uuid();
                         $arr['url'] = '/house/'.$obj->id.'/'.$row;
                         $arr['houseid'] = $obj->id;
                         $arr['created_at'] = date("Y-m-d H:i:s");
+
                         HouseImage::insert($arr);
                     }
                 }
             }
-            if( array_has($data,'del_images') &&  is_array( $data['del_images'] ) )
+            if( array_has($data,'del_images') && $data['del_images'] )
             {
                 //删除
-                foreach ( $data['del_images'] as $row )
+                foreach ( explode(',',$data['del_images']) as $row )
                 {
                     $res = $upload->delImg( $row );
                     if( $res )
