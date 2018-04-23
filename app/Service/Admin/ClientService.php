@@ -352,5 +352,30 @@ class ClientService extends AdminBase
             return $row;
         }
     }
+    /***
+     * 获取业务员的所有客户
+     */
+    public function  getAdminClient($adminid)
+    {
+        try {
+            //获取详情数据
+            $list = ClientDynamic::where("ownadminid",$adminid)
+                ->with(["dynamicToClient" => function ($query) {
+                $query->select("id", "name", "mobile");
+            }])->select( "uuid","ownadminid","clientid")->get();
+            if (empty($list)) {
+                responseData(\StatusCode::EMPTY_ERROR, "无结果");
+            }
+
+        } catch (\ErrorException $e) {
+            //记录日志
+            Log::error('======ClientService-getAdminClient:======' . $e->getMessage());
+            //业务执行失败
+            responseData(\StatusCode::CATCH_ERROR, "获取异常");
+        } finally {
+            //返回处理结果数据
+            return $list;
+        }
+    }
 
 }

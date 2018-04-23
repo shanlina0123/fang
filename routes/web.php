@@ -52,6 +52,10 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
             //默认属性管理
             $router->get('datas-default', 'DatasController@getDefault');//获取默认所有属性列表----OK
             $router->get('datas-default-one/{cateid}', 'DatasController@getDefaultOne');//获取默认单个属性列表----OK
+
+            $router->get('client-houses', 'ClientController@houseData');//客户房源列表
+            $router->get('client-admin/{adminid}', 'ClientController@getAdminClient');//业务员的客户列表
+
             //权限后
             $router->group(['middleware' => 'admin_auth'], function () use ($router) {
                 //房源
@@ -82,7 +86,8 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
                 $router->put('client-follow/store', 'ClientController@followStore');//跟进修改
                 $router->post('client-transfer/update', 'ClientController@transferUpdate');//客户移交
                 $router->delete('client/delete/{uuid}', 'ClientController@destroy');//客户删除
-                $router->get('client-houses', 'ClientController@houseData');//客户房源列表
+
+
                 //角色
                 $router->get('roles', 'RolesController@index');//获取角色列表 ----OK
                 $router->get('roles/{uuid}', 'RolesController@edit');//角色详情  ----OK

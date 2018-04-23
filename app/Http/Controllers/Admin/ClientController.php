@@ -190,4 +190,23 @@ class ClientController extends AdminBaseController
         //接口返回结果
         responseData(\StatusCode::SUCCESS,"获取成功",$list);
     }
+
+    /***
+     * 获取业务员的所有客户
+     */
+    public  function  getAdminClient($adminid)
+    {
+        //验证规则
+        $validator = Validator::make(["adminid"=>$adminid],[
+            "adminid"=>'required|numeric',
+        ],[ 'adminid.required'=>'移交人不能为空','adminid.numeric'=>'移交人只能是int类型',]);
+        //进行验证
+        if ($validator->fails()) {
+            responseData(\StatusCode::PARAM_ERROR,"验证失败","",$validator->errors());
+        }
+
+        $list=$this->client->getAdminClient($adminid);
+        //接口返回结果
+        responseData(\StatusCode::SUCCESS,"获取成功",$list);
+    }
 }
