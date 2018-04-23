@@ -208,15 +208,15 @@ class ClientService extends AdminBase
     /**
      * 跟进客户
      */
-    public function followEditInfo( $client, $request  )
+    public function followEditInfo( $uuid, $request  )
     {
         $admin_user = $request->get('admin_user');
         if(  $admin_user->isadmin == 1 )
         {
-            $where['uuid'] = $client;
+            $where['uuid'] = $uuid;
         }else
         {
-            $where['uuid'] = $client;
+            $where['uuid'] = $uuid;
             $where['ownadminid'] = $admin_user->id;
         }
         $obj = ClientFollow::orderBy('id','desc')->with('followToAdminUser')->get();
@@ -228,7 +228,7 @@ class ClientService extends AdminBase
                 $rowObj = new \stdClass();
                 $rowObj->followstatusid = $row->followstatusid;
                 $rowObj->content = $row->content;
-                $rowObj->time = $row->created_at?date_format($row->created_at,date("Y-m-d")):'';
+                $rowObj->time = $row->created_at?date_format($row->created_at,date("Y-m-d H:i:s")):'';
                 $rowObj->username = $row->followToAdminUser?$row->followToAdminUser->nickname:'';
                 $arr[] = $rowObj;
             }
@@ -265,7 +265,7 @@ class ClientService extends AdminBase
             $dynamic->save();
             DB::commit();
             Cache::tags(['clientList','clientRefereeChart','HomeClientList'])->flush();
-            return 'success';
+            return array_merge($data,["time"=> $dynamic->followdate]);
         }catch (Exception $e)
         {
             DB::rollBack();
