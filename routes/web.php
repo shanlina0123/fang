@@ -22,17 +22,16 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
         $router->get('get/poc', 'PublicController@getAddress');//省市数据
         $router->post('get/user', 'LoginController@getUser');//检测用户名
         //微信授权接口
-        $router->get('wechat/authorization', 'WechatController@authorization');
+        $router->get('user/binding/{uuid}', 'LoginController@binding'); //检测是否绑定
+        $router->get('wechat/authorization', 'WechatController@authorization');//绑openid
+
         //忘记密码
-        $router->get('wechat/forget', 'WechatController@forget');//忘记密码扫码
-        $router->get('wechat/testing', 'LoginController@testing');//检测扫码结果
+        $router->get('wechat/forget', 'WechatController@forget');//修改密码扫码结果
+        $router->post('wechat/testing', 'LoginController@testing');//检测扫码结果
         $router->post('user/modify-pass', 'LoginController@modifyPass');//修改密码
         //登录后
         $router->group(['middleware' => 'admin_token'], function () use ($router) {
             $router->get('token', 'TokenController@index');//检查已有token
-
-            //检测是否绑定
-            $router->get('user/binding', 'LoginController@binding');
             //修改密码
             $router->post('user/update-pass', 'UserController@update');
             //菜单
