@@ -67,7 +67,12 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
                 $router->put('house/update/{uuid}', 'HouseController@update');//修改房源
                 $router->post('house/recommend', 'HouseController@recommend');//推荐房源
                 $router->delete('house/delete/{uuid}', 'HouseController@destroy');//删除房源
+                $router->get('house/tag/edit/{id}', 'HouseController@editTag');//修改标签
+                $router->post('house/tag/edit/save', 'HouseController@editTagSave');//修改标签
+                $router->get('house/img/edit/{id}', 'HouseController@editImage');//修改图片
+                $router->post('house/img/edit/save', 'HouseController@editImageSave');//修改图片
 
+                //$router->post('house/tag', 'HouseController@storeTag');
                 //公司
                 $router->get('company/index', 'CompanyController@index');//列表
                 $router->post('company/store', 'CompanyController@store');//添加

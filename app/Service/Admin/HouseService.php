@@ -7,6 +7,7 @@
  */
 
 namespace App\Service\Admin;
+use App\Model\Data\Select;
 use App\Model\Data\SelectCateDefault;
 use App\Model\House\House;
 use App\Model\House\HouseHome;
@@ -359,10 +360,6 @@ class HouseService extends AdminBase
         $res = House::where('uuid',$uuid)->first();
         if( $res )
         {
-
-            $res->images = $res->houseToImage()->select('uuid','url')->get();
-            $house_tag = $res->houseToTag()->select('tagid')->get()->toArray();
-            $res->house_tag = i_array_column($house_tag,null,'tagid');
             return $res;
         }else
         {
@@ -462,79 +459,11 @@ class HouseService extends AdminBase
                     $obj->wide = $data['wide'];//面宽
                     break;
             }
-            //修改标签
-            if( array_has($data,'tagid') )
-            {
-                foreach ( $data['tagid'] as $k=>$row )
-                {
-                    $arr[$k]['uuid'] = create_uuid();
-                    $arr[$k]['tagid'] = $row;
-                    $arr[$k]['houseid'] = $obj->id;
-                    $arr[$k]['created_at'] = date('Y-m-d H:i:s');
-                    $arr[$k]['updated_at'] = date('Y-m-d H:i:s');
-                }
-                HouseTag::insert( $arr );
-            }
-
-            //删除标签
-            if(  array_has($data,'del_tagid') &&  $data['del_tagid'] )
-            {
-                if( is_array($data['del_tagid']) )
-                {
-                    HouseTag::where('houseid',$obj->id)->whereIn('id',$data['del_tagid'])->delete();
-                }
-            }
-            //上传图片
-            $upload = new \Upload();
-            if( array_has($data,'images') && $data['images'])
-            {
-                //上传
-                foreach ( explode(',',$data['images']) as $row )
-                {
-
-                    $res = $upload->uploadProductImage( $obj->id, $row, 'house' );
-                    if( $res )
-                    {
-                        $arr['uuid'] = create_uuid();
-                        $arr['url'] = '/house/'.$obj->id.'/'.$row;
-                        $arr['houseid'] = $obj->id;
-                        $arr['created_at'] = date("Y-m-d H:i:s");
-
-                        HouseImage::insert($arr);
-                    }
-                }
-            }
-            if( array_has($data,'del_images') && $data['del_images'] )
-            {
-                //删除
-                foreach ( explode(',',$data['del_images']) as $row )
-                {
-                    $res = $upload->delImg( $row );
-                    if( $res )
-                    {
-                        HouseImage::where(['url'=>$row,'houseid'=>$obj->id])->delete();
-                    }
-                }
-            }
-            //上传封面
-            if(  array_has($data,'covermap') && $data['covermap'] )
-            {
-                $covermap = $upload->uploadProductImage( $obj->id, $data['covermap'], 'house' );
-                if( $covermap )
-                {
-                    $obj->covermap = '/house/'.$obj->id.'/'.$data['covermap'];
-                }
-            }
-            //删除封面
-            if( array_has($data,'del_covermap') && $data['del_covermap'] )
-            {
-                $upload->delImg( $data['del_covermap'] );
-            }
             //修改房源信息
             $obj->save();
             DB::commit();
             Cache::tags(['houseList','HomeHouseList','HomeRecommend','HomeInfo'])->flush();
-            return "success";
+            return base64_encode($obj->id);
         }catch (Exception $e)
         {
             DB::rollBack();
@@ -563,4 +492,178 @@ class HouseService extends AdminBase
         }
         responseData(\StatusCode::ERROR,'推荐失败');
     }
+
+
+    /**
+     * 修改房签
+     */
+    public function editTag( $id )
+    {
+        $id = base64_decode($id);
+        $tag = HouseTag::where('houseid',$id)->pluck('tagid')->toArray();
+        if( count($tag) )
+        {
+            $res = new \stdClass();
+            $res->tag = $tag;
+            $arr = array();
+            $tages = Select::where(['cateid'=>5,'status'=>1])->get();
+            foreach ( $tages as $row )
+            {
+                $obj = new \stdClass();
+                $obj->name = $row->name;
+                $obj->id = $row->id;
+                if( in_array( $obj->id, $tag) )
+                {
+                    $chencked = true;
+                    $obj->istag = 1;
+                }else
+                {
+                    $chencked = false;
+                    $obj->istag = 0;
+                }
+                $obj->chencked = $chencked;
+                $arr[] = $obj;
+            }
+            $res->data = $arr;
+            return $res;
+        }else
+        {
+            responseData(\StatusCode::ERROR,'未查到信息');
+        }
+    }
+
+
+    /**
+     * @param $data
+     * @return string
+     * 修改保存标签
+     */
+    public function saveEditTag( $data )
+    {
+        //修改标签
+        if( array_has($data,'tagid') &&  $data['tagid'] )
+        {
+            $k = 0;
+            $arr = array();
+            foreach ( $data['tagid'] as $row )
+            {
+                $res = HouseTag::where(['houseid'=> $data['houseid'],'tagid'=>(int)$row])->first();
+                if( !$res )
+                {
+                    $arr[$k]['uuid'] = create_uuid();
+                    $arr[$k]['tagid'] = $row;
+                    $arr[$k]['houseid'] = $data['houseid'];
+                    $arr[$k]['created_at'] = date('Y-m-d H:i:s');
+                    $arr[$k]['updated_at'] = date('Y-m-d H:i:s');
+                    $k++;
+                }
+            }
+            if( count($arr) )
+            {
+                HouseTag::insert( $arr );
+            }
+        }
+
+        //删除标签
+        if(  array_has($data,'del_tagid') &&  $data['del_tagid'] )
+        {
+            if( is_array($data['del_tagid']) )
+            {
+                HouseTag::where('houseid',$data['houseid'])->whereIn('tagid',$data['del_tagid'])->delete();
+            }
+        }
+
+        return base64_encode($data['houseid']);
+    }
+
+
+    /**
+     * @param $id
+     * @return \stdClass
+     * 图片信息
+     */
+    public function editImage( $id )
+    {
+        $id = base64_decode($id);
+        $img = HouseImage::where('houseid',$id)->get();
+        $covermap = House::where('id',$id)->value('covermap');
+        if( count( $img ) )
+        {
+            $obj = new \stdClass();
+            $arr = array();
+            foreach ( $img as $row )
+            {
+                $arr[] = $row->url;
+            }
+            $obj->img = $arr;
+            $obj->res = $img;
+            $obj->covermap = $covermap;
+            return $obj;
+        }else
+        {
+            responseData(\StatusCode::ERROR,'未查到信息');
+        }
+    }
+
+
+    /**
+     * @param $data
+     * 保存图片
+     */
+    public function editImageSave( $data )
+    {
+        try{
+            DB::beginTransaction();
+            $upload = new \Upload();
+            if( array_has($data,'addImg') && $data['addImg'])
+            {
+                //上传
+                foreach ( $data['addImg'] as $row )
+                {
+
+                    $res = $upload->uploadProductImage( $data['houseid'], $row, 'house' );
+                    if( $res )
+                    {
+                        $arr['uuid'] = create_uuid();
+                        $arr['url'] = '/house/'.$data['houseid'].'/'.$row;
+                        $arr['houseid'] = $data['houseid'];
+                        $arr['created_at'] = date("Y-m-d H:i:s");
+                        HouseImage::insert($arr);
+                    }
+                }
+            }
+            if( array_has($data,'delImg') && $data['delImg'] )
+            {
+                //删除
+                foreach ( $data['delImg'] as $row )
+                {
+
+                    $res = $upload->delImg(  $row );
+                    if( $res )
+                    {
+                        HouseImage::where(['url'=>$row,'houseid'=>$data['houseid']])->delete();
+                    }
+                }
+            }
+            //上传封面
+            if(  array_has($data,'addcovermap') && $data['addcovermap'] )
+            {
+                $covermap = $upload->uploadProductImage( $data['houseid'], $data['addcovermap'], 'house' );
+                if( $covermap )
+                {
+                    $obj = House::where('id', $data['houseid'])->first();
+                    $obj->covermap = '/house/'.$data['houseid'].'/'.$data['addcovermap'];
+                    $obj->save();
+                }
+            }
+            Cache::tags(['houseList','HomeHouseList','HomeRecommend','HomeInfo'])->flush();
+            DB::commit();
+            return 'success';
+        }catch (Exception $e)
+        {
+            DB::rollBack();
+            responseData(\StatusCode::ERROR,'编辑失败');
+        }
+    }
+
 }
