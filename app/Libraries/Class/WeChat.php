@@ -27,7 +27,7 @@ class WeChat
      * @param $openid openid
      * @param $username 用户名
      * @param $phone
-     * @param $name
+     * @param $name 房源名称
      * @param null $url
      * @return bool
      * 发送模板消息

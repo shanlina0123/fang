@@ -138,7 +138,7 @@ class ClientController extends HomeBaseController
         }
 
         //执行业务处理
-        $this->client_service->store($userinfo->adminid,$userinfo->id,$data);
+        $this->client_service->store($userinfo->adminid,$userinfo->id,$userinfo,$data);
         //接口返回结果
         responseData(\StatusCode::SUCCESS,"推荐成功");
     }

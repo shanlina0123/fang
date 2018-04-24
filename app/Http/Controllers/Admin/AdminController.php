@@ -110,6 +110,12 @@ class AdminController extends AdminBaseController
         if ($validator->fails()) {
             responseData(\StatusCode::PARAM_ERROR,"验证失败","",$validator->errors());
         }
+
+        if(!checkMobile($data["mobile"]))
+        {
+            responseData(\StatusCode::PARAM_ERROR,"手机格式错误","",["mobile"=>["手机格式错误"]]);
+        }
+
         //密码base_decode验证
         if($data["password"])
         {
