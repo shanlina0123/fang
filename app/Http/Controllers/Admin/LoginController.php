@@ -63,7 +63,7 @@ class LoginController extends AdminBaseController
         {
             responseData(\StatusCode::CHECK_FROM,'验证失败','',['uuid'=>'uuid不合法'] );
         }
-        $res = $this->mod->checkOpenid();
+        $res = $this->mod->checkOpenid( $uuid );
         responseData(\StatusCode::SUCCESS,'绑定成功', $res );
     }
 
@@ -78,7 +78,7 @@ class LoginController extends AdminBaseController
         $validator = Validator::make(
             $data,
             [
-                'name' => 'required',
+                'uuid' => 'required',
             ]
         );
         if ($validator->fails())
@@ -101,7 +101,6 @@ class LoginController extends AdminBaseController
         $validator = Validator::make(
             $data,
             [
-                'name' => 'required',
                 'wechatopenid' => 'required',
                 'uuid' => 'required',
                 'password' => 'required|min:6|max:12',
@@ -129,7 +128,7 @@ class LoginController extends AdminBaseController
             $res = AdminUser::where('name',trim( $name) )->first();
             if( $res )
             {
-                responseData(\StatusCode::SUCCESS,'检测成功');
+                responseData(\StatusCode::SUCCESS,'检测成功',$res->uuid);
             }
         }
 

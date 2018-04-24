@@ -37,7 +37,7 @@ class LoginService extends AdminBase
             $where['name'] = $data['name'];
         }
         $where['password'] = optimizedSaltPwd("admin",base64_decode($data['password']));
-        $user = AdminUser::where( $where )->select('id','uuid','name',"nickname", 'isadmin','mobile','status')->first();
+        $user = AdminUser::where( $where )->select('id','uuid','name',"nickname", 'isadmin','mobile','status','wechatopenid')->first();
 
         if( $user == false )
         {
@@ -79,7 +79,7 @@ class LoginService extends AdminBase
         $res = AdminUser::where('uuid',$uuid)->value('wechatopenid');
         if( $res )
         {
-            return 'success';
+            return $res;
         }else
         {
             responseData(\StatusCode::ERROR,'未绑定');
@@ -90,11 +90,11 @@ class LoginService extends AdminBase
     /**
      * @param $data
      * @return mixed
-     * 扫码检测状态
+     * 忘记密码扫码检测状态
      */
     public function checkWechatbackStatus( $data )
     {
-        $res = AdminUser::where(['name'=>$data['name'],'wechatbackstatus'=>1])->select(['name','uuid','wechatopenid','wechatbackstatus'])->first();
+        $res = AdminUser::where(['uuid'=>$data['uuid'],'wechatbackstatus'=>1])->select('id','name','uuid','wechatopenid','wechatbackstatus')->first();
         if( $res )
         {
             $data = $res;
@@ -115,7 +115,6 @@ class LoginService extends AdminBase
      */
     public function modifyPass( $data )
     {
-        $where['name'] = $data['name'];
         $where['wechatopenid'] = $data['wechatopenid'];
         $where['uuid'] = $data['uuid'];
         $res = AdminUser::where( $where )->first();

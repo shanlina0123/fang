@@ -10,6 +10,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Service\Admin\UserService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends AdminBaseController
 {
@@ -72,7 +73,7 @@ class UserController extends AdminBaseController
             $messages = $validator->errors();
             responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages );
         }
-        $res = $this->mod->updatePass($this->request);
+        $res = $this->mod->updatePass($this->request,$data);
         responseData(\StatusCode::SUCCESS, '修改成功', $res);
     }
 
