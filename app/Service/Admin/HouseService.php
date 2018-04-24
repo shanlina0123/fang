@@ -185,7 +185,7 @@ class HouseService extends AdminBase
             $arr['name'] = $data['name'];//楼盘名称
             $arr['iscommission'] = $data['iscommission'];//展示拥金
             $arr['commissionid'] = $data['commissionid'];//佣金规则
-            $arr['ishome'] = $data['name'];//是否推荐 1推荐 0不推荐
+            $arr['ishome'] = $data['ishome'];//是否推荐 1推荐 0不推荐
             $arr['provinceid'] = $data['provinceid'];
             $arr['cityid'] = $data['cityid'];
             $arr['street'] = $data['street'];//街道
@@ -237,6 +237,14 @@ class HouseService extends AdminBase
             }
 
             $res = House::insertGetId( $arr );
+            //首页推荐
+            if(  $data['ishome'] == 1 )
+            {
+                $home = new HouseHome();
+                $home->cityid = $data['cityid'];
+                $home->houseid = $res;
+                $home->save();
+            }
             Cache::tags(['houseList','HomeHouseList'])->flush();
             return base64_encode($res);
         }catch (Exception $e){
@@ -415,7 +423,7 @@ class HouseService extends AdminBase
             $obj->name = $data['name'];//楼盘名称
             $obj->iscommission = $data['iscommission'];//展示拥金
             $obj->commissionid = $data['commissionid'];//佣金规则
-            $obj->ishome = $data['name'];//是否推荐 1推荐 0不推荐
+            $obj->ishome = $data['ishome'];//是否推荐 1推荐 0不推荐
             $obj->provinceid = $data['provinceid'];
             $obj->cityid = $data['cityid'];
             $obj->street = $data['street'];//街道
@@ -461,6 +469,13 @@ class HouseService extends AdminBase
             }
             //修改房源信息
             $obj->save();
+
+            //首页推荐
+            if(  $data['ishome'] == 1 )
+            {
+                HouseHome::where('houseid',$obj->id)->delete();
+            }
+
             DB::commit();
             Cache::tags(['houseList','HomeHouseList','HomeRecommend','HomeInfo'])->flush();
             return base64_encode($obj->id);
