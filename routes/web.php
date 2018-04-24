@@ -16,20 +16,11 @@ $router->get('/', 'IndexController@index'); //入口
  */
 //$router->get('api-test','Admin\TestController@index');
 $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($router) {
-
-    //PC端跨域访问
-    //$router->group(['middleware' => 'cors_admin_ware'], function () use ($router) {
-        //跨域访问设置
-      /*  $router->options("{all}", function () {});
-        $router->options('house/index',  function () {});
-        $router->options('datas-default-one/{cateid}',  function () {});
-        $router->options('datas-one/{cateid}',  function () {});
-        $router->options('house/delete/{uuid}',  function () {});
-        $router->options('house/create',  function () {});*/
         $router->get('get/map/address', 'PublicController@getMapAddress');//腾旭地址
         //登录前
         $router->post('login', 'LoginController@login');//登录
         $router->get('get/poc', 'PublicController@getAddress');//省市数据
+        $router->post('get/user', 'LoginController@getUser');//检测用户名
         //微信授权接口
         $router->get('wechat/authorization', 'WechatController@authorization');
         //忘记密码

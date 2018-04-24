@@ -7,6 +7,7 @@
  */
 
 namespace App\Http\Controllers\Admin;
+use App\Model\User\AdminUser;
 use App\Service\Admin\LoginService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -115,4 +116,24 @@ class LoginController extends AdminBaseController
         $res = $this->mod->modifyPass( $data );
         responseData(\StatusCode::SUCCESS,'修改成功', $res );
     }
+
+
+    /**
+     * 检测用户名称
+     */
+    public function getUser( Request $request )
+    {
+        $name = $request->input('name');
+        if( $name )
+        {
+            $res = AdminUser::where('name',trim( $name) )->first();
+            if( $res )
+            {
+                responseData(\StatusCode::SUCCESS,'检测成功');
+            }
+        }
+
+        responseData(\StatusCode::ERROR,'用户不存在');
+    }
+
 }

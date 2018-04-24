@@ -94,7 +94,4 @@ class PublicController extends AdminBaseController
         return json_decode($output);
     }
 
-
-
-
 }
