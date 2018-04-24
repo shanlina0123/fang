@@ -175,6 +175,7 @@ class DatasService extends AdminBase
             Log::error('======DatasService-store:======' . $e->getMessage());
             responseData(\StatusCode::CATCH_ERROR, "新增异常");
         }
+        return ["uuid"=>$role["uuid"]];
     }
 
 
@@ -346,5 +347,18 @@ class DatasService extends AdminBase
             return $list;
         });
     }
-
+    /***
+     * 获取自定义分类列表
+     */
+    public  function  cateList()
+    {
+            //属性分类列表
+             $list = SelectCate::select("id", "name","status")->orderBy('id', 'asc')->get();
+            //结果检测
+            if (empty($list)) {
+                responseData(\StatusCode::EMPTY_ERROR, "无结果");
+            }
+            //返回数据库层查询结果
+            return $list;
+    }
 }

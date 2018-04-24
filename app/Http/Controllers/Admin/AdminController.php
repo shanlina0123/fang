@@ -175,7 +175,7 @@ class AdminController extends AdminBaseController
             }
         }
 
-        if($data["status"])
+        if(strlen($data["status"])>0)
         {
            if(!in_array($data["status"],[0,1]))
             {

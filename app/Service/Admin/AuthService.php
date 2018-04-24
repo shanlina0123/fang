@@ -109,6 +109,10 @@ class AuthService extends AdminBase
                 responseData(\StatusCode::NOT_DEFINED, "存在非定义数值，请移除");
             }
 
+            //修改视野
+            $roleUpdate["islook"]=$data["islook"];
+            $rsRole=Role::where("uuid", $role_uuid)->update($roleUpdate);
+
             //业务处理
             foreach ($data["functionid"] as $k => $v) {
                 //唯一条件
@@ -128,7 +132,7 @@ class AuthService extends AdminBase
             }
 
             //结果处理
-            if (!in_array(false, $rs, true)) {
+            if ($rsRole!==false&&!in_array(false, $rs, true)) {
                 DB::commit();
                 //删除缓存
                 Cache::forget("authList");

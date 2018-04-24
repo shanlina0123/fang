@@ -72,8 +72,10 @@ class AuthController extends AdminBaseController
         $validator = Validator::make($validateData,[
             'role_uuid' => 'required|max:32|min:32',
             "functionid"=>'required',
+            "islook"=>"required|numeric"
         ],['role_uuid.required'=>'uuid参数为空错误','role_uuid.max'=>'uuid参数max错误','role_uuid.min'=>'uuid参数min错误',
-            'functionid.required'=>'functionid参数为空错误']);
+            'functionid.required'=>'functionid参数为空错误',
+            'islook.required'=>'视野参数为空错误','islook.numeric'=>'视野参数只能是int',]);
 
         //进行验证
         if ($validator->fails()) {
@@ -86,6 +88,13 @@ class AuthController extends AdminBaseController
             responseData(\StatusCode::PARAM_ERROR,"验证失败","",["functionid"=>["functionid参数格式错误"]]);
         }
 
+        if(strlen($data["islook"])>0)
+        {
+            if(!in_array($data["islook"],[0,1]))
+            {
+                responseData(\StatusCode::PARAM_ERROR,"验证失败","",["islook"=>["islook参数非预定义"]]);
+            }
+        }
         //获取业务数据
         $this->auth_service->update($role_uuid,$data);
         //接口返回结果

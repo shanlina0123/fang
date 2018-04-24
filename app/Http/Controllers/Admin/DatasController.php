@@ -27,6 +27,7 @@ class DatasController extends AdminBaseController
     }
 
 
+
     /***
      * 获取数据源列表 所有
      */
@@ -111,9 +112,9 @@ class DatasController extends AdminBaseController
             responseData(\StatusCode::PARAM_ERROR,"验证失败","",$validator->errors());
         }
         //执行业务处理
-         $this->datas_service->store($data);
+        $data= $this->datas_service->store($data);
         //接口返回结果
-        responseData(\StatusCode::SUCCESS,"新增成功");
+        responseData(\StatusCode::SUCCESS,"新增成功",$data);
     }
 
 
@@ -199,4 +200,16 @@ class DatasController extends AdminBaseController
         //接口返回结果
         responseData(\StatusCode::SUCCESS,"获取成功",$list);
     }
+
+    /***
+     * 获取自定义分类列表
+     */
+    public function  cateList()
+    {
+        //获取业务数据
+        $list=$this->datas_service->cateList();
+        //接口返回结果
+        responseData(\StatusCode::SUCCESS,"获取成功",$list);
+    }
+
 }
