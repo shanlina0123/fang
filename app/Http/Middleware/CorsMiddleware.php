@@ -30,7 +30,6 @@ class CorsMiddleware
 
         // 执行动作
         $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
-
         $this->allow_origin = config("configure.allow");
 
         //如果origin不在允许列表内，直接返回403

@@ -2,7 +2,7 @@
 use Illuminate\Support\Facades\Storage;
 class Upload
 {
-    public  $filepath = 'uploads';
+    public  $filepath = 'upload';
     public  $fileFrom = "temp/";
     public static $disk = 'upload';
     public function __construct()
@@ -24,12 +24,12 @@ class Upload
             switch ( $type )
             {
                 case "house": //房源图片
-                    $filePath  = $this->filepath.'/'.'house/'.$id;
+                    $filePath = base_path().'/public/'.$this->filepath.'/'.'house/'.$id;
                     break;
                 default:
                     return false;
             }
-            $fileFrom = public_path().$this->fileFrom.$name;
+            $fileFrom = base_path().'/public/'.$this->fileFrom.$name;
             if( file_exists($fileFrom) )
             {
                 $res = $this->uploads( $filePath, $fileFrom, $name, $alias );
@@ -58,17 +58,18 @@ class Upload
      * @return bool
      * 私有方法
      */
-    private function uploads( $filePath, $fileFrom, $name, $alias  )
+    private function uploads( $filePath, $fileFrom, $name  )
     {
-        $newName = $alias?$alias:$name;
         if( $filePath && $fileFrom && $name )
         {
+
             $Directory = $filePath;
-            $obj = Storage::disk(self::$disk)->makeDirectory( $Directory );
-            if( $obj === true )
+            $arrDirectory =  str_replace("\\","/",$Directory);
+            $dir = $this->Directory($arrDirectory);
+            if( $dir )
             {
-                $upload = Storage::disk(self::$disk)->put($Directory.'/'.$newName,file_get_contents($fileFrom));
-                if( $upload === true && file_exists($fileFrom) == true )
+                $file =  copy( $fileFrom,$arrDirectory.'/'.$name );
+                if( $file == true )
                 {
                     @unlink($fileFrom);
                     return true;
@@ -88,15 +89,25 @@ class Upload
     }
 
     /**
+     * @param $dir
+     * @return bool
+     * 递归创建文件夹
+     */
+    public function Directory( $dir )
+    {
+        return  is_dir ( $dir ) or $this->Directory(dirname( $dir )) and  mkdir ( $dir , 0777);
+    }
+
+    /**
      *  删除图片
      *
      */
     public function delImg( $path )
     {
-        $path = $this->filepath.'/'.$path;
-        if( Storage::disk(self::$disk)->exists($path) )
+        $path = base_path().'/public/'.$this->filepath.'/'.$path;
+        if( file_exists($path) )
         {
-            $images = Storage::disk(self::$disk)->delete( $path );
+            $images =  @unlink($path);;
             if ( $images )
             {
                 return true;
@@ -117,17 +128,22 @@ class Upload
     {
         try
         {
-            if( $dir && $id )
+            $dirName = base_path().'/public/'.$this->filepath . '/' . $dir . '/' . $id;
+            if(! is_dir($dirName))
             {
-                $Path = $this->filepath . '/' . $dir . '/' . $id;
-                $res = Storage::disk(self::$disk)->deleteDirectory($Path);
-                if ( $res )
+                return false;
+            }
+            $handle = @opendir($dirName);
+            while(($file = @readdir($handle)) !== false)
+            {
+                if($file != '.' && $file != '..')
                 {
-                    return true;
+                    $dir = $dirName . '/' . $file;
+                    is_dir($dir) ? removeDir($dir) : @unlink($dir);
                 }
-                return false;
-            }else
-                return false;
+            }
+            closedir($handle);
+            return rmdir($dirName) ;
 
         }catch (Exception $e)
         {

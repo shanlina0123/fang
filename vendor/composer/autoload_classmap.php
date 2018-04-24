@@ -42,7 +42,6 @@ return array(
     'App\\Http\\Middleware\\CheckAdminAuth' => $baseDir . '/app/Http/Middleware/CheckAdminAuth.php',
     'App\\Http\\Middleware\\CheckAdminToken' => $baseDir . '/app/Http/Middleware/CheckAdminToken.php',
     'App\\Http\\Middleware\\CheckUserToken' => $baseDir . '/app/Http/Middleware/CheckUserToken.php',
-    'App\\Http\\Middleware\\CorsAdminMiddleware' => $baseDir . '/app/Http/Middleware/CorsAdminMiddleware.php',
     'App\\Http\\Middleware\\CorsMiddleware' => $baseDir . '/app/Http/Middleware/CorsMiddleware.php',
     'App\\Http\\Middleware\\ExampleMiddleware' => $baseDir . '/app/Http/Middleware/ExampleMiddleware.php',
     'App\\Jobs\\ExampleJob' => $baseDir . '/app/Jobs/ExampleJob.php',

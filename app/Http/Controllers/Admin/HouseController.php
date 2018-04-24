@@ -232,4 +232,71 @@ class HouseController extends AdminBaseController
         $res = $this->house->recommendHouse( $data );
         responseData(\StatusCode::SUCCESS,'删除成功',$res);
     }
+
+    /**
+     * @param $id
+     * 修改标签
+     */
+    public function editTag( $id )
+    {
+        $res = $this->house->editTag( $id );
+        responseData(\StatusCode::SUCCESS,'标签信息', $res);
+    }
+
+    /**
+     * 发布修改标签
+     */
+    public function editTagSave()
+    {
+        $data = trimValue( $this->request->all() );
+        //验证
+        $validator = Validator::make(
+            $data,[
+                'tagid'=>'sometimes|array',
+                'houseid'=>'required|numeric',
+                'del_tagid'=>'sometimes|array'
+            ]
+        );
+        if ($validator->fails())
+        {
+            $messages = $validator->errors();
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
+        }
+        $res = $this->house->saveEditTag( $data );
+        responseData(\StatusCode::SUCCESS,'写入成功',$res);
+    }
+
+
+    /**
+     * @param $id
+     * 图片信息
+     */
+    public function editImage( $id )
+    {
+        $res = $this->house->editImage( $id );
+        responseData(\StatusCode::SUCCESS,'图片信息', $res);
+    }
+
+    /**
+     * 保存图片
+     */
+    public function editImageSave()
+    {
+        $data = trimValue( $this->request->all() );
+        //验证
+        $validator = Validator::make(
+            $data,[
+                'addImg'=>'sometimes|array',
+                'houseid'=>'required|numeric',
+                'delImg'=>'sometimes|array'
+            ]
+        );
+        if ($validator->fails())
+        {
+            $messages = $validator->errors();
+            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
+        }
+        $res = $this->house->editImageSave( $data );
+        responseData(\StatusCode::SUCCESS,'修改成功',$res);
+    }
 }
