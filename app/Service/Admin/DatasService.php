@@ -8,10 +8,13 @@
 
 namespace App\Service\Admin;
 
+use App\Model\Client\ClientDynamic;
 use App\Model\Data\Select;
 use App\Model\Data\SelectCate;
 use App\Model\Data\SelectCateDefault;
 use App\Model\Data\SelectDefault;
+use App\Model\House\House;
+use App\Model\House\HouseTag;
 use App\Service\AdminBase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -81,6 +84,7 @@ class DatasService extends AdminBase
      */
     public function getall()
     {
+
         //redis缓存数据，无则执行数据库获取业务数据
         return Cache::get('datasWebAllList', function () {
             //属性分类列表
@@ -164,6 +168,8 @@ class DatasService extends AdminBase
                 Cache::forget("datasAllList");
                 //删除Home下缓存
                 Cache::forget("webDatasAllList");
+                Cache::forget("datasAllList");
+                Cache::forget("datasWebAllList");
             } else {
                 DB::rollBack();
                 responseData(\StatusCode::DB_ERROR, "新增失败");
@@ -222,6 +228,8 @@ class DatasService extends AdminBase
                 Cache::forget("datasAllList");
                 //删除Home下缓存
                 Cache::forget("webDatasAllList");
+                Cache::forget("datasAllList");
+                Cache::forget("datasWebAllList");
             } else {
                 DB::rollBack();
                 responseData(\StatusCode::DB_ERROR, "修改失败");
@@ -265,6 +273,8 @@ class DatasService extends AdminBase
                 Cache::forget("datasAllList");
                 //删除Home下缓存
                 Cache::forget("webDatasAllList");
+                Cache::forget("datasAllList");
+                Cache::forget("datasWebAllList");
 
             } else {
                 DB::rollBack();
@@ -279,7 +289,82 @@ class DatasService extends AdminBase
         }
     }
 
+    /***
+     * 删除属性 - 执行
+     */
+    public  function delete($uuid)
+    {
+        try{
+            //开启事务
+            DB::beginTransaction();
+            //业务处理
+            //检测存在
+            $row=Select::where("uuid",$uuid)->first();
+            if(empty($row))
+            {
+                responseData(\StatusCode::NOT_EXIST_ERROR,"请求数据不存在");
+            }
+            //属性id
+            $datasid=$row["id"];
+            $houseExist=0;
+            $clientExist=0;
+            $houseTagExist=0;
+            switch ($row["cateid"])
+            {
+                case 1:
+                    $houseExist=House::where("commissionid",$datasid)->exists();
+                    break;
+                case 2:
+                    $houseExist=House::where("roomtypeid",$datasid)->exists();
+                    break;
+                case 3:
+                    $houseExist=House::where("decoratestyleid",$datasid)->exists();
+                    break;
+                case 4:
+                    $clientExist=ClientDynamic::where("levelid",$datasid)->exists();
+                    break;
+                case 5:
+                    $houseTagExist=HouseTag::where("tagid",$datasid)->exists();
+                    break;
+            }
 
+                if($houseExist>0)
+                {
+                    responseData(\StatusCode::EXIST_ERROR,"属性下关联房源，不能删除");
+                }
+                if($clientExist>0)
+                {
+                    responseData(\StatusCode::EXIST_ERROR,"属性下关联客户，不能删除");
+                }
+                if($houseTagExist>0)
+                {
+                    responseData(\StatusCode::EXIST_ERROR,"属性下关联房源，不能删除");
+                }
+
+            //删除数据
+            $rs=Select::where("id",$datasid)->delete();
+            //结果处理
+            if($rs!==false)
+            {
+                DB::commit();
+                //删除缓存
+                Cache::forget("datasAllList");
+                //删除Home下缓存
+                Cache::forget("webDatasAllList");
+                Cache::forget("datasAllList");
+                Cache::forget("datasWebAllList");
+            }else{
+                DB::rollBack();
+                responseData(\StatusCode::DB_ERROR,"删除失败");
+            }
+        }catch (\ErrorException $e){
+            //业务执行失败
+            DB::rollBack();
+            //记录日志
+            Log::error('======DatasService-delete:======'. $e->getMessage());
+            responseData(\StatusCode::CATCH_ERROR,"删除异常");
+        }
+    }
     /***
      * 获取数据源默认数据列表 所有
      * @return mixed

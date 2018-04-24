@@ -147,7 +147,25 @@ class DatasController extends AdminBaseController
         responseData(\StatusCode::SUCCESS,"修改成功");
     }
 
+    /***
+     * 删除
+     */
+    public function  delete($uuid)
+    {
+        //定义验证规则
+        $validator = Validator::make(["uuid"=>$uuid],[
+            'uuid' => 'required|max:32|min:32',
+        ],['uuid.required'=>'参数错误','uuid.max'=>'参数错误','uuid.min'=>'参数错误']);
 
+        //进行验证
+        if ($validator->fails()) {
+            responseData(\StatusCode::PARAM_ERROR,"参数错误");
+        }
+        //获取业务数据
+        $this->datas_service->delete($uuid);
+        //接口返回结果
+        responseData(\StatusCode::SUCCESS,"删除成功");
+    }
     /***
      * 禁用/启用
      */
