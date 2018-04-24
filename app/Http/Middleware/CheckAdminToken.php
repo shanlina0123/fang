@@ -46,8 +46,10 @@ class CheckAdminToken
             //具备的权限功能
             $roleFuncObj = RoleFunction::where(["roleid" => $roleid, "status" => 1])->select("functionid")->get();
             $admin["roleFunids"] = array_flatten($roleFuncObj->toArray());
+        }else{
+            $admin["islook"]=0;
+            $admin["roleFunids"]=[];
         }
-
         $request->attributes->add(['admin_user' => $admin]);//添加参数
         return $next($request);
     }

@@ -165,7 +165,7 @@ class AuthService extends AdminBase
         return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($adminid, $roleFunids) {
 
             //获取菜单列表
-            $queryModel= Functions::select("id", "menuname", "pid", "level","url")
+            $queryModel= Functions::select("id", "menuname","menuicon", "pid", "level","url")
                 ->where("ismenu",1)
                 ->where("level","<=",2)
                 ->where("status",1)

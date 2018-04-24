@@ -25,7 +25,7 @@ class RolesService extends AdminBase
         //redis缓存数据，无则执行数据库获取业务数据
         return Cache::get('roleList', function() {
             //默认条件
-            $list=Role::select("id","uuid","name","status","isdeafult","created_at")->orderBy('id','asc')->get();
+            $list=Role::select("id","uuid","name","islook","status","isdeafult","created_at")->orderBy('id','asc')->get();
             //结果检测
             if(empty($list))
             {
