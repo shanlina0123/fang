@@ -109,6 +109,7 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
 
                 //自定义属性管理
                 $router->get('datas', 'DatasController@index');//获取自定义所有属性列表----OK
+                $router->get('datas-catelist', 'DatasController@cateList');//获取自定义所有属性列表----OK
                 $router->get('datas-all', 'DatasController@getall');//获取全部自定义属性
                 $router->get('datas-one/{cateid}', 'DatasController@getOne');//获取单个属性列表----OK
                 $router->get('datas-detail/{uuid}', 'DatasController@edit');//属性详情----OK
