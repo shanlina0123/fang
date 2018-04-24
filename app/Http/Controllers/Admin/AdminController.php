@@ -142,7 +142,7 @@ class AdminController extends AdminBaseController
     public  function  update($uuid)
     {
         //获取请求参数
-        $data=$this->getData(["name","nickname","mobile","password","roleid"],$this->request->all());
+        $data=$this->getData(["name","nickname","mobile","password","roleid","status"],$this->request->all());
         //拼接验证数据集
         $validateData=array_merge(["uuid"=>$uuid],$data);
 
