@@ -69,6 +69,8 @@ class AuthService extends AdminBase
             $arrList = i_array_column($arrList, null, "functionid");
             //取键
             $list["functionid"] = array_keys($arrList);
+            $list["roleid"]=$roleData["id"];
+            $list["islook"]=$roleData["islook"];
         } catch (\ErrorException $e) {
             //记录日志
             Log::error('======RolesService-edit:======' . $e->getMessage());
