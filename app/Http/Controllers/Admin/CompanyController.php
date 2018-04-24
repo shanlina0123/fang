@@ -41,9 +41,9 @@ class CompanyController extends AdminBaseController
             $data,
             [
                 'name' => 'required|max:255',
-                'mobile' => 'required|max:11|min:11',
-                'conncat' => 'required|max:30',
-                'addr' => 'required|max:255',
+                'mobile' => 'present|max:11|min:11',
+                'conncat' => 'present|max:30',
+                'addr' => 'present|max:255',
             ]
         );
         if ($validator->fails())
@@ -90,9 +90,9 @@ class CompanyController extends AdminBaseController
             $data,[
                 'uuid'=>'required|min:32|max:32',
                 'name' => 'required|max:255',
-                'mobile' => 'required|max:11|min:11',
-                'conncat' => 'required|max:30',
-                'addr' => 'required|max:255',
+                'mobile' => 'present|max:11|min:11',
+                'conncat' => 'present|max:30',
+                'addr' => 'present|max:255',
             ]
         );
         if ($validator->fails())

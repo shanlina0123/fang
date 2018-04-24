@@ -46,12 +46,39 @@ class CheckAdminToken
             //具备的权限功能
             $roleFuncObj = RoleFunction::where(["roleid" => $roleid, "status" => 1])->select("functionid")->get();
             $admin["roleFunids"] = array_flatten($roleFuncObj->toArray());
+            //菜单列表
+            $admin["menuList"]=getMnueTmp($admin["roleFunids"]);
         }else{
             $admin["islook"]=0;
             $admin["roleFunids"]=[];
+            $admin["menuList"]=[];
         }
         $request->attributes->add(['admin_user' => $admin]);//添加参数
         return $next($request);
+    }
+
+    protected  function getMnueTmp($roleFunids)
+    {
+        //获取菜单列表
+        $queryModel= Functions::select("id", "menuname","menuicon", "pid", "level","url")
+            ->where("ismenu",1)
+            ->where("level","<=",2)
+            ->where("status",1)
+            ->orderBy('sort', 'asc');
+        //检查权限
+        if(count($roleFunids)>0)
+        {
+            $queryModel->whereIn("id",$roleFunids);
+        }
+
+        $objList =$queryModel->get();
+
+        //结果检测
+        if (empty($objList)) {
+            return [];
+        }
+        //生成tree数组
+        return list_to_tree($objList->toArray(),"id","pid", '_child',0);
     }
 
 }
