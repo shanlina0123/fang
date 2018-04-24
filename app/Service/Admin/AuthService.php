@@ -68,6 +68,7 @@ class AuthService extends AdminBase
             //重组为键
             $arrList = i_array_column($arrList, null, "functionid");
             //取键
+            unset($arrList[0]);
             $list["functionid"] = array_keys($arrList);
             $list["roleid"]=$roleData["id"];
             $list["islook"]=$roleData["islook"];
