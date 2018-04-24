@@ -65,7 +65,7 @@ class AuthController extends AdminBaseController
     public  function  update($role_uuid)
     {
         //获取请求参数
-        $data=$this->getData(["functionid"],$this->request->all());
+        $data=$this->getData(["functionid","islook"],$this->request->all());
         $validateData=array_merge(["role_uuid"=>$role_uuid],$data);
 
         //定义验证规则
