@@ -47,7 +47,7 @@ class RolesService extends AdminBase
     {
         try{
             //获取详情数据
-            $row = Role::where("uuid",$uuid)->select("uuid","name","status","isdeafult","created_at")->first();
+            $row = Role::where("uuid",$uuid)->select("uuid","name","status","isdeafult","islook","created_at")->first();
             if(empty($row))
             {
                 responseData(\StatusCode::NOT_EXIST_ERROR,"请求数据不存在");
