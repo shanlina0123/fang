@@ -111,6 +111,7 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
                 $router->post('datas', 'DatasController@store');//添加属性----OK
                 $router->put('datas/{uuid}', 'DatasController@update');//修改属性----OK
                 $router->put('datas-setting/{uuid}', 'DatasController@setting');//禁用启用属性----OK
+                $router->put('datas-delete/{uuid}', 'DatasController@delete');//删除属性----OK
 
                 //数据分析
                 $router->post('chart', 'ChartController@index');//客户分析----OK

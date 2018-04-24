@@ -25,7 +25,7 @@ class RolesService extends AdminBase
         //redis缓存数据，无则执行数据库获取业务数据
         return Cache::get('roleList', function() {
             //默认条件
-            $list=Role::select("id","uuid","name","status","isdeafult","created_at")->orderBy('id','asc')->get();
+            $list=Role::select("id","uuid","name","islook","status","isdeafult","created_at")->orderBy('id','asc')->get();
             //结果检测
             if(empty($list))
             {
@@ -47,7 +47,7 @@ class RolesService extends AdminBase
     {
         try{
             //获取详情数据
-            $row = Role::where("uuid",$uuid)->select("uuid","name","status","isdeafult","created_at")->first();
+            $row = Role::where("uuid",$uuid)->select("uuid","name","status","isdeafult","islook","created_at")->first();
             if(empty($row))
             {
                 responseData(\StatusCode::NOT_EXIST_ERROR,"请求数据不存在");

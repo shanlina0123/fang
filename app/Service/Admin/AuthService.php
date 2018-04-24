@@ -68,7 +68,10 @@ class AuthService extends AdminBase
             //重组为键
             $arrList = i_array_column($arrList, null, "functionid");
             //取键
+            unset($arrList[0]);
             $list["functionid"] = array_keys($arrList);
+            $list["roleid"]=$roleData["id"];
+            $list["islook"]=$roleData["islook"];
         } catch (\ErrorException $e) {
             //记录日志
             Log::error('======RolesService-edit:======' . $e->getMessage());
@@ -159,10 +162,10 @@ class AuthService extends AdminBase
         //定义tag的key
         $tagKey = base64_encode(mosaic("", $tag, $adminid));
         //redis缓存返回
-        return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($adminid, $roleFunids) {
+        //return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($adminid, $roleFunids) {
 
             //获取菜单列表
-            $queryModel= Functions::select("id", "menuname", "pid", "level","url")
+            $queryModel= Functions::select("id", "menuname","menuicon", "pid", "level","url")
                 ->where("ismenu",1)
                 ->where("level","<=",2)
                 ->where("status",1)
@@ -185,7 +188,7 @@ class AuthService extends AdminBase
             Cache::put('menuList', $list, config('configure.sCache'));
             //返回数据库层查询结果
             return $list;
-       });
+       //});
     }
 
 }
