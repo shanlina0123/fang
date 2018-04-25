@@ -196,7 +196,7 @@ class HouseService extends AdminBase
             $arr['orientationid'] = $data['orientationid'];//朝向
             $arr['purposeid'] = $data['purposeid'];//用途
             $arr['area'] = $data['area'];//面积
-            $arr['created_at'] = date('Y-m-d H:i:s');//发布时间
+            $arr['created_at'] = $data['created_at']?$data['created_at']:date('Y-m-d H:i:s');//发布时间
 
             $arr['iselevator'] = $data['iselevator'];//电梯
             $arr['years'] = $data['years'];//年代
@@ -217,7 +217,7 @@ class HouseService extends AdminBase
                 case 1:
                     //新房
                     $arr['salestatusid'] = $data['salestatusid'];//现状
-                    $arr['opendate'] = $data['opendate'];//开盘日期
+                    $arr['opendate'] = $data['opendate']?$data['opendate']:"(NULL)";//开盘日期
                     $arr['price'] = $data['price'];//单价
                     $arr['roomtypeid'] = $data['roomtypeid'];//房型
                     break;
@@ -449,7 +449,7 @@ class HouseService extends AdminBase
                 case 1:
                     //新房
                     $obj->salestatusid = $data['salestatusid'];//现状
-                    $obj->opendate = $data['opendate'];//开盘日期
+                    $obj->opendate = $data['opendate']?$data['opendate']:"(NULL)";//开盘日期
                     $obj->price = $data['price'];//单价
                     $obj->roomtypeid = $data['roomtypeid'];//房型
                     break;

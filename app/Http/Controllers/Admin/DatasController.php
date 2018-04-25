@@ -114,6 +114,8 @@ class DatasController extends AdminBaseController
         //执行业务处理
         $data= $this->datas_service->store($data);
         //接口返回结果
+        //清除缓存
+        Cache::forget('getSelect');
         responseData(\StatusCode::SUCCESS,"新增成功",$data);
     }
 
@@ -143,6 +145,8 @@ class DatasController extends AdminBaseController
         }
         //获取业务数据
         $this->datas_service->update($uuid,$data);
+        //清除缓存
+        Cache::forget('getSelect');
         //接口返回结果
         responseData(\StatusCode::SUCCESS,"修改成功");
     }
@@ -163,6 +167,8 @@ class DatasController extends AdminBaseController
         }
         //获取业务数据
         $this->datas_service->delete($uuid);
+        //清除缓存
+        Cache::forget('getSelect');
         //接口返回结果
         responseData(\StatusCode::SUCCESS,"删除成功");
     }
@@ -182,6 +188,8 @@ class DatasController extends AdminBaseController
         }
         //获取业务数据
         $this->datas_service->setting($uuid);
+        //清除缓存
+        Cache::forget('getSelect');
         //接口返回结果
         responseData(\StatusCode::SUCCESS,"设置成功");
     }
