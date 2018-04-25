@@ -52,7 +52,7 @@ class AuthController extends AdminBaseController
             responseData(\StatusCode::PARAM_ERROR,"验证失败","",$validator->errors());
         }
         //获取业务数据
-        $data=$this->auth_service->edit($role_uuid);
+         $data=$this->auth_service->edit($role_uuid);
         //接口返回结果
          responseData(\StatusCode::SUCCESS,"获取成功",$data);
     }

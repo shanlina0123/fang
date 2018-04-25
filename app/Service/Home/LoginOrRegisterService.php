@@ -66,14 +66,7 @@ class LoginOrRegisterService extends HomeBase
     {
         if( $openid )
         {
-            $user = Users::where( 'wechatopenid',$openid )->select('id','uuid','companyid','nickname','name','mobile','economictid','isadminafter','wechatopenid','status')->first();
-            if( $user )
-            {
-                if( $user->status != 1 )
-                {
-                    return '';
-                }
-            }else return '';
+            $user = Users::where( 'wechatopenid',$openid )->select('id','uuid','companyid','nickname','name','mobile','economictid','isadminafter','wechatopenid','status','faceimg')->first();
         }else
         {
             $where['nickname'] = $data['nickname'];
