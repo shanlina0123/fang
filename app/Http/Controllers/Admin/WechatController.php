@@ -20,12 +20,62 @@ class WechatController extends AdminBaseController
 
     public $appid;
     public $secret;
+    static $TOKEN = '30b06afa21235689666220154e1adc540fa';
     public function __construct()
     {
         $wechatConfig = config('configure.wechat');
         $this->appid = $wechatConfig['appid'];
         $this->secret = $wechatConfig['secret'];
     }
+
+    /**
+     * @return mixed
+     * 请求入口
+     */
+    public function index( Request $request )
+    {
+        $token = $request->input('token');
+        if( $request->method() == "GET" || $request->method() == "get" )
+        {
+            $echoStr = $request->input('echostr');
+            if( $this->checkSignature( $request,static::$TOKEN ) )
+            {
+                echo $echoStr;
+                exit;
+            }
+
+        }else
+        {
+            $this->responseMsg();
+        }
+
+    }
+
+    /**
+     * @param $request
+     * @param $token
+     * @return bool.
+     * 验证
+     */
+    private function checkSignature( $request,$token )
+    {
+        $signature = $request->input('signature');
+        $timestamp = $request->input('timestamp');
+        $nonce = $request->input('nonce');
+        $token = $token;
+        $tmpArr = array($token, $timestamp, $nonce );
+        sort($tmpArr, SORT_STRING);
+        $tmpStr = implode( $tmpArr );
+        $tmpStr = sha1( $tmpStr );
+        if( $tmpStr == $signature )
+        {
+            return true;
+        }else
+        {
+            return false;
+        }
+    }
+
 
     /**
      * @param Request $request
@@ -135,7 +185,6 @@ class WechatController extends AdminBaseController
         $data = json_decode($data);
         $access_token = $data->access_token;
         $openid = $data->openid;
-        $user['access_token'] = $access_token;
         $user = 'https://api.weixin.qq.com/sns/userinfo?access_token='.$access_token.'&openid='.$openid.'&lang=zh_CN';
         $obj = $this->curlGetDate( $user );
         return $obj;
