@@ -50,7 +50,6 @@ class AuthService extends AdminBase
     public function edit($role_uuid)
     {
         try {
-
             //获取角色
             $roleData = Role::where("uuid", $role_uuid)->first();
             if (empty($roleData)) {
@@ -58,7 +57,56 @@ class AuthService extends AdminBase
             }
             //角色id
             $roleid = $roleData->id;
-            //获取详情数据
+            //查询选择的角色
+            $functionID = RoleFunction::where("roleid", $roleid)->pluck("functionid")->toArray();
+            //查询所有权限
+            $all = Functions::select("id", "name", "pid", "level")->orderBy('sort', 'asc')->get();
+            $objData = new  \stdClass();
+            $arr = array();
+            foreach ( $all as $rows )
+            {
+                if( $rows->pid == 0 )
+                {
+                    $obj = new \stdClass();
+                    $obj->id = $rows->id;
+                    $obj->uuid = $rows->uuid;
+                    $obj->name = $rows->name;
+                    if( in_array( $rows->id, $functionID) )
+                    {
+                        $chencked = true;
+                    }else
+                    {
+                        $chencked = false;
+                    }
+                    $obj->checked =  $chencked;
+                    $_child = array();
+                    foreach ( $all as $row )
+                    {
+                       if( $row->pid == $rows->id )
+                       {
+                           $obj_child = new \stdClass();
+                           $obj_child->id = $row->id;
+                           $obj_child->uuid = $row->uuid;
+                           $obj_child->name = $row->name;
+                           if( in_array( $rows->id, $functionID) )
+                           {
+                               $child_chencked = true;
+                           }else
+                           {
+                               $child_chencked = false;
+                           }
+                           $obj_child->checked =  $child_chencked;
+                           $_child[] = $obj_child;
+                       }
+                    }
+                    $obj->_child = $_child;
+                    $arr[] = $obj;
+                }
+            }
+            $objData->functionID = $functionID;
+            $objData->functionList = $arr;
+            return $objData;
+           /* //获取详情数据
             $objList = RoleFunction::where("roleid", $roleid)->select("functionid")->get();
             if (empty($objList)) {
                 responseData(\StatusCode::NOT_EXIST_ERROR, "角色未设置权限");
@@ -71,7 +119,7 @@ class AuthService extends AdminBase
             unset($arrList[0]);
             $list["functionid"] = array_keys($arrList);
             $list["roleid"]=$roleData["id"];
-            $list["islook"]=$roleData["islook"];
+            $list["islook"]=$roleData["islook"];*/
         } catch (\ErrorException $e) {
             //记录日志
             Log::error('======RolesService-edit:======' . $e->getMessage());
@@ -79,7 +127,7 @@ class AuthService extends AdminBase
             responseData(\StatusCode::CATCH_ERROR, "获取异常");
         } finally {
             //返回处理结果数据
-            return $list;
+           // return $list;
         }
     }
 
@@ -96,12 +144,12 @@ class AuthService extends AdminBase
 
             //检测角色是否存在
             $roleData = Role::where("uuid", $role_uuid)->first();
-            if (empty($roleData)) {
+            if (empty($roleData))
+            {
                 responseData(\StatusCode::NOT_EXIST_ERROR, "角色名称不存在");
             }
             //角色id
             $roleid = $roleData->id;
-
             //检查管理员
             if ($roleid == 1) {
                 responseData(\StatusCode::OUT_ERROR, "不能重置管理员权限");
@@ -116,26 +164,26 @@ class AuthService extends AdminBase
             $roleUpdate["islook"]=$data["islook"];
             $rsRole=Role::where("uuid", $role_uuid)->update($roleUpdate);
 
-            //业务处理
-            foreach ($data["functionid"] as $k => $v) {
-                //唯一条件
-                $condition["roleid"] = $roleid;
-                $condition["functionid"] = $v;
-                //判断处理
-                $existFR = RoleFunction::where($condition)->exists();
-                if (empty($existFR)) {
-                    $rolefunc["uuid"] = create_uuid();
-                    $rolefunc["roleid"] = $roleid;
-                    $rolefunc["functionid"] = $v;
-                    $rolefunc["created_at"] = date("Y-m-d H:i:s");
-                    $rs[] = RoleFunction::create($rolefunc);
-                } else {
-                    $rs[] = RoleFunction::where($condition)->delete();
-                }
-            }
 
+            //删除数据库原始的
+            RoleFunction::where("roleid",$roleid)->delete();
+            //新添加
+            $rolefunc = array();
+            foreach ( $data["functionid"] as $k=>$row  )
+            {
+                $rolefunc[$k]["uuid"] = create_uuid();
+                $rolefunc[$k]["roleid"] = $roleid;
+                $rolefunc[$k]["functionid"] = $row;
+                $rolefunc[$k]["status"] = 1;
+                $rolefunc[$k]["created_at"] = date("Y-m-d H:i:s");
+            }
+            if( count($rolefunc) )
+            {
+                $rs = RoleFunction::insert($rolefunc);
+            }
             //结果处理
-            if ($rsRole!==false&&!in_array(false, $rs, true)) {
+            if (  $rs )
+            {
                 DB::commit();
                 //删除缓存
                 Cache::forget("authList");
