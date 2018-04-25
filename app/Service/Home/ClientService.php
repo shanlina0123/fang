@@ -145,7 +145,7 @@ class ClientService extends HomeBase
     /***
      * 推荐客户
      */
-    public function store($adminid, $userid, $data)
+    public function store($adminid, $userid,$userinfo, $data)
     {
         try {
             //开启事务
@@ -231,7 +231,12 @@ class ClientService extends HomeBase
                 //TODO::删除后端客户列表缓存、前端客户列表缓存、客户推荐统计缓存
                 Cache::tags(["clientList", "HomeClientList", "clientRefereeChart"])->flush();
 
-                //TODO:: 发送微信推送消息
+                //TODO:: 发送微信推送消息：登录openid 客户名称, 客户电话$phone, 楼盘 名称$name
+                if($userinfo["openid"])
+                {
+                    $wx= new \WeChat();
+                    $wx->sendNotice($userinfo["openid"], $data["name"],$data["mobile"],$houseData["name"]);
+                }
 
             } else {
                 DB::rollBack();

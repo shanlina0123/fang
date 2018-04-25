@@ -347,3 +347,17 @@ function searchFilter($str)
     $search = str_replace('%',"\\%",$search);
     return $search;
 }
+
+/****
+ * 手机格式验证
+ * @param $mobile
+ * @return bool
+ */
+function checkMobile($mobile)
+{
+    if(preg_match("/^1[34578]\d{9}$/", $mobile)){
+            return true;
+    }else{
+        return false;
+    }
+}
