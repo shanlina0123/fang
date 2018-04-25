@@ -184,10 +184,8 @@ class AdminService extends AdminBase
             //结果处理
             if ($adminid !== false && $userid !== false) {
                 DB::commit();
-                //删除缓存
-                Cache::forget("adminList");
                 //删除推荐人的客户列表缓存
-                Cache::tags(["HomeClientList"])->flush();
+                Cache::tags(["HomeClientList","adminList"])->flush();
             } else {
                 DB::rollBack();
                 responseData(\StatusCode::DB_ERROR, "新增失败");
@@ -250,7 +248,7 @@ class AdminService extends AdminBase
             if ($rs !== false) {
                 DB::commit();
                 //删除缓存
-                Cache::forget("adminList");
+                Cache::tags(["HomeClientList","adminList"])->flush();
             } else {
                 DB::rollBack();
                 responseData(\StatusCode::DB_ERROR, "修改失败");
@@ -295,7 +293,7 @@ class AdminService extends AdminBase
             if ($rs !== false) {
                 DB::commit();
                 //删除缓存
-                Cache::forget("adminList");
+                Cache::tags(["HomeClientList","adminList"])->flush();
             } else {
                 DB::rollBack();
                 responseData(\StatusCode::DB_ERROR, "设置失败");
