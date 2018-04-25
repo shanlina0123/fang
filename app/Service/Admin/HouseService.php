@@ -272,13 +272,13 @@ class HouseService extends AdminBase
             {
                 $sql->where('typeid',$typeID);
             }
-            if(  $isCommission )
+            if(  $isCommission != '' )
             {
                 $sql->where('iscommission',$isCommission);
             }
             if(  $cTime )
             {
-                $sql->whereDate('created_at','>=',explode('-',$cTime)[0])->whereDate('created_at','<=',explode('-',$cTime)[1]);
+                $sql->whereDate('created_at','>=',trim(explode('|',$cTime)[0]))->whereDate('created_at','<=',trim(explode('|',$cTime)[1]));
             }
             if( $name )
             {

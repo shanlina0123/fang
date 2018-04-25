@@ -41,9 +41,18 @@ class ChartService extends AdminBase
             if(!empty($data["companyid"]))$queryModel->where("companyid",$data["companyid"]);
             if(!empty($data["ownadminid"]))$queryModel->where("ownadminid",$data["ownadminid"]);
             if(!empty($data["refereeuserid"]))$queryModel->where("refereeuserid",$data["refereeuserid"]);
-            if(!empty($data["makedate"]))$queryModel->where("makedate",$data["makedate"]);
-            if(!empty($data["comedate"]))$queryModel->where("comedate",$data["comedate"]);
-            if(!empty($data["dealdate"]))$queryModel->where("dealdate",$data["dealdate"]);
+            if(!empty($data["makedate"]))
+            {
+                $queryModel->whereDate('makedate','>=',trim(explode('|',$data["makedate"])[0]))->whereDate('makedate','<=',trim(explode('|',$data["makedate"])[1]));
+            }
+            if(!empty($data["comedate"]))
+            {
+                $queryModel->whereDate('comedate','>=',trim(explode('|',$data["comedate"])[0]))->whereDate('comedate','<=',trim(explode('|',$data["comedate"])[1]));
+            }
+            if(!empty($data["dealdate"]))
+            {
+                $queryModel->whereDate('dealdate','>=',trim(explode('|',$data["dealdate"])[0]))->whereDate('dealdate','<=',trim(explode('|',$data["dealdate"])[1]));
+            }
 
             //分页
             $list= $queryModel->paginate(config('configure.sPage'));
