@@ -17,7 +17,7 @@ $router->get('/', 'IndexController@index'); //入口
 //$router->get('api-test','Admin\TestController@index');
 $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($router) {
 
-        $router->get('api/wechat', 'WechatController@index');//修改密码扫码授权
+        $router->get('api/wechat', 'WechatController@index');//授权
         $router->get('get/map/address', 'PublicController@getMapAddress');//腾旭地址
         //登录前
         $router->post('login', 'LoginController@login');//登录

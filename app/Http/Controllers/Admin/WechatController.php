@@ -13,7 +13,7 @@ use App\Model\User\Users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-
+//use Illuminate\Support\Facades\Log;
 class WechatController extends AdminBaseController
 {
 
@@ -107,6 +107,7 @@ class WechatController extends AdminBaseController
                     if( $data )
                     {
                         $openid = $data['openid'];
+
                     }else
                     {
                         $data = $this->getAccessToken( $code, $uid );
@@ -118,6 +119,18 @@ class WechatController extends AdminBaseController
                             responseData(\StatusCode::ERROR,'授权失败未获取到openid');
                         }
                     }
+                }else
+                {
+                    //请求
+                    $data = $this->getAccessToken( $code, $uid );
+                    if( $data )
+                    {
+                        $openid = $data['openid'];
+                    }else
+                    {
+                        responseData(\StatusCode::ERROR,'授权失败未获取到openid');
+                    }
+
                 }
                 //用openid 和全局token换取用户信息
                 $weChat = new \WeChat();
@@ -166,7 +179,9 @@ class WechatController extends AdminBaseController
         if( !array_has($data,'errcode') )
         {
             //存储token信息
-            Cache::put('authorization_token'.$uid, $data, 43200);
+            Cache::put('authorization_token'.$uid, $data, $data['expires_in']/60);
+            //存储refreshToken信息
+            Cache::put('authorization_refresh'.$uid, $data, 43200);
             return $data;
         }else
         {
@@ -262,6 +277,9 @@ class WechatController extends AdminBaseController
                     $user->wechatbackstatus = 1;
                     $user->save();
                     responseData(\StatusCode::SUCCESS,'扫码成功');
+                }else
+                {
+                    responseData(\StatusCode::SUCCESS,'您还未绑定微信');
                 }
             }
             responseData(\StatusCode::ERROR,'授权失败');
