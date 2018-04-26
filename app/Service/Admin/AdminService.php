@@ -29,7 +29,7 @@ class AdminService extends AdminBase
         //redis缓存返回
         return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () {
             //默认条件
-            $list = AdminUser::select("id","uuid", "nickname", "name", "roleid", "mobile", "isadmin", "status")
+            $list = AdminUser::select("id","uuid", "nickname", "name", "roleid", "mobile", "isadmin","isdefault", "status")
                 ->with(["dynamicToRole" => function ($query){
                     //部分字段
                     $query->select("id","uuid", "name");
@@ -54,7 +54,7 @@ class AdminService extends AdminBase
     {
         try {
             //获取详情数据
-            $row = AdminUser::select("uuid", "nickname", "name", "roleid", "mobile", "isadmin", "status", "created_at")->where("uuid", $uuid)->first();
+            $row = AdminUser::select("uuid", "nickname", "name", "roleid", "mobile", "isadmin", "status","isdefault", "created_at")->where("uuid", $uuid)->first();
             if (empty($row)) {
                 responseData(\StatusCode::NOT_EXIST_ERROR, "请求数据不存在");
             }
