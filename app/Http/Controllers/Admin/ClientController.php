@@ -9,6 +9,7 @@
 namespace App\Http\Controllers\Admin;
 use App\Service\Admin\ClientService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class ClientController extends AdminBaseController
@@ -113,7 +114,8 @@ class ClientController extends AdminBaseController
      */
     public function followEdit( $clientid )
     {
-        $res = $this->client->followEditInfo( $clientid, $this->request );
+        $admin_user = $this->request->get('admin_user');
+        $res = $this->client->followEditInfo( $clientid,  $this->request );
         responseData(\StatusCode::SUCCESS,'跟进记录',$res);
     }
 
@@ -147,6 +149,7 @@ class ClientController extends AdminBaseController
     public function transferUpdate()
     {
         $data = trimValue( $this->request->all() );
+
         //验证
         $validator = Validator::make(
             $data,[
@@ -164,8 +167,15 @@ class ClientController extends AdminBaseController
         {
             responseData(\StatusCode::ERROR,'接收人不能和移交人相同');
         }
-        $res = $this->client->transferSave( $data, $this->request );
-        responseData(\StatusCode::SUCCESS,'移交成功',$res);
+        Log::error("xxxxxxxxxxxxxxxxxx".var_export($data,true));
+        if(in_array(null,$data["uuid"]) || in_array("",$data["uuid"]))
+        {
+            $data["uuid"]=null;
+        }
+        Log::error("nnnnnnnnnnnnnn".var_export($data,true));
+
+       $this->client->transferSave( $data);
+
     }
 
     /****
