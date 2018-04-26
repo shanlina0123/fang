@@ -79,6 +79,12 @@ class LoginOrRegisterService extends HomeBase
                 //没有用户信息
                 return '';
             }
+
+            if( $user->status != 1 )
+            {
+                responseData(\StatusCode::USER_LOCKING,'用户锁定');
+            }
+
         }else
         {
             $where['nickname'] = $data['nickname'];
