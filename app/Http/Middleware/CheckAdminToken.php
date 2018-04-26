@@ -47,7 +47,7 @@ class CheckAdminToken
             $roleFuncObj = RoleFunction::where(["roleid" => $roleid, "status" => 1])->select("functionid")->get();
             $admin["roleFunids"] = array_flatten($roleFuncObj->toArray());
             //菜单列表
-            $admin["menuList"]=getMnueTmp($admin["roleFunids"]);
+            $admin["menuList"]=$this->getMnueTmp($admin["roleFunids"]);
         }else{
             $admin["islook"]=0;
             $admin["roleFunids"]=[];

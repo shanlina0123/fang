@@ -29,7 +29,7 @@ class AdminService extends AdminBase
         //redis缓存返回
         return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () {
             //默认条件
-            $list = AdminUser::select("id","uuid", "nickname", "name", "roleid", "mobile", "isadmin", "status")
+            $list = AdminUser::select("id","uuid", "nickname", "name", "roleid", "mobile", "isadmin","isdefault", "status")
                 ->with(["dynamicToRole" => function ($query){
                     //部分字段
                     $query->select("id","uuid", "name");
@@ -54,7 +54,7 @@ class AdminService extends AdminBase
     {
         try {
             //获取详情数据
-            $row = AdminUser::select("uuid", "nickname", "name", "roleid", "mobile", "isadmin", "status", "created_at")->where("uuid", $uuid)->first();
+            $row = AdminUser::select("uuid", "nickname", "name", "roleid", "mobile", "isadmin", "status","isdefault", "created_at")->where("uuid", $uuid)->first();
             if (empty($row)) {
                 responseData(\StatusCode::NOT_EXIST_ERROR, "请求数据不存在");
             }
@@ -112,11 +112,6 @@ class AdminService extends AdminBase
         try {
             //开启事务
             DB::beginTransaction();
-
-            //检查管理员
-            if ($data["roleid"] == 1) {
-                responseData(\StatusCode::OUT_ERROR, "不能选择管理员角色");
-            }
 
             //检查roleid是否存在
             $roleExist = Role::where("id", $data["roleid"])->exists();
@@ -213,8 +208,8 @@ class AdminService extends AdminBase
             //业务处理
             //检查管理员信息
             $row = AdminUser::where("uuid", $uuid)->first();
-            if ($row["isadmin"] == 1) {
-                responseData(\StatusCode::OUT_ERROR, "不能查看管理员信息");
+            if ($row["isdefault"] == 1) {
+                responseData(\StatusCode::OUT_ERROR, "不能修改默认用户");
             }
 
             //检查roleid是否存在
@@ -278,9 +273,8 @@ class AdminService extends AdminBase
             if (empty($adminData)) {
                 responseData(\StatusCode::NOT_EXIST_ERROR, "请求数据不存在");
             }
-            //管理员不能被修改
-            if ($adminData["isadmin"] == 1) {
-                responseData(\StatusCode::OUT_ERROR, "不能设置管理员信息");
+            if ($adminData["isdefault"] == 1) {
+                responseData(\StatusCode::OUT_ERROR, "不能设置默认用户");
             }
 
             //整理修改数据
