@@ -74,6 +74,11 @@ class LoginOrRegisterService extends HomeBase
         if( $openid )
         {
             $user = Users::where( 'wechatopenid',$openid )->select('id','uuid','companyid','nickname','name','mobile','economictid','isadminafter','wechatopenid','status','faceimg')->first();
+            if( !$user )
+            {
+                //没有用户信息
+                return '';
+            }
         }else
         {
             $where['nickname'] = $data['nickname'];
@@ -91,7 +96,7 @@ class LoginOrRegisterService extends HomeBase
         //检测用户图像
         if( !$user->faceimg )
         {
-            $faceimg = (new \WeChat())->getyWechatUserInfo($data['wechatopenid']);
+            $faceimg = (new \WeChat())->getyWechatUserInfo($openid);
             //判断用户状态
             if( $faceimg )
             {
