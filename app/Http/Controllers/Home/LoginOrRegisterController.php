@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 class LoginOrRegisterController extends HomeBaseController
 {
 
@@ -78,22 +79,23 @@ class LoginOrRegisterController extends HomeBaseController
     {
         $wechatConfig = config('configure.wechat');
         $url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid='.$wechatConfig['appid'].'&secret='.$wechatConfig['secret'].'&code='.$code.'&grant_type=authorization_code';
-        $data = $this->curlGetDate( $url );
-        if( $data )
+        $res = $this->curlGetDate( $url );
+        if( !array_has($res,'errcode') )
         {
-            if( !array_has($data,'errcode') )
+            $obj = new \stdClass();
+            $obj->openid = $res['openid'];
+            $users = $this->mod->checkUser('',$res['openid']);
+            if( $users )
             {
-                $obj = new \stdClass();
-                $obj->openid = $data['openid'];
-                $obj->users = $this->mod->checkUser([],$data['openid']);
-                return $obj;
+                $obj->users = $users;
             }else
             {
-                responseData(\StatusCode::ERROR,'用户微信授权失败');
+                $obj->users='';
             }
+            responseData(\StatusCode::SUCCESS,'用户微信授权信息',$obj);
         }else
         {
-            responseData(\StatusCode::ERROR,'请求微信失败');
+            responseData(\StatusCode::ERROR,'用户微信授权失败');
         }
     }
 

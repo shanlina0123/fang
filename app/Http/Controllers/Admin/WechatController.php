@@ -272,6 +272,18 @@ class WechatController extends AdminBaseController
                         responseData(\StatusCode::ERROR,'授权失败未获取到openid');
                     }
                 }
+            }else
+            {
+                //请求
+                $data = $this->getAccessToken( $code, $user->id );
+                if( $data )
+                {
+                    $openid = $data['openid'];
+                }else
+                {
+                    responseData(\StatusCode::ERROR,'授权失败未获取到openid');
+                }
+
             }
             if( $openid )
             {

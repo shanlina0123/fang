@@ -10,6 +10,7 @@ namespace App\Service\Home;
 use App\Model\User\Users;
 use App\Model\User\UserToken;
 use App\Service\HomeBase;
+use Illuminate\Support\Facades\Log;
 class LoginOrRegisterService extends HomeBase
 {
 
@@ -77,9 +78,8 @@ class LoginOrRegisterService extends HomeBase
             if( !$user )
             {
                 //没有用户信息
-                return '';
+                return false;
             }
-
             if( $user->status != 1 )
             {
                 responseData(\StatusCode::USER_LOCKING,'用户锁定');
@@ -109,7 +109,7 @@ class LoginOrRegisterService extends HomeBase
                 if( array_has($faceimg,'headimgurl') )
                 {
                     $user->faceimg = $faceimg['headimgurl'];
-                    $user->save();
+                    Users::where( 'wechatopenid',$openid )->update(['faceimg'=>$faceimg['headimgurl']]);
                 }
             }
         }
