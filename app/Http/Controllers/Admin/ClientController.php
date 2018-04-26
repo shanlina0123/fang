@@ -91,11 +91,11 @@ class ClientController extends AdminBaseController
             $data,[
                 'uuid'=>'required|min:32|max:32',
                 'name'=>'required|max:100',
-                'comedate'=>'required|date',
-                'followstatusid'=>'required|numeric',
-                'dealdate'=>'required|date',
-                'levelid'=>'required|numeric',
-                'houseid'=>'required|numeric',
+                'comedate'=>'present|date',
+                'followstatusid'=>'present|numeric',
+                'dealdate'=>'present|date',
+                'levelid'=>'present|numeric',
+                'houseid'=>'present|numeric',
             ]
         );
         if ($validator->fails())

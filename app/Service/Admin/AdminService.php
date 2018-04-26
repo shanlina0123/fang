@@ -60,8 +60,8 @@ class AdminService extends AdminBase
             }
 
             //检查管理员信息
-            if ($row["isadmin"] == 1) {
-                responseData(\StatusCode::OUT_ERROR, "不能查看管理员信息");
+            if ($row["isdefault"] == 1) {
+                responseData(\StatusCode::OUT_ERROR, "不能查看默认用户");
             }
         } catch (\ErrorException $e) {
             //记录日志
@@ -114,8 +114,8 @@ class AdminService extends AdminBase
             DB::beginTransaction();
 
             //检查roleid是否存在
-            $roleExist = Role::where("id", $data["roleid"])->exists();
-            if ($roleExist == 0) {
+            $roleData = Role::where("id", $data["roleid"])->first();
+            if (empty($roleData)) {
                 responseData(\StatusCode::NOT_EXIST_ERROR, "角色值不存在");
             }
 
@@ -144,6 +144,7 @@ class AdminService extends AdminBase
             $admin["nickname"] = $data["nickname"];
             $admin["roleid"] = $data["roleid"];
             $admin["mobile"] = $data["mobile"];
+            $admin["isadmin"]=$roleData["id"]==1?1:0;
             $admin["password"] = optimizedSaltPwd("admin",$data['password']);
             $admin["created_at"] = date("Y-m-d H:i:s");
             //录入数据
@@ -229,6 +230,7 @@ class AdminService extends AdminBase
             $admin["name"] = $data["name"];
             $admin["nickname"] = $data["nickname"];
             $admin["roleid"] = $data["roleid"];
+            $admin["isadmin"]=$data["roleid"]==1?1:0;
             $admin["mobile"] = $data["mobile"];
             if($data["status"])
             {
