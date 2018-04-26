@@ -143,7 +143,7 @@ class ClientService extends AdminBase
             $obj->name = $res->dynamicToClient?$res->dynamicToClient->name:'';
             $obj->mobile = $res->dynamicToClient?$res->dynamicToClient->mobile:'';
             $obj->makedate =$res->makedate?date("Y-m-d",strtotime($res->makedate)):"";
-            $obj->comedate =$res->makedate?date("Y-m-d",strtotime($res->comedate)):"";
+            $obj->comedate =$res->comedate?date("Y-m-d",strtotime($res->comedate)):"";
             $obj->followstatusid = $res->followstatusid;
             $company = $res->companyid;
             if( $company )
@@ -156,6 +156,7 @@ class ClientService extends AdminBase
             }
             $obj->refereeusername = $res->dynamicToUser?$res->dynamicToUser->nickname:'';//经纪人
             $obj->followname = $res->dynamicToAdminUser?$res->dynamicToAdminUser->nickname:'';//跟进人名称
+            $obj->adminname = $res->dynamicToAdminOwn?$res->dynamicToAdminOwn->nickname:'';//归属者名称
             $obj->houseid=$res->houseid;
             $obj->housename=$res->housename;
             $obj->followcount = $res->followcount;
@@ -332,9 +333,9 @@ class ClientService extends AdminBase
             $rsTrans=ClientTransfer::insert($transfer);
             //修改客户表
             if($data["uuid"]){
-                $rsDyna= ClientDynamic::whereIn('uuid',$data['uuid'])->update(['ownadminid'=>$data['accept']]);
+                $rsDyna= ClientDynamic::whereIn('uuid',$data['uuid'])->update(['ownadminid'=>$data['accept'],"followadminid"=>$data['accept']]);
             }else{
-                $rsDyna= ClientDynamic::where('ownadminid',$data['transfer'])->update(['ownadminid'=>$data['accept']]);
+                $rsDyna= ClientDynamic::where('ownadminid',$data['transfer'])->update(['ownadminid'=>$data['accept'],"followadminid"=>$data['accept']]);
             }
             if($rsDis!==false&&$rsTrans!==false&&$rsDyna!==false)
             {
