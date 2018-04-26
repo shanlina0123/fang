@@ -7,9 +7,13 @@
  */
 
 namespace App\Service\Admin;
+use App\Model\Data\Functions;
+use App\Model\Roles\Role;
+use App\Model\Roles\RoleFunction;
 use App\Model\User\AdminToken;
 use App\Service\AdminBase;
 use App\Model\User\AdminUser;
+use Illuminate\Support\Facades\Log;
 
 class LoginService extends AdminBase
 {
@@ -37,7 +41,7 @@ class LoginService extends AdminBase
             $where['name'] = $data['name'];
         }
         $where['password'] = optimizedSaltPwd("admin",base64_decode($data['password']));
-        $user = AdminUser::where( $where )->select('id','uuid','name',"nickname", 'isadmin','mobile','status','wechatopenid')->first();
+        $user = AdminUser::where( $where )->select('id','uuid','name',"nickname", 'isadmin',"roleid",'mobile','status','wechatopenid')->first();
 
         if( $user == false )
         {
@@ -66,6 +70,10 @@ class LoginService extends AdminBase
         }
         $user->token = $uToken->token;
         $user->expiration = $uToken->expiration;
+
+        $adminRole=$this->getLoginMenue($user->isadmin,$user->roleid);
+        $user->roleFunids=$adminRole["roleFunids"];
+        $user->menuList=$adminRole["menuList"];
         return $user;
     }
 
@@ -132,5 +140,56 @@ class LoginService extends AdminBase
         {
             responseData(\StatusCode::ERROR,'未查询到');
         }
+    }
+
+
+    /***
+     * 获取登录后已有的权限菜单
+     * @param $admin
+     */
+    protected  function  getLoginMenue($isadmin,$roleid)
+    {
+        //非管理员已有的功能id
+        if($isadmin==0)
+        {
+            //具备的权限功能
+            $roleFuncObj = RoleFunction::where(["roleid" => $roleid, "status" => 1])->select("functionid")->get();
+            $admin["roleFunids"] = array_flatten($roleFuncObj->toArray());
+            //菜单列表
+            $admin["menuList"]=$this->getMnueTmp($admin["roleFunids"]);
+        }else{
+            $admin["roleFunids"]=[];
+            $admin["menuList"]=[];
+        }
+        return $admin;
+    }
+
+    /****
+     * 权限ids
+     * @param $roleFunids
+     * @return array
+     */
+    protected  function getMnueTmp($roleFunids)
+    {
+        //获取菜单列表
+        $queryModel= Functions::select("id", "menuname","menuicon", "pid", "level","url")
+            ->where("ismenu",1)
+            ->where("level","<=",2)
+            ->where("status",1)
+            ->orderBy('sort', 'asc');
+        //检查权限
+        if(count($roleFunids)>0)
+        {
+            $queryModel->whereIn("id",$roleFunids);
+        }
+
+        $objList =$queryModel->get();
+
+        //结果检测
+        if (empty($objList)) {
+            return [];
+        }
+        //生成tree数组
+        return list_to_tree($objList->toArray(),"id","pid", '_child',0);
     }
 }

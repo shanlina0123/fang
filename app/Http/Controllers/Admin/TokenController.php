@@ -20,6 +20,7 @@ class TokenController extends AdminBaseController
      */
     public function  index()
     {
+
         //接口返回结果
         responseData(\StatusCode::SUCCESS,"检测成功");
     }

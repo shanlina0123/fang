@@ -12,6 +12,7 @@ use App\Model\Data\Functions;
 use App\Model\Roles\Role;
 use App\Model\Roles\RoleFunction;
 use Closure;
+use Illuminate\Support\Facades\Log;
 
 class CheckAdminAuth
 {
@@ -22,6 +23,9 @@ class CheckAdminAuth
 
         //非管理员验证权限
         if ($admin_user->isadmin == 0) {
+            if(!$admin_user->roleFunids){
+                responseData(\StatusCode::AUTH_NOT_DEFINED_ERROR, "该角色未设定权限，请联系管理员");
+            }
             //验证权限
             $this->authRole($admin_user->roleFunids);
         }

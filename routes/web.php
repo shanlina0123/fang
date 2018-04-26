@@ -29,6 +29,7 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
         $router->get('wechat/authorization', 'WechatController@authorization');//绑openid授权
         $router->post('wechat/testing', 'LoginController@testing');//检测扫码结果
         $router->post('user/modify-pass', 'LoginController@modifyPass');//忘记密码修改密码
+
         //登录后
         $router->group(['middleware' => 'admin_token'], function () use ($router) {
             $router->get('token', 'TokenController@index');//检查已有token
@@ -36,6 +37,7 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
             $router->post('user/update-pass', 'UserController@update');
             //菜单
             $router->get('auth-menu', 'AuthController@getMenu');//获取权限菜单数据
+
             $router->post('admin-user-check', 'AdminController@checkUserMobile');//检测后端手机号手否于经纪人有关----OK
             $router->get('house/create', 'HouseController@create');//发房下拉数据
             $router->post('img/upload', 'PublicController@uploadImgToTemp');//图片上传到临时目录
@@ -46,6 +48,16 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
             $router->get('client-houses', 'ClientController@houseData');//客户房源列表
             $router->get('client-admin/{adminid}', 'ClientController@getAdminClient');//业务员的客户列表
 
+            $router->get('role-list', 'RolesController@roleList');//下拉框角色列表
+
+            $router->get('datas-one/{cateid}', 'DatasController@getOne');//获取单个属性列表----OK
+            $router->get('datas-all', 'DatasController@getall');//获取全部自定义属性
+
+
+            $router->get('chart-user', 'ChartController@getUsers');//前端经纪人列表----OK
+            $router->get('chart-admin', 'ChartController@getAdmins');//业务员列表----OK
+
+            $router->get('datas-catelist', 'DatasController@cateList');//获取自定义所有属性列表----OK
             //权限后
             $router->group(['middleware' => 'admin_auth'], function () use ($router) {
                 //房源
@@ -62,7 +74,6 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
                 $router->get('house/img/edit/{id}', 'HouseController@editImage');//修改图片
                 $router->post('house/img/edit/save', 'HouseController@editImageSave');//修改图片
 
-                //$router->post('house/tag', 'HouseController@storeTag');
                 //公司
                 $router->get('company/index', 'CompanyController@index');//列表
                 $router->post('company/store', 'CompanyController@store');//添加
@@ -104,9 +115,6 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
 
                 //自定义属性管理
                 $router->get('datas', 'DatasController@index');//获取自定义所有属性列表----OK
-                $router->get('datas-catelist', 'DatasController@cateList');//获取自定义所有属性列表----OK
-                $router->get('datas-all', 'DatasController@getall');//获取全部自定义属性
-                $router->get('datas-one/{cateid}', 'DatasController@getOne');//获取单个属性列表----OK
                 $router->get('datas-detail/{uuid}', 'DatasController@edit');//属性详情----OK
                 $router->post('datas', 'DatasController@store');//添加属性----OK
                 $router->put('datas/{uuid}', 'DatasController@update');//修改属性----OK
@@ -115,8 +123,7 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
 
                 //数据分析
                 $router->post('chart', 'ChartController@index');//客户分析----OK
-                $router->get('chart-user', 'ChartController@getUsers');//前端经纪人列表----OK
-                $router->get('chart-admin', 'ChartController@getAdmins');//业务员列表----OK
+
 
             });
         });

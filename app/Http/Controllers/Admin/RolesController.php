@@ -38,6 +38,17 @@ class RolesController extends AdminBaseController
     }
 
     /***
+     * 获取角色列表
+     */
+    public function  roleList()
+    {
+        //获取业务数据
+        $list=$this->roles_service->index();
+        //接口返回结果
+        responseData(\StatusCode::SUCCESS,"获取成功",$list);
+    }
+
+    /***
      * 角色详情
      * @param $uuid
      */
