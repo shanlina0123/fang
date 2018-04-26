@@ -203,6 +203,7 @@ class ClientService extends AdminBase
                 $obj->levelid =  $data['levelid'];
                 $obj->houseid =  $houseData['id'];
                 $obj->housename =  $houseData['name'];
+                $obj->followstatusid = $data['followstatusid'];
                 $obj->save();
                 $obj->dynamicToClient->update(['name'=>$data['name']]);
                 DB::commit();
@@ -222,18 +223,18 @@ class ClientService extends AdminBase
     /**
      * 跟进客户
      */
-    public function followEditInfo( $uuid, $request  )
+    public function followEditInfo( $clientid, $request  )
     {
         $admin_user = $request->get('admin_user');
         if(  $admin_user->isadmin == 1 )
         {
-            $where['uuid'] = $uuid;
+            $where['clientid'] = $clientid;
         }else
         {
-            $where['uuid'] = $uuid;
+            $where['clientid'] = $clientid;
             $where['ownadminid'] = $admin_user->id;
         }
-        $obj = ClientFollow::orderBy('id','desc')->with('followToAdminUser')->get();
+        $obj = ClientFollow::where($where)->orderBy('id','desc')->with('followToAdminUser')->get();
         if( $obj )
         {
             $arr = array();

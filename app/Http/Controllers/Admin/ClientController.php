@@ -111,21 +111,9 @@ class ClientController extends AdminBaseController
      * @param $client
      * 跟进客户记录
      */
-    public function followEdit( $uuid )
+    public function followEdit( $clientid )
     {
-        $data['uuid'] = $uuid;
-        //验证
-        $validator = Validator::make(
-            $data,[
-                'uuid'=>'required|max:32|min:32',
-            ]
-        );
-        if ($validator->fails())
-        {
-            $messages = $validator->errors();
-            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages);
-        }
-        $res = $this->client->followEditInfo( $uuid, $this->request );
+        $res = $this->client->followEditInfo( $clientid, $this->request );
         responseData(\StatusCode::SUCCESS,'跟进记录',$res);
     }
 
