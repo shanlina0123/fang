@@ -113,11 +113,6 @@ class AdminService extends AdminBase
             //开启事务
             DB::beginTransaction();
 
-            //检查管理员
-            if ($data["roleid"] == 1) {
-                responseData(\StatusCode::OUT_ERROR, "不能选择管理员角色");
-            }
-
             //检查roleid是否存在
             $roleExist = Role::where("id", $data["roleid"])->exists();
             if ($roleExist == 0) {
@@ -213,8 +208,8 @@ class AdminService extends AdminBase
             //业务处理
             //检查管理员信息
             $row = AdminUser::where("uuid", $uuid)->first();
-            if ($row["isadmin"] == 1) {
-                responseData(\StatusCode::OUT_ERROR, "不能查看管理员信息");
+            if ($row["isdefault"] == 1) {
+                responseData(\StatusCode::OUT_ERROR, "不能修改默认用户");
             }
 
             //检查roleid是否存在
@@ -278,9 +273,8 @@ class AdminService extends AdminBase
             if (empty($adminData)) {
                 responseData(\StatusCode::NOT_EXIST_ERROR, "请求数据不存在");
             }
-            //管理员不能被修改
-            if ($adminData["isadmin"] == 1) {
-                responseData(\StatusCode::OUT_ERROR, "不能设置管理员信息");
+            if ($adminData["isdefault"] == 1) {
+                responseData(\StatusCode::OUT_ERROR, "不能设置默认用户");
             }
 
             //整理修改数据
