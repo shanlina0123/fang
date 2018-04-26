@@ -29,9 +29,9 @@ class HouseService extends AdminBase
     {
         $rules = [
             'name' => 'required',
-            'iscommission' =>'sometimes|required|numeric',
+            'iscommission' =>'required|numeric',
             'commissionid' =>'sometimes|required|numeric',
-            'ishome' =>'sometimes|numeric',
+            'ishome' =>'numeric',
             'provinceid' =>'numeric',
             'cityid' =>'numeric',
             'stree' =>'present',
@@ -183,8 +183,8 @@ class HouseService extends AdminBase
         try{
             $arr['uuid'] = create_uuid();//楼盘名称
             $arr['name'] = $data['name'];//楼盘名称
-            $arr['iscommission'] = $data['iscommission'];//展示拥金
-            $arr['commissionid'] = $data['commissionid'];//佣金规则
+            $arr['iscommission'] = array_has($data,'iscommission')?$data['iscommission']:0;//展示拥金
+            $arr['commissionid'] =  array_has($data,'commissionid')?$data['commissionid']:0;//佣金规则
             $arr['ishome'] = $data['ishome'];//是否推荐 1推荐 0不推荐
             $arr['provinceid'] = $data['provinceid'];
             $arr['cityid'] = $data['cityid'];
