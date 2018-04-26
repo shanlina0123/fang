@@ -29,7 +29,14 @@ class LoginOrRegisterService extends HomeBase
         $obj->isadminafter = 0;
         $obj->wechatopenid = $data['wechatopenid'];
         $obj->status = 1;
-        $obj->faceimg = $faceimg?$faceimg['headimgurl']:'';
+        //判断用户状态
+        if( $faceimg )
+        {
+            if( array_has($faceimg,'headimgurl') )
+            {
+                $obj->faceimg = $faceimg?$faceimg['headimgurl']:'';
+            }
+        }
         if( $obj->save() )
         {
             $tWhere['userid'] = $obj->id;
@@ -79,6 +86,20 @@ class LoginOrRegisterService extends HomeBase
             if( $user->status != 1 )
             {
                 responseData(\StatusCode::USER_LOCKING,'用户锁定');
+            }
+        }
+        //检测用户图像
+        if( !$user->faceimg )
+        {
+            $faceimg = (new \WeChat())->getyWechatUserInfo($data['wechatopenid']);
+            //判断用户状态
+            if( $faceimg )
+            {
+                if( array_has($faceimg,'headimgurl') )
+                {
+                    $user->faceimg = $faceimg['headimgurl'];
+                    $user->save();
+                }
             }
         }
         $tWhere['userid'] = $user->id;
