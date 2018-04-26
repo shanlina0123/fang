@@ -50,6 +50,9 @@ class WechatController extends AdminBaseController
             {
                 //$this->responseMsg();
             }
+        }else
+        {
+            echo false; exit;
         }
 
     }
