@@ -89,11 +89,11 @@ class LoginOrRegisterController extends HomeBaseController
                 return $obj;
             }else
             {
-                responseData(\StatusCode::ERROR,'获取openid失败');
+                responseData(\StatusCode::ERROR,'用户微信授权失败');
             }
         }else
         {
-            responseData(\StatusCode::ERROR,'获取openid失败');
+            responseData(\StatusCode::ERROR,'请求微信失败');
         }
     }
 
