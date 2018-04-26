@@ -41,7 +41,7 @@ class CompanyController extends AdminBaseController
             $data,
             [
                 'name' => 'required|max:255',
-                'mobile' => 'present|max:11|min:11',
+                'mobile' => 'present|max:100|min:1',
                 'conncat' => 'present|max:30',
                 'addr' => 'present|max:255',
             ]
@@ -90,7 +90,7 @@ class CompanyController extends AdminBaseController
             $data,[
                 'uuid'=>'required|min:32|max:32',
                 'name' => 'required|max:255',
-                'mobile' => 'present|max:11|min:11',
+                'mobile' => 'present|max:100|min:1',
                 'conncat' => 'present|max:30',
                 'addr' => 'present|max:255',
             ]

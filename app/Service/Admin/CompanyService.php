@@ -24,7 +24,7 @@ class CompanyService extends AdminBase
         $tag = 'companyList';
         $where = $request->input('page');
         $value = Cache::tags($tag)->remember( $tag.$where,config('configure.sCache'), function() use( $request ){
-            return Company::where("isdefault",0)->orderBy('id','desc')->paginate(config('configure.sPage'));
+            return Company::orderBy('created_at','asc')->paginate(config('configure.sPage'));
         });
         return $value;
     }
