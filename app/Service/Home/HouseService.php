@@ -88,9 +88,9 @@ class HouseService extends HomeBase
      */
     public function getRecommend()
     {
-        //Cache::tags(['HomeRecommend'])->flush();
+       // Cache::tags(['HomeRecommend'])->flush();
         $tag = 'HomeRecommend';
-        $value = Cache::tags($tag)->remember( $tag,config('configure.sCache'), function(){
+        /*$value = Cache::tags($tag)->remember( $tag,config('configure.sCache'), function(){
             $RecommendID = HouseHome::orderBy('id','desc')->take(8)->pluck('houseid');
             $res = House::whereIn('id',$RecommendID)->take(8)->with(['houseToTag'=>function($query){
                 $query->select('tagid','houseid');
@@ -106,6 +106,11 @@ class HouseService extends HomeBase
             {
                 return $res;
             }
+        });*/
+        $value = Cache::tags($tag)->remember( $tag,config('configure.sCache'), function(){
+            return House::where('status',1)->orderBy('ishome','desc')->orderBy('created_at','desc')->take(8)->with(['houseToTag'=>function($query){
+                $query->select('tagid','houseid');
+            }])->get()->toArray();
         });
         return $value;
     }
