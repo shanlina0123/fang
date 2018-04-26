@@ -81,19 +81,19 @@ class LoginOrRegisterController extends HomeBaseController
         $data = $this->curlGetDate( $url );
         if( $data )
         {
-            if( empty($data->errcode) )
+            if( !array_has($data,'errcode') )
             {
                 $obj = new \stdClass();
-                $obj->openid = $data->openid;
-                $obj->users = $this->mod->checkUser([],$data->openid);
-                responseData(\StatusCode::SUCCESS,'openid',$obj);
+                $obj->openid = $data['openid'];
+                $obj->users = $this->mod->checkUser([],$data['openid']);
+                return $obj;
             }else
             {
-                responseData(\StatusCode::ERROR,'获取openid失败');
+                responseData(\StatusCode::ERROR,'用户微信授权失败');
             }
         }else
         {
-            responseData(\StatusCode::ERROR,'获取openid失败');
+            responseData(\StatusCode::ERROR,'请求微信失败');
         }
     }
 
@@ -110,7 +110,7 @@ class LoginOrRegisterController extends HomeBaseController
         curl_setopt($ch, CURLOPT_HEADER, 0);
         $output = curl_exec($ch);
         curl_close($ch);
-        return json_decode($output);
+        return json_decode($output,true);
     }
 
 }

@@ -44,14 +44,14 @@ class LoginOrRegisterService extends HomeBase
             if( $uToken )
             {
                 $uToken->token = str_random(60);
-                $uToken->expiration = time()+7200;
+                $uToken->expiration = time()+604800;//7天
                 $uToken->save();
             }else
             {
                 $uToken = new UserToken();
                 $uToken->uuid = create_uuid();
                 $uToken->token = str_random(60);
-                $uToken->expiration = time()+7200;
+                $uToken->expiration = time()+604800;//7天
                 $uToken->userid = $obj->id;
                 $uToken->save();
             }
@@ -74,6 +74,17 @@ class LoginOrRegisterService extends HomeBase
         if( $openid )
         {
             $user = Users::where( 'wechatopenid',$openid )->select('id','uuid','companyid','nickname','name','mobile','economictid','isadminafter','wechatopenid','status','faceimg')->first();
+            if( !$user )
+            {
+                //没有用户信息
+                return '';
+            }
+
+            if( $user->status != 1 )
+            {
+                responseData(\StatusCode::USER_LOCKING,'用户锁定');
+            }
+
         }else
         {
             $where['nickname'] = $data['nickname'];
@@ -91,7 +102,7 @@ class LoginOrRegisterService extends HomeBase
         //检测用户图像
         if( !$user->faceimg )
         {
-            $faceimg = (new \WeChat())->getyWechatUserInfo($data['wechatopenid']);
+            $faceimg = (new \WeChat())->getyWechatUserInfo($openid);
             //判断用户状态
             if( $faceimg )
             {
@@ -107,14 +118,14 @@ class LoginOrRegisterService extends HomeBase
         if( $uToken )
         {
             $uToken->token = str_random(60);
-            $uToken->expiration = time()+7200;
+            $uToken->expiration = time()+604800;//7天
             $uToken->save();
         }else
         {
             $uToken = new UserToken();
             $uToken->uuid = create_uuid();
             $uToken->token = str_random(60);
-            $uToken->expiration = time()+7200;
+            $uToken->expiration = time()+604800;//7天
             $uToken->userid = $user->id;
             $uToken->save();
         }
