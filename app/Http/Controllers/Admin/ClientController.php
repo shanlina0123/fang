@@ -167,12 +167,10 @@ class ClientController extends AdminBaseController
         {
             responseData(\StatusCode::ERROR,'接收人不能和移交人相同');
         }
-        Log::error("xxxxxxxxxxxxxxxxxx".var_export($data,true));
         if(in_array(null,$data["uuid"]) || in_array("",$data["uuid"]))
         {
             $data["uuid"]=null;
         }
-        Log::error("nnnnnnnnnnnnnn".var_export($data,true));
 
        $this->client->transferSave( $data);
 
