@@ -187,6 +187,7 @@ class AuthService extends AdminBase
                 DB::commit();
                 //删除缓存
                 Cache::forget("authList");
+                Cache::forget('roleList');
             } else {
                 DB::rollBack();
                 responseData(\StatusCode::DB_ERROR, "勾选失败");

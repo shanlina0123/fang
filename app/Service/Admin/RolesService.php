@@ -8,6 +8,7 @@
 
 namespace App\Service\Admin;
 use App\Model\Roles\Role;
+use App\Model\Roles\RoleFunction;
 use App\Model\User\AdminUser;
 use App\Service\AdminBase;
 use Illuminate\Support\Facades\Cache;
@@ -197,8 +198,10 @@ class RolesService extends AdminBase
             }
             //删除数据
             $rs=Role::where("uuid",$uuid)->delete();
+
+            $rsF=RoleFunction::where("roleid",$roleid)->delete();
             //结果处理
-            if($rs!==false)
+            if($rs!==false&&$rsF!==false)
             {
                 DB::commit();
                 //删除缓存
