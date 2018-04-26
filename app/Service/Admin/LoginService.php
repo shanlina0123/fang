@@ -53,14 +53,14 @@ class LoginService extends AdminBase
         if( $uToken )
         {
             $uToken->token = str_random(60);
-            $uToken->expiration = time()+7200;
+            $uToken->expiration = time()+604800;//7天
             $uToken->save();
         }else
         {
             $uToken = new AdminToken();
             $uToken->uuid = create_uuid();
             $uToken->token = str_random(60);
-            $uToken->expiration = time()+7200;
+            $uToken->expiration = time()+604800;//7天
             $uToken->userid = $user->id;
             $uToken->save();
         }
