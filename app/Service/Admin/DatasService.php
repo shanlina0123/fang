@@ -170,6 +170,8 @@ class DatasService extends AdminBase
                 Cache::forget("webDatasAllList");
                 Cache::forget("datasAllList");
                 Cache::forget("datasWebAllList");
+                //清除缓存
+                Cache::forget('getSelect');
             } else {
                 DB::rollBack();
                 responseData(\StatusCode::DB_ERROR, "新增失败");
@@ -230,6 +232,8 @@ class DatasService extends AdminBase
                 Cache::forget("webDatasAllList");
                 Cache::forget("datasAllList");
                 Cache::forget("datasWebAllList");
+                //清除缓存
+                Cache::forget('getSelect');
             } else {
                 DB::rollBack();
                 responseData(\StatusCode::DB_ERROR, "修改失败");
@@ -275,6 +279,8 @@ class DatasService extends AdminBase
                 Cache::forget("webDatasAllList");
                 Cache::forget("datasAllList");
                 Cache::forget("datasWebAllList");
+                //清除缓存
+                Cache::forget('getSelect');
 
             } else {
                 DB::rollBack();
@@ -353,6 +359,8 @@ class DatasService extends AdminBase
                 Cache::forget("webDatasAllList");
                 Cache::forget("datasAllList");
                 Cache::forget("datasWebAllList");
+                //清除缓存
+                Cache::forget('getSelect');
             }else{
                 DB::rollBack();
                 responseData(\StatusCode::DB_ERROR,"删除失败");
