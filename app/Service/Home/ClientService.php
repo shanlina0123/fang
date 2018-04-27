@@ -231,10 +231,10 @@ class ClientService extends HomeBase
                 Cache::tags(["clientList", "HomeClientList", "clientRefereeChart","CharList"])->flush();
 
                 //TODO:: 发送微信推送消息：登录openid 客户名称, 客户电话$phone, 楼盘 名称$name
-                if($userinfo["openid"])
+                if($userinfo["wechatopenid"])
                 {
                     $wx= new \WeChat();
-                    $wx->sendNotice($userinfo["openid"], $data["name"],$data["mobile"],$houseData["name"]);
+                    $wx->sendNotice($userinfo["wechatopenid"], $data["name"],$data["mobile"],$houseData["name"]);
                 }
 
             } else {
