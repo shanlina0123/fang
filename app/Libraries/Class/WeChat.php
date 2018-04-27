@@ -54,7 +54,7 @@ class WeChat
         if( $res )
         {
             $res = json_decode($res,true);
-            if( !array_has($res,'errcode') )
+            if( $res['errcode'] == 0 )
             {
                 return true;
 

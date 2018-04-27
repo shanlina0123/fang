@@ -99,7 +99,7 @@ class WechatController extends AdminBaseController
                 DB::beginTransaction();
 
                 //拿到openid
-                if( Cache::has('authorization_token'.$uid ) )
+               /* if( Cache::has('authorization_token'.$uid ) )
                 {
                     //获取openid
                     $openid = Cache::get('authorization_token'.$uid )['openid'];
@@ -134,7 +134,23 @@ class WechatController extends AdminBaseController
                         responseData(\StatusCode::ERROR,'授权失败未获取到openid');
                     }
 
+                }*/
+                //请求
+                $data = $this->getAccessToken( $code, $uid );
+                if( $data )
+                {
+                    $openid = $data['openid'];
+                }else
+                {
+                    responseData(\StatusCode::ERROR,'授权失败未获取到openid');
                 }
+                //检测微信绑了几个用户
+                $is_binding = AdminUser::where('wechatopenid',$openid)->count();
+                if( $is_binding )
+                {
+                    responseData(\StatusCode::ERROR,'同一微信号只能绑一个用户');
+                }
+
                 //用openid 和全局token换取用户信息
                 $weChat = new \WeChat();
                 $weChatUserInfo = $weChat->getyWechatUserInfo($openid);
@@ -167,6 +183,9 @@ class WechatController extends AdminBaseController
                 DB::rollBack();
                 responseData(\StatusCode::ERROR,'授权失败');
             }
+        }else
+        {
+            responseData(\StatusCode::ERROR,'请刷新二维码');
         }
     }
 
@@ -182,9 +201,9 @@ class WechatController extends AdminBaseController
         if( !array_has($data,'errcode') )
         {
             //存储token信息
-            Cache::put('authorization_token'.$uid, $data, $data['expires_in']/60);
+            //Cache::put('authorization_token'.$uid, $data, $data['expires_in']/60);
             //存储refreshToken信息
-            Cache::put('authorization_refresh'.$uid, $data, 43200);
+            //Cache::put('authorization_refresh'.$uid, $data, 43200);
             return $data;
         }else
         {
@@ -250,7 +269,7 @@ class WechatController extends AdminBaseController
         if( $user )
         {
             //拿到openid
-            if( Cache::has('authorization_token'.$user->id ) )
+            /*if( Cache::has('authorization_token'.$user->id ) )
             {
                 //获取openid
                 $openid = Cache::get('authorization_token'.$user->id )['openid'];
@@ -284,6 +303,15 @@ class WechatController extends AdminBaseController
                     responseData(\StatusCode::ERROR,'授权失败未获取到openid');
                 }
 
+            }*/
+            //请求
+            $data = $this->getAccessToken( $code, $user->id );
+            if( $data )
+            {
+                $openid = $data['openid'];
+            }else
+            {
+                responseData(\StatusCode::ERROR,'授权失败未获取到微信信息');
             }
             if( $openid )
             {

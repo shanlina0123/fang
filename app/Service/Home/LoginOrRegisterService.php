@@ -10,6 +10,7 @@ namespace App\Service\Home;
 use App\Model\User\Users;
 use App\Model\User\UserToken;
 use App\Service\HomeBase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 class LoginOrRegisterService extends HomeBase
 {
@@ -40,6 +41,9 @@ class LoginOrRegisterService extends HomeBase
         }
         if( $obj->save() )
         {
+
+            //清后台缓存
+            Cache::tags(['brokerList'])->flush();
             $tWhere['userid'] = $obj->id;
             $uToken = UserToken::where( $tWhere )->first();
             if( $uToken )
