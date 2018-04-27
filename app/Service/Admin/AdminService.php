@@ -325,7 +325,7 @@ class AdminService extends AdminBase
             $adminid=$row->id;
 
             //不能删除管理员角色
-            if($row->isadmin || $row->isdefault==1)
+            if($row->isadmin==1 || $row->isdefault==1)
             {
                 responseData(\StatusCode::OUT_ERROR,"不能删除默认用户");
             }
