@@ -38,12 +38,19 @@ class LoginOrRegisterController extends HomeBaseController
                 'mobile' => 'required|regex:/^1[345789][0-9]{9}$/|unique:user',
                 'economictid'=>'required|numeric',
                 'wechatopenid'=> 'required|unique:user'
+            ],
+            [
+                'nickname.required'=>'请检查姓名',
+                'mobile.regex'=>'请检查手机号码',
+                'mobile.unique'=>'该手机号码已被注册',
+                'wechatopenid.required'=>'请在微信浏览器打开',
+                'wechatopenid.unique'=>'同一微信号只能注册一次',
             ]
         );
         if ($validator->fails())
         {
-            $messages = $validator->errors();
-            responseData(\StatusCode::CHECK_FROM,'验证失败','',$messages );
+            $messages = $validator->errors()->first();
+            responseData(\StatusCode::CHECK_FROM,$messages,'',$messages );
         }
         $res = $this->mod->registerUser( $data );
         responseData(\StatusCode::SUCCESS,'注册成功', $res );

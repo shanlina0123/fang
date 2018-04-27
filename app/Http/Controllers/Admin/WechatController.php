@@ -135,6 +135,13 @@ class WechatController extends AdminBaseController
                     }
 
                 }
+                //检测微信绑了几个用户
+                $is_binding = AdminUser::where('wechatopenid',$openid)->count();
+                if( $is_binding )
+                {
+                    responseData(\StatusCode::ERROR,'同一微信号只能绑一个用户');
+                }
+
                 //用openid 和全局token换取用户信息
                 $weChat = new \WeChat();
                 $weChatUserInfo = $weChat->getyWechatUserInfo($openid);
