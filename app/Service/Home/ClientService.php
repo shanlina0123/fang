@@ -114,7 +114,6 @@ class ClientService extends HomeBase
         //定义tag的key
         $tagKey = base64_encode(mosaic("", $tag, $userid));
         //redis缓存返回
-        Cache::tags($tag)->flush();
        // return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($userid) {
             $row = [
                 "refereeCount"=>0,//推荐量
@@ -229,7 +228,7 @@ class ClientService extends HomeBase
             if ($clientid !== false && $clientDispatchid !== false && $clientDynamicid !== false && $clientRefereeid !== false) {
                 DB::commit();
                 //TODO::删除后端客户列表缓存、前端客户列表缓存、客户推荐统计缓存
-                Cache::tags(["clientList", "HomeClientList", "clientRefereeChart"])->flush();
+                Cache::tags(["clientList", "HomeClientList", "clientRefereeChart","CharList"])->flush();
 
                 //TODO:: 发送微信推送消息：登录openid 客户名称, 客户电话$phone, 楼盘 名称$name
                 if($userinfo["openid"])
@@ -301,7 +300,7 @@ class ClientService extends HomeBase
             if ($rs !== false) {
                 DB::commit();
                 //删除缓存
-                Cache::tags(["clientList", "HomeClientList", "clientRefereeChart"])->flush();
+                Cache::tags(["clientList", "HomeClientList", "clientRefereeChart","CharList"])->flush();
             } else {
                 DB::rollBack();
                 responseData(\StatusCode::DB_ERROR, "修改失败");

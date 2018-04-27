@@ -44,7 +44,8 @@ class CompanyService extends AdminBase
         $obj->isdefault = 0;
         if( $obj->save() )
         {
-            Cache::tags(['companyList'])->flush();
+            Cache::tags(['companyList','HomeRecommend',"HomeCompanyList"])->flush();
+
             return 'success';
         }else
         {
@@ -91,7 +92,7 @@ class CompanyService extends AdminBase
         $obj->addr = $data['addr'];
         if( $obj->save() )
         {
-            Cache::tags(['companyList','HomeRecommend'])->flush();
+            Cache::tags(['companyList','HomeRecommend',"HomeCompanyList"])->flush();
             return 'success';
         }else
         {
@@ -118,7 +119,7 @@ class CompanyService extends AdminBase
         }
         if( $obj->delete() )
         {
-            Cache::tags(['companyList'])->flush();
+            Cache::tags(['companyList','HomeRecommend',"HomeCompanyList"])->flush();
             return 'success';
         }else
         {

@@ -54,9 +54,11 @@ class HouseService extends HomeBase
                     case 1:
                         //新房
                         $priceType = 'price';
+                        break;
                     case 3:
+                        break;
                     case 2:
-                        //商铺
+                        //二手房
                         $priceType = 'total';
                         break;
                     default:

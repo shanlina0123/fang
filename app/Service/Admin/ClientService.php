@@ -112,7 +112,7 @@ class ClientService extends AdminBase
             }
             DB::commit();
             //清除缓存
-            Cache::tags(['clientList'])->flush();
+            Cache::tags(['clientList','clientRefereeChart','HomeClientList'])->flush();
             return 'success';
         }catch (Exception $e){
             DB::rollBack();
@@ -142,8 +142,8 @@ class ClientService extends AdminBase
             $obj->uuid = $res->uuid;
             $obj->name = $res->dynamicToClient?$res->dynamicToClient->name:'';
             $obj->mobile = $res->dynamicToClient?$res->dynamicToClient->mobile:'';
-            $obj->makedate =$res->makedate?date("Y-m-d",strtotime($res->makedate)):"";
-            $obj->comedate =$res->comedate?date("Y-m-d",strtotime($res->comedate)):"";
+            $obj->makedate =$res->makedate!="0000-00-00 00:00:00"?date("Y-m-d",strtotime($res->makedate)):"";
+            $obj->comedate =$res->comedate!="0000-00-00 00:00:00"?date("Y-m-d",strtotime($res->comedate)):"";
             $obj->followstatusid = $res->followstatusid;
             $company = $res->companyid;
             if( $company )
@@ -160,8 +160,8 @@ class ClientService extends AdminBase
             $obj->houseid=$res->houseid;
             $obj->housename=$res->housename;
             $obj->followcount = $res->followcount;
-            $obj->followdate =$res->followdate?date("Y-m-d",strtotime($res->followdate)):date("Y-m-d");
-            $obj->dealdate =$res->dealdate?date("Y-m-d",strtotime($res->dealdate)):"";
+            $obj->followdate =$res->followdate!="0000-00-00 00:00:00"?date("Y-m-d",strtotime($res->followdate)):date("Y-m-d");
+            $obj->dealdate =$res->dealdate!="0000-00-00 00:00:00"?date("Y-m-d",strtotime($res->dealdate)):"";
 
             $obj->levelid = $res->levelid;
             return $obj;
@@ -209,7 +209,7 @@ class ClientService extends AdminBase
                 $obj->save();
                 $obj->dynamicToClient->update(['name'=>$data['name']]);
                 DB::commit();
-                Cache::tags(['clientList'])->flush();
+                Cache::tags(["clientList", "HomeClientList", "clientRefereeChart","CharList"])->flush();
                 return 'success';
             }catch (Exception $e){
                 DB::rollBack();
@@ -281,7 +281,7 @@ class ClientService extends AdminBase
             $dynamic->followdate = date('Y-m-d H:i:s');
             $dynamic->save();
             DB::commit();
-            Cache::tags(['clientList','clientRefereeChart','HomeClientList'])->flush();
+            Cache::tags(["clientList", "HomeClientList", "clientRefereeChart","CharList"])->flush();
             return array_merge($data,["time"=> $dynamic->followdate]);
         }catch (Exception $e)
         {
@@ -341,7 +341,7 @@ class ClientService extends AdminBase
             {
                 DB::commit();
                 //清除缓存
-                Cache::tags(['clientList','clientRefereeChart'])->flush();
+                Cache::tags(["clientList", "HomeClientList", "clientRefereeChart","CharList"])->flush();
                 responseData(\StatusCode::SUCCESS,'移交成功',$res);
             }else{
                 DB::rollBack();

@@ -65,6 +65,8 @@ class UsersService extends HomeBase
             if($rs!==false)
             {
                 DB::commit();
+                //删除缓存
+                Cache::tags(['brokerList'])->flush();
             }else{
                 DB::rollBack();
                 responseData(\StatusCode::DB_ERROR,"修改失败");
@@ -110,7 +112,7 @@ class UsersService extends HomeBase
             if ($rs !== false) {
                 DB::commit();
                 //删除缓存
-                Cache::tags(["clientList", "HomeClientList", "clientRefereeChart"])->flush();
+                Cache::tags(['brokerList'])->flush();
             } else {
                 DB::rollBack();
                 responseData(\StatusCode::DB_ERROR, "修改失败");
