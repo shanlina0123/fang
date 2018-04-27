@@ -71,9 +71,9 @@ class ClientController extends HomeBaseController
             "name"=>'present|max:100|min:1',
             "typeid"=>'present|numeric',
             "uuid"=>'present|max:32|min:32',
-        ],[ 'name.required'=>'账号参数缺少','name.max'=>'账号长度不能大于100个字符','name.min'=>'账号长度不能小于1个字符',
-            'typeid.required'=>'房源类型参数缺少','typeid.numeric'=>'房源类型只能是int类型',
-            'uuid.required'=>'uuid参数缺少','uuid.max'=>'uuid长度不能大于32个字符','uuid.min'=>'uuid长度不能小于32个字符',]);
+        ],[ 'name.present'=>'账号参数缺少','name.max'=>'账号长度不能大于100个字符','name.min'=>'账号长度不能小于1个字符',
+            'typeid.present'=>'房源类型参数缺少','typeid.numeric'=>'房源类型只能是int类型',
+            'uuid.present'=>'uuid参数缺少','uuid.max'=>'uuid长度不能大于32个字符','uuid.min'=>'uuid长度不能小于32个字符',]);
         //进行验证
         if ($validator->fails()) {
             responseData(\StatusCode::PARAM_ERROR,"验证失败","",$validator->errors());
