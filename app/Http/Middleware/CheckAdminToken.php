@@ -13,6 +13,7 @@ use App\Model\Roles\Role;
 use App\Model\Roles\RoleFunction;
 use App\Model\User\AdminToken;
 use Closure;
+use Illuminate\Support\Facades\Log;
 
 class CheckAdminToken
 {
@@ -26,6 +27,10 @@ class CheckAdminToken
         $res = AdminToken::where('token', $token)->with('tokenToAdminUser')->first();
         if ($res) {
             $admin = $res->tokenToAdminUser;
+            if(!$admin)
+            {
+                responseData(\StatusCode::TOKEN_ERROR, "token用户信息不存在");
+            }
             if ($res->expiration <= time()) {
                 responseData(\StatusCode::TOKEN_ERROR, "token失效");
             }

@@ -8,6 +8,7 @@
 
 namespace App\Service\Admin;
 
+use App\Model\Client\ClientDynamic;
 use App\Model\Roles\Role;
 use App\Model\User\AdminUser;
 use App\Model\User\Users;
@@ -232,7 +233,7 @@ class AdminService extends AdminBase
             $admin["roleid"] = $data["roleid"];
             $admin["isadmin"]=$data["roleid"]==1?1:0;
             $admin["mobile"] = $data["mobile"];
-            if($data["status"])
+            if(strlen($data["status"])>0)
             {
                 $admin["status"] = $data["status"];
             }
@@ -302,5 +303,61 @@ class AdminService extends AdminBase
             responseData(\StatusCode::CATCH_ERROR, "设置异常");
         }
     }
+
+
+    /***
+     * 删除用户 - 执行
+     */
+    public  function delete($uuid)
+    {
+        try{
+            //开启事务
+            DB::beginTransaction();
+            //业务处理
+            //检测存在
+            $row=AdminUser::where("uuid",$uuid)->first();
+            if(empty($row))
+            {
+                responseData(\StatusCode::NOT_EXIST_ERROR,"请求数据不存在");
+            }
+
+            //后台用户id
+            $adminid=$row->id;
+
+            //不能删除管理员角色
+            if($row->isadmin || $row->isdefault==1)
+            {
+                responseData(\StatusCode::OUT_ERROR,"不能删除默认用户");
+            }
+
+            //检测后台用户下是否有对应客户
+            $ClientExist=ClientDynamic::where("followadminid",$adminid)->orWhere("ownadminid",$adminid)->exists();
+            if($ClientExist>0)
+            {
+                responseData(\StatusCode::EXIST_NOT_DELETE,"用户下关联客户，不能删除");
+            }
+
+            //删除数据
+            $rs=AdminUser::where("uuid",$uuid)->delete();
+
+            //结果处理
+            if($rs!==false)
+            {
+                DB::commit();
+                //删除推荐人的客户列表缓存
+                Cache::tags(["HomeClientList","adminList"])->flush();
+            }else{
+                DB::rollBack();
+                responseData(\StatusCode::DB_ERROR,"删除失败");
+            }
+        }catch (\ErrorException $e){
+            //业务执行失败
+            DB::rollBack();
+            //记录日志
+            Log::error('======AdminService-delete:======'. $e->getMessage());
+            responseData(\StatusCode::CATCH_ERROR,"删除异常");
+        }
+    }
+
 
 }

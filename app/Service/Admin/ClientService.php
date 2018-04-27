@@ -16,6 +16,7 @@ use App\Model\House\House;
 use App\Service\AdminBase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ClientService extends AdminBase
 {
@@ -39,7 +40,7 @@ class ClientService extends AdminBase
             $sql = ClientDynamic::orderBy('id','desc')->with('dynamicToClient');
 
             //管理员
-            if($admin_user->isadmin == 1 )
+            if($admin_user->isadmin == 1 || $admin_user->islook==0)
             {
                 if( $request->input('ownadminid') )
                 {
@@ -107,7 +108,7 @@ class ClientService extends AdminBase
                 $res->delete();
             }else
             {
-                responseData(\StatusCode::ERROR,'未擦查询到用户信息');
+                responseData(\StatusCode::EXIST_NOT_DELETE,'只能删除属于自己的客户');
             }
             DB::commit();
             //清除缓存
@@ -142,7 +143,7 @@ class ClientService extends AdminBase
             $obj->name = $res->dynamicToClient?$res->dynamicToClient->name:'';
             $obj->mobile = $res->dynamicToClient?$res->dynamicToClient->mobile:'';
             $obj->makedate =$res->makedate?date("Y-m-d",strtotime($res->makedate)):"";
-            $obj->comedate =$res->makedate?date("Y-m-d",strtotime($res->comedate)):"";
+            $obj->comedate =$res->comedate?date("Y-m-d",strtotime($res->comedate)):"";
             $obj->followstatusid = $res->followstatusid;
             $company = $res->companyid;
             if( $company )
@@ -155,6 +156,7 @@ class ClientService extends AdminBase
             }
             $obj->refereeusername = $res->dynamicToUser?$res->dynamicToUser->nickname:'';//经纪人
             $obj->followname = $res->dynamicToAdminUser?$res->dynamicToAdminUser->nickname:'';//跟进人名称
+            $obj->adminname = $res->dynamicToAdminOwn?$res->dynamicToAdminOwn->nickname:'';//归属者名称
             $obj->houseid=$res->houseid;
             $obj->housename=$res->housename;
             $obj->followcount = $res->followcount;
@@ -226,13 +228,13 @@ class ClientService extends AdminBase
     public function followEditInfo( $clientid, $request  )
     {
         $admin_user = $request->get('admin_user');
-        if(  $admin_user->isadmin == 1 )
+        if($admin_user->isadmin == 1 || $admin_user->islook == 0)
         {
             $where['clientid'] = $clientid;
         }else
         {
             $where['clientid'] = $clientid;
-            $where['ownadminid'] = $admin_user->id;
+            $where['followadminid'] = $admin_user->id;
         }
         $obj = ClientFollow::where($where)->orderBy('id','desc')->with('followToAdminUser')->get();
         if( $obj )
@@ -294,37 +296,56 @@ class ClientService extends AdminBase
     public function transferSave( $data )
     {
         try{
+            DB::beginTransaction();
+            if($data["uuid"]){
+               $res = ClientDynamic::whereIn('uuid',$data['uuid'])->get()->toArray();
+            }else{
+                $res = ClientDynamic::where("ownadminid",$data["transfer"])->get()->toArray();
+            }
+            if(count($res)==0)
+            {
+                responseData(\StatusCode::NOT_EXIST_ERROR,'该移交人下无任何客户');
+            }
 
-            $res = ClientDynamic::whereIn('uuid',$data['uuid'])->get();
             $dispatch = array();
             $transfer = array();
-            foreach ( $res as $key=>$row )
+            foreach($res as $key=>$row )
             {
                 //派单记录
                 $dispatch[$key]['uuid'] = create_uuid();
-                $dispatch[$key]['clientid'] = $row->clientid;
+                $dispatch[$key]['clientid'] = $row["clientid"];
                 $dispatch[$key]['type'] = 3;
                 $dispatch[$key]['remark'] = '移交派单';
                 $dispatch[$key]['adminid'] = $data['accept'];
                 $dispatch[$key]['created_at'] = date('Y-m-d H:i:s');
                 //移交记录
                 $transfer[$key]['uuid'] = create_uuid();
-                $transfer[$key]['clientid'] = $row->clientid;
+                $transfer[$key]['clientid'] = $row["clientid"];
                 $transfer[$key]['beforeownadminid'] = $data['transfer'];
                 $transfer[$key]['afterownadminid'] = $data['accept'];
                 $transfer[$key]['remark'] = '客户移交';
                 $transfer[$key]['created_at'] = date('Y-m-d H:i:s');
             }
+
             //写入派单记录
-            ClientDispatch::insert($dispatch);
+            $rsDis=ClientDispatch::insert($dispatch);
             //写入移交记录
-            ClientTransfer::insert($transfer);
+            $rsTrans=ClientTransfer::insert($transfer);
             //修改客户表
-            ClientDynamic::whereIn('uuid',$data['uuid'])->update(['ownadminid'=>$data['accept']]);
-            DB::commit();
-            //清除缓存
-            Cache::tags(['clientList','clientRefereeChart'])->flush();
-            return 'success';
+            if($data["uuid"]){
+                $rsDyna= ClientDynamic::whereIn('uuid',$data['uuid'])->update(['ownadminid'=>$data['accept'],"followadminid"=>$data['accept']]);
+            }else{
+                $rsDyna= ClientDynamic::where('ownadminid',$data['transfer'])->update(['ownadminid'=>$data['accept'],"followadminid"=>$data['accept']]);
+            }
+            if($rsDis!==false&&$rsTrans!==false&&$rsDyna!==false)
+            {
+                DB::commit();
+                //清除缓存
+                Cache::tags(['clientList','clientRefereeChart'])->flush();
+                responseData(\StatusCode::SUCCESS,'移交成功',$res);
+            }else{
+                DB::rollBack();
+            }
         }catch (Exception $e){
             DB::rollBack();
             responseData(\StatusCode::ERROR,'编辑失败');

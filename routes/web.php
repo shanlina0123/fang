@@ -58,6 +58,17 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
             $router->get('chart-admin', 'ChartController@getAdmins');//业务员列表----OK
 
             $router->get('datas-catelist', 'DatasController@cateList');//获取自定义所有属性列表----OK
+
+            $router->get('house/tag/edit/{id}', 'HouseController@editTag');//修改标签
+            $router->post('house/tag/edit/save', 'HouseController@editTagSave');//修改标签
+            $router->get('house/img/edit/{id}', 'HouseController@editImage');//修改图片
+            $router->post('house/img/edit/save', 'HouseController@editImageSave');//修改图片
+
+            $router->get('client-follow/edit/{clientid}', 'ClientController@followEdit');//跟进详情
+            $router->put('datas-delete/{uuid}', 'DatasController@delete');//删除属性----OK
+
+            $router->put('admin-delete/{uuid}', 'AdminController@delete');//删除后台用户----OK
+
             //权限后
             $router->group(['middleware' => 'admin_auth'], function () use ($router) {
                 //房源
@@ -69,10 +80,7 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
                 $router->put('house/update/{uuid}', 'HouseController@update');//修改房源
                 $router->post('house/recommend', 'HouseController@recommend');//推荐房源
                 $router->delete('house/delete/{uuid}', 'HouseController@destroy');//删除房源
-                $router->get('house/tag/edit/{id}', 'HouseController@editTag');//修改标签
-                $router->post('house/tag/edit/save', 'HouseController@editTagSave');//修改标签
-                $router->get('house/img/edit/{id}', 'HouseController@editImage');//修改图片
-                $router->post('house/img/edit/save', 'HouseController@editImageSave');//修改图片
+
 
                 //公司
                 $router->get('company/index', 'CompanyController@index');//列表
@@ -88,7 +96,7 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
                 $router->post('client/index', 'ClientController@index');//客户列表
                 $router->get('client/edit/{uuid}', 'ClientController@edit');//客户详情
                 $router->put('client/update/{uuid}', 'ClientController@update');//客户修改
-                $router->get('client-follow/edit/{clientid}', 'ClientController@followEdit');//跟进详情
+
                 $router->put('client-follow/store', 'ClientController@followStore');//跟进修改
                 $router->post('client-transfer/update', 'ClientController@transferUpdate');//客户移交
                 $router->delete('client/delete/{uuid}', 'ClientController@destroy');//客户删除
@@ -119,7 +127,7 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
                 $router->post('datas', 'DatasController@store');//添加属性----OK
                 $router->put('datas/{uuid}', 'DatasController@update');//修改属性----OK
                 $router->put('datas-setting/{uuid}', 'DatasController@setting');//禁用启用属性----OK
-                $router->put('datas-delete/{uuid}', 'DatasController@delete');//删除属性----OK
+
 
                 //数据分析
                 $router->post('chart', 'ChartController@index');//客户分析----OK
