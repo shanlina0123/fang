@@ -12,6 +12,7 @@ use App\Model\Client\ClientDynamic;
 use App\Model\Roles\Role;
 use App\Model\User\AdminUser;
 use App\Model\User\Users;
+use App\Model\User\UserToken;
 use App\Service\AdminBase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -167,19 +168,27 @@ class AdminService extends AdminBase
                 $user["created_at"] = date("Y-m-d H:i:s");
                 $rsUser = Users::create($user);
                 $userid = $rsUser->id;
+                $rsupadminid=1;
+                $rsdeleid=1;
             }else{
                 //TODO::更新
                 $userUpdateData["name"] = $data["name"];
                 $userUpdateData["companyid"] = 1;
                 $userUpdateData["nickname"] = $data["nickname"];
                 $userUpdateData["adminid"] = $adminid;//后端用户id
+                $userUpdateData["economictid"] = 42;//房产经纪人
                 $userUpdateData["isadminafter"] = 1;//后端
                 $userUpdateData["updated_at"] = date("Y-m-d H:i:s");
                 $userid= Users::where("id",$UserData["id"])->update($userUpdateData);
+                //同步openid
+                $updateOpen["wechatopenid"]=$UserData["wechatopenid"];
+                $rsupadminid=AdminUser::where("id",$adminid)->update($updateOpen);
+                //删除手机端token
+                $rsdeleid=UserToken::where("userid",$UserData["id"])->delete();
             }
 
             //结果处理
-            if ($adminid !== false && $userid !== false) {
+            if ($adminid !== false && $userid !== false&&$rsupadminid!==false&&$rsdeleid!==false) {
                 DB::commit();
                 //删除推荐人的客户列表缓存
                 Cache::tags(["HomeClientList","adminList"])->flush();
