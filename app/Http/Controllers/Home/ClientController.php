@@ -196,7 +196,7 @@ class ClientController extends HomeBaseController
         $userinfo=$this->request->get("userinfo");//对象
 
         //获取业务数据
-        $this->client_service->update($uuid,$userinfo->id,$data);
+        $this->client_service->update($uuid,$userinfo->id,$userinfo->adminid,$data);
         //接口返回结果
         responseData(\StatusCode::SUCCESS,"修改成功");
     }

@@ -11,6 +11,7 @@ namespace App\Service\Home;
 use App\Model\Client\Client;
 use App\Model\Client\ClientDispatch;
 use App\Model\Client\ClientDynamic;
+use App\Model\Client\ClientFollow;
 use App\Model\Client\ClientReferee;
 use App\Model\Company\Company;
 use App\Model\Data\Select;
@@ -31,11 +32,11 @@ class ClientService extends HomeBase
      */
     public function index($userid,$isadminafter, $adminid, $data, $page, $tag = "HomeClientList")
     {
-       // Cache::tags($tag)->flush();
+      Cache::tags($tag)->flush();
         //定义tag的key
         $tagKey = base64_encode(mosaic("", $tag, $userid,$isadminafter,$adminid, $page, $data["name"], $data["followstatusid"]));
         //redis缓存返回
-       return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($userid, $isadminafter, $data) {
+    //   return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($userid, $isadminafter, $data) {
             //操作数据库
            $pre=getenv("DB_PREFIX")?getenv("DB_PREFIX"):config("configure.DB_PREFIX");
            $aliasA=$pre."a";
@@ -44,7 +45,7 @@ class ClientService extends HomeBase
             //字段 业务员可以--- 产品意思暂时屏蔽
            // if ($isadminafter > 0) {
                 $sql->select(DB::raw("$aliasB.uuid,$aliasA.userid,$aliasA.clientid,$aliasA.houseid,$aliasA.housename,$aliasA.name,$aliasA.mobile,$aliasA.created_at,
-                    $aliasB.levelid,$aliasB.followstatusid,FROM_UNIXTIME(UNIX_TIMESTAMP($aliasB.makedate),'%m-%d %H:%i') as makedate"));
+                    $aliasB.levelid,$aliasB.followstatusid,FROM_UNIXTIME(UNIX_TIMESTAMP($aliasB.makedate),'%m-%d %H:%i') as makedate,$aliasB.ownadminid"));
           //  } else {
                 //无客户等级
             //    $sql->select(DB::raw("$aliasB.uuid,$aliasA.userid,$aliasA.clientid,$aliasA.houseid,$aliasA.housename,$aliasA.name,$aliasA.mobile,$aliasA.created_at,
@@ -67,7 +68,7 @@ class ClientService extends HomeBase
 
            return $sql->orderBy("created_at","desc")->paginate(config('configure.sPage'));
 
-      });
+    //  });
     }
 
     /****
@@ -280,7 +281,7 @@ class ClientService extends HomeBase
     /***
      * 修改级别和客户状态
      */
-    public  function  update($uuid,$userid,$data)
+    public  function  update($uuid,$userid,$adminid,$data)
     {
         try {
             //开启事务
@@ -323,8 +324,18 @@ class ClientService extends HomeBase
             $client["updated_at"] = date("Y-m-d H:i:s");
             //修改数据
             $rs = ClientDynamic::where("uuid", $uuid)->update($client);
+
+            //录入跟进记录
+            $followClient["uuid"] =  create_uuid();
+            $followClient["clientid"] = $row['clientid'];
+            $followClient["followstatusid"] = $client["followstatusid"];
+            $followClient["content"] = "手机端修改客户状态";
+            $followClient["adminid"] =$adminid;
+            $followClient["created_at"] =date("Y-m-d H:i:s");
+            $rsFollowid=ClientFollow::create($followClient);
+
             //结果处理
-            if ($rs !== false) {
+            if ($rs !== false&&$rsFollowid!==false) {
                 DB::commit();
                 //删除缓存
                 Cache::tags(["clientList", "HomeClientList", "clientRefereeChart","CharList"])->flush();

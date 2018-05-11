@@ -78,7 +78,7 @@ class LoginOrRegisterService extends HomeBase
     {
         if( $openid )
         {
-            $user = Users::where( 'wechatopenid',$openid )->select('id','uuid','companyid','nickname','name','mobile','economictid','isadminafter','wechatopenid','status','faceimg')->first();
+            $user = Users::where( 'wechatopenid',$openid )->select('id','uuid','companyid','nickname','name','mobile','economictid','isadminafter','wechatopenid','status','faceimg',"adminid")->first();
             if( !$user )
             {
                 //没有用户信息
@@ -93,7 +93,7 @@ class LoginOrRegisterService extends HomeBase
         {
             $where['nickname'] = $data['nickname'];
             $where['mobile'] = $data['mobile'];
-            $user = Users::where( $where )->select('id','uuid','companyid','nickname','name','mobile','economictid','isadminafter','wechatopenid','status','faceimg')->first();
+            $user = Users::where( $where )->select('id','uuid','companyid','nickname','name','mobile','economictid','isadminafter','wechatopenid','status','faceimg',"adminid")->first();
             if( $user == false )
             {
                 responseData(\StatusCode::LOGIN_FAILURE,'用户名密码错误');
