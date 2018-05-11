@@ -149,11 +149,23 @@ class ClientService extends HomeBase
         try {
             //开启事务
             DB::beginTransaction();
-
             //检查companyid是否存在
             $companyExist = Company::where("id", $data["companyid"])->exists();
             if ($companyExist == 0) {
                 responseData(\StatusCode::NOT_EXIST_ERROR, "公司不存在");
+            }
+             //检查业务员是否存在
+            if($data["adminid"])
+            {
+                $adminUserExistData = AdminUser::where("id",$data["adminid"])->first();
+                if (empty($adminUserExistData)) {
+                    responseData(\StatusCode::NOT_EXIST_ERROR, "该业务员不存在");
+                }
+                //检查该业务员是否有效
+                if($adminUserExistData["status"]==0)
+                {
+                    responseData(\StatusCode::NOT_EXIST_ERROR, "该业务员处于禁用状态不能进行指定");
+                }
             }
 
             //检测房源是否存在
@@ -168,12 +180,20 @@ class ClientService extends HomeBase
                 responseData(\StatusCode::EXIST_ERROR, "手机号" . $data["mobile"] . "已存在");
             }
             //业务处理
+            //未指定
+           if($data["isappoint"]==0)
+           {
+               //获取派单后台用户id，派单次数和创建时间顺序
+               if (empty($adminid)) {
+                   $adminUserFilterData = AdminUser::where("status",1)->select("id")->orderBy("dispatchtotal","asc")->orderBy("created_at","asc")->first();
+                   $adminid = $adminUserFilterData["id"];
+              }
 
-            //获取随机派单后台用户id
-            if (empty($adminid)) {
-                $adminUserList = AdminUser::select("id")->get();
-                $adminid = array_random(array_flatten($adminUserList->toArray()));
-            }
+           }else{
+               //已指定
+               $adminid=$data["adminid"];
+           }
+
 
             //录入客户信息
             $client["uuid"] = create_uuid();
@@ -224,17 +244,24 @@ class ClientService extends HomeBase
             $clientReferee["created_at"] = date("Y-m-d H:i:s");
             $rsClientReferee = ClientReferee::create($clientReferee);
             $clientRefereeid = $rsClientReferee->id;
+
+            //修改指派次数
+            $adminuserupdateid=AdminUser::where("id",$adminid)->increment("dispatchtotal",1);
+
+            //获取推送的微信openid
+            $sendWechatopenid=AdminUser::where("id",$adminid)->pluck("wechatopenid");
+
             //结果处理
-            if ($clientid !== false && $clientDispatchid !== false && $clientDynamicid !== false && $clientRefereeid !== false) {
+            if ($clientid !== false && $clientDispatchid !== false && $clientDynamicid !== false && $clientRefereeid !== false&&$adminuserupdateid!==false) {
                 DB::commit();
                 //TODO::删除后端客户列表缓存、前端客户列表缓存、客户推荐统计缓存
                 Cache::tags(["clientList", "HomeClientList", "clientRefereeChart","CharList"])->flush();
 
                 //TODO:: 发送微信推送消息：登录openid 客户名称, 客户电话$phone, 楼盘 名称$name
-                if($userinfo["wechatopenid"])
+                if($sendWechatopenid)
                 {
                     $wx= new \WeChat();
-                    $wx->sendNotice($userinfo["wechatopenid"], $data["name"],$data["mobile"],$houseData["name"]);
+                    $wx->sendNotice($sendWechatopenid, $data["name"],$data["mobile"],$houseData["name"]);
                 }
 
             } else {

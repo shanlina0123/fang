@@ -105,7 +105,7 @@ class ClientController extends HomeBaseController
     public  function  store()
     {
         //获取请求参数
-        $data=$this->getData(["name","mobile","houseid","companyid","remark"],$this->request->all());
+        $data=$this->getData(["name","mobile","houseid","companyid","remark","isappoint","adminid"],$this->request->all());
         //验证规则
         $validator = Validator::make($data,[
             "name"=>'required|max:100|min:1',
@@ -113,11 +113,15 @@ class ClientController extends HomeBaseController
             "houseid"=>'required|numeric',
             'companyid' => 'present|numeric',
             'remark' => 'present',
+            'isappoint' =>'required|numeric',
+            'adminid' => 'required|numeric',
         ],[ 'name.required'=>'账号不能为空','name.max'=>'账号长度不能大于100个字符','name.min'=>'账号长度不能小于1个字符',
             'mobile.required'=>'手机号不能为空','mobile.max'=>'手机号不能大于11位字符','mobile.min'=>'手机号不能少于11位字符',
             'houseid.required'=>'楼盘id不能为空','houseid.numeric'=>'楼盘id只能是int类型',
             'companyid.present'=>'公司id参数缺少','companyid.numeric'=>'公司id只能是int类型',
-            'remark.present'=>'备注参数缺少']);
+            'remark.present'=>'备注参数缺少',
+            'isappoint.required'=>'指定id不能为空','isappoint.numeric'=>'指定id只能是int类型',
+            'adminid.required'=>'业务员id不能为空','adminid.numeric'=>'业务员id只能是int类型']);
         //进行验证
         if ($validator->fails()) {
             responseData(\StatusCode::PARAM_ERROR,"验证失败","",$validator->errors());
@@ -136,6 +140,23 @@ class ClientController extends HomeBaseController
                 responseData(\StatusCode::PARAM_ERROR,"验证失败","",["companyid",["非内部员工，公司id不能为空"]]);
             }
         }
+
+        //判断是否指定值
+        if(!in_array($data["isappoint"],[0,1]))
+        {
+            responseData(\StatusCode::PARAM_ERROR,"验证失败","",["companyid",["指定值不符合预定义"]]);
+        }
+        //未指定，设置adminid=0
+        if($data["isappoint"]==0)
+        {
+            $data["adminid"]=0;
+        }
+        //已指定，判定adminid是否有值
+        if($data["isappoint"]==1&&$data["adminid"]==0)
+        {
+            responseData(\StatusCode::PARAM_ERROR,"未选择指定业务员","",["adminid",["未选择指定业务员"]]);
+        }
+
 
         //执行业务处理
         $this->client_service->store($userinfo->adminid,$userinfo->id,$userinfo,$data);
