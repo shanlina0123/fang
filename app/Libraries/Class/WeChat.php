@@ -51,6 +51,7 @@ class WeChat
             )
         );
         $res = $this->curl_request( $url , urldecode(json_encode($data)) );
+        \Illuminate\Support\Facades\Log::error("wechatLog========".var_export($res,true));
         if( $res )
         {
             $res = json_decode($res,true);

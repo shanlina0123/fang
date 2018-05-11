@@ -250,7 +250,7 @@ class ClientService extends HomeBase
             $adminuserupdateid=AdminUser::where("id",$adminid)->increment("dispatchtotal",1);
 
             //获取推送的微信openid
-            $sendWechatopenid=AdminUser::where("id",$adminid)->pluck("wechatopenid");
+            $sendWechatopenid=AdminUser::where("id",$adminid)->value("wechatopenid");
 
             //结果处理
             if ($clientid !== false && $clientDispatchid !== false && $clientDynamicid !== false && $clientRefereeid !== false&&$adminuserupdateid!==false) {
