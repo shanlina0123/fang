@@ -131,7 +131,7 @@ class ChartService extends AdminBase
                 $excelList[$k+1]=[
                     ($k+1),
                     ($v["dynamicToClient"]["name"]?$v["dynamicToClient"]["name"]:""),
-                    ($v["dynamicToSelectComm"]["name"]?$v["dynamicToSelectComm"]["name"]:""),
+                    ($v["dynamicToSelectStatus"]["name"]?$v["dynamicToSelectStatus"]["name"]:""),
                     ($v["dynamicToCompany"]["name"]?$v["dynamicToCompany"]["name"]:""),
                     ($v["dynamicToAdminOwn"]["nickname"]?$v["dynamicToAdminOwn"]["nickname"]:""),
                     ($v["dynamicToUser"]["nickname"]?$v["dynamicToUser"]["nickname"]:""),
