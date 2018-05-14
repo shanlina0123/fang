@@ -194,6 +194,7 @@ class ChartService extends AdminBase
     public function export($search,$tag="CharList")
     {
         //业务数据
+        $search= base64_decode($search);
         $tagKey=base64_encode($tag.$search);
         $cellData= Cache::tags($tag)->get($tagKey);
         $cellData[0]=['ID','客户姓名','客户状态',"合作公司","业务员","经纪人","楼盘","佣金规则","预约时间","上门时间","成交时间"];
