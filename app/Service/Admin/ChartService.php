@@ -26,8 +26,9 @@ class ChartService extends AdminBase
     {
         //定义tag的key
         $tagKey = base64_encode(mosaic("",$tag,$page,
-            $data["followstatusid"],$data["companyid"],$data["ownadminid"],$data["refereeuserid"],
-            $data["makedate"],$data["comedate"],$data["dealdate"]));
+                $data["followstatusid"],$data["companyid"],$data["ownadminid"],$data["refereeuserid"],
+                $data["makedate"],$data["comedate"],$data["dealdate"]));
+
         //redis缓存返回
         return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ( $data) {
             //默认条件
@@ -53,8 +54,7 @@ class ChartService extends AdminBase
             {
                 $queryModel->whereDate('dealdate','>=',trim(explode('|',$data["dealdate"])[0]))->whereDate('dealdate','<=',trim(explode('|',$data["dealdate"])[1]));
             }
-
-            //分页
+             //分页
             $list= $queryModel->paginate(config('configure.sPage'));
             //结果检测
             if(empty($list->toArray()))
@@ -65,6 +65,86 @@ class ChartService extends AdminBase
            return $list;
 
            });
+
+
+    }
+
+    /***
+     * excel数据
+     * @param $data
+     * @param string $tag
+     * @return mixed
+     */
+    public  function  excellist($data,$tag="CharList")
+    {
+        set_time_limit(0);
+       $tagKey = base64_encode(mosaic("",$tag,"excel",
+                $data["followstatusid"],$data["companyid"],$data["ownadminid"],$data["refereeuserid"],
+                $data["makedate"],$data["comedate"],$data["dealdate"]));
+
+
+        //redis缓存返回
+      return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ( $data) {
+            //默认条件
+            $queryModel=ClientDynamic::with(["dynamicToClient" => function ($query) use($data) {
+                $query->select("id", "name");
+            }])
+                ->select("clientid","followstatusid","companyid","refereeuserid","ownadminid","housename","commissionid","makedate","comedate","dealdate")
+                ->orderBy('created_at','desc');
+            //搜索结果
+            if(!empty($data["followstatusid"]))$queryModel->where("followstatusid",$data["followstatusid"]);
+            if(!empty($data["companyid"]))$queryModel->where("companyid",$data["companyid"]);
+            if(!empty($data["ownadminid"]))$queryModel->where("ownadminid",$data["ownadminid"]);
+            if(!empty($data["refereeuserid"]))$queryModel->where("refereeuserid",$data["refereeuserid"]);
+            if(!empty($data["makedate"]))
+            {
+                $queryModel->whereDate('makedate','>=',trim(explode('|',$data["makedate"])[0]))->whereDate('makedate','<=',trim(explode('|',$data["makedate"])[1]));
+            }
+            if(!empty($data["comedate"]))
+            {
+                $queryModel->whereDate('comedate','>=',trim(explode('|',$data["comedate"])[0]))->whereDate('comedate','<=',trim(explode('|',$data["comedate"])[1]));
+            }
+            if(!empty($data["dealdate"]))
+            {
+                $queryModel->whereDate('dealdate','>=',trim(explode('|',$data["dealdate"])[0]))->whereDate('dealdate','<=',trim(explode('|',$data["dealdate"])[1]));
+            }
+
+            $queryModel->with(["dynamicToCompany" => function ($query) use($data) {
+                $query->select("id", "name");
+            }]);
+            $queryModel->with(["dynamicToUser" => function ($query) use($data) {
+                $query->select("id", "nickname");
+            }]);
+            $queryModel->with(["dynamicToAdminOwn" => function ($query) use($data) {
+                $query->select("id", "nickname");
+            }]);
+            $queryModel->with(["dynamicToSelectComm" => function ($query) use($data) {
+                $query->select("id", "name");
+            }]);
+            $queryModel->with(["dynamicToSelectStatus" => function ($query) use($data) {
+                $query->select("id", "name");
+            }]);
+            $list= $queryModel->get();
+            //'客户姓名','客户状态',"合作公司","业务员","经纪人","楼盘","佣金规则","预约时间","上门时间","成交时间";
+            foreach($list as $k=>$v)
+            {
+                $excelList[$k+1]=[
+                    ($k+1),
+                    ($v["dynamicToClient"]["name"]?$v["dynamicToClient"]["name"]:""),
+                    ($v["dynamicToSelectComm"]["name"]?$v["dynamicToSelectComm"]["name"]:""),
+                    ($v["dynamicToCompany"]["name"]?$v["dynamicToCompany"]["name"]:""),
+                    ($v["dynamicToAdminOwn"]["nickname"]?$v["dynamicToAdminOwn"]["nickname"]:""),
+                    ($v["dynamicToUser"]["nickname"]?$v["dynamicToUser"]["nickname"]:""),
+                    ($v["housename"]?$v["housename"]:""),
+                    ($v["dynamicToSelectComm"]["name"]?$v["dynamicToSelectComm"]["name"]:""),
+                    (($v["makedate"]&&$v["makedate"]!="0000-00-00 00:00:00")?$v["makedate"]:""),
+                    (($v["comedate"]&&$v["comedate"]!="0000-00-00 00:00:00")?$v["comedate"]:""),
+                    (($v["dealdate"]&&$v["dealdate"]!="0000-00-00 00:00:00")?$v["dealdate"]:""),
+                ];
+            }
+            return $excelList;
+
+        });
 
 
     }
@@ -106,4 +186,18 @@ class ChartService extends AdminBase
         return $list;
     }
 
+    /***
+     * 导出excel
+     * @param $tag
+     * @param $tagKey
+     */
+    public function export($search,$tag="CharList")
+    {
+        //业务数据
+        $tagKey=base64_encode($tag.$search);
+        $cellData= Cache::tags($tag)->get($tagKey);
+        $cellData[0]=['ID','客户姓名','客户状态',"合作公司","业务员","经纪人","楼盘","佣金规则","预约时间","上门时间","成交时间"];
+        sort($cellData);
+        $this->exportExcel("数据分析","客户数据",$cellData);
+    }
 }

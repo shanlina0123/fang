@@ -60,4 +60,23 @@ class ClientDynamic extends Model
     {
         return $this->belongsTo('App\Model\User\AdminUser','ownadminid','id');
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * 关联佣金规则
+     */
+    public function dynamicToSelectComm()
+    {
+        return $this->belongsTo('App\Model\Data\Select','commissionid','id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * 关联状态
+     */
+    public function dynamicToSelectStatus()
+    {
+        return $this->belongsTo('App\Model\Data\Select','followstatusid','id');
+    }
+
 }

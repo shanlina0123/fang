@@ -8,6 +8,7 @@
 
 namespace App\Service;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminBase
 {
@@ -43,4 +44,15 @@ class AdminBase
    }
 
 
+    /***
+     * 导出excel
+     */
+    public function exportExcel($fileName,$sheetName,$cellData){
+        Excel::create($fileName,function($excel) use ($cellData,$sheetName){
+            $excel->sheet($sheetName, function($sheet) use ($cellData){
+                $sheet->rows($cellData);
+            });
+        })->export('xls');
+
+    }
 }

@@ -29,7 +29,7 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
         $router->get('wechat/authorization', 'WechatController@authorization');//绑openid授权
         $router->post('wechat/testing', 'LoginController@testing');//检测扫码结果
         $router->post('user/modify-pass', 'LoginController@modifyPass');//忘记密码修改密码
-
+        $router->get('chart/export/{search}','ChartController@export');
         //登录后
         $router->group(['middleware' => 'admin_token'], function () use ($router) {
             $router->get('token', 'TokenController@index');//检查已有token
@@ -68,6 +68,8 @@ $router->group(['prefix' => 'admin', 'namespace' => 'Admin'], function () use ($
             $router->put('datas-delete/{uuid}', 'DatasController@delete');//删除属性----OK
 
             $router->put('admin-delete/{uuid}', 'AdminController@delete');//删除后台用户----OK
+
+
 
             //权限后
             $router->group(['middleware' => 'admin_auth'], function () use ($router) {
