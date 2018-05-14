@@ -32,6 +32,41 @@ class ClientService extends HomeBase
      */
     public function index($userid,$isadminafter, $adminid, $data, $page, $tag = "HomeClientList")
     {
+        //定义tag的key
+        $tagKey = base64_encode(mosaic("", $tag, $userid,$isadminafter,$adminid, $page, $data["name"], $data["followstatusid"]));
+        //redis缓存返回
+         return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($userid, $isadminafter,$adminid, $data) {
+        //操作数据库
+        $pre=getenv("DB_PREFIX")?getenv("DB_PREFIX"):config("configure.DB_PREFIX");
+        $aliasA=$pre."a";
+        $aliasB=$pre."b";
+        $sql = DB::table("client_dynamic as a");
+        //字段 业务员可以--- 产品意思暂时屏蔽
+        // if ($isadminafter > 0) {
+        $sql->select(DB::raw("$aliasA.uuid,$aliasA.refereeuserid,$aliasA.clientid,$aliasA.houseid,$aliasA.housename,$aliasB.name,$aliasB.mobile,$aliasA.created_at,
+                    $aliasA.levelid,$aliasA.followstatusid,FROM_UNIXTIME(UNIX_TIMESTAMP($aliasA.makedate),'%m-%d %H:%i') as makedate,$aliasA.ownadminid"));
+        $sql->join("client as  b", "a.clientid", '=', "b.id")
+            ->where("ownadminid", $adminid)
+            ->orWhere("refereeuserid", $userid);
+        //客户名称 - 搜索条件
+        if (!empty($data["name"])) {
+            $sql->where("name", "like", "%" . $data["name"] . "%");
+        }
+        //状态搜索 - 搜索条件
+        if (!empty($data["followstatusid"])) {
+            $sql->where("followstatusid", $data["followstatusid"]);
+        }
+        return $sql->orderBy("created_at","desc")->paginate(config('configure.sPage'));
+
+         });
+    }
+
+    /***
+     * 获取我的推荐客户列表
+     * @return mixed
+     */
+    public function index_destory($userid,$isadminafter, $adminid, $data, $page, $tag = "HomeClientList")
+    {
       Cache::tags($tag)->flush();
         //定义tag的key
         $tagKey = base64_encode(mosaic("", $tag, $userid,$isadminafter,$adminid, $page, $data["name"], $data["followstatusid"]));
@@ -110,12 +145,12 @@ class ClientService extends HomeBase
     /***
      * 获取我推荐的客户量统计
      */
-    public function statistics($userid, $tag = "clientRefereeChart")
+    public function statistics($userid,$tag = "clientRefereeChart")
     {
         //定义tag的key
         $tagKey = base64_encode(mosaic("", $tag, $userid));
         //redis缓存返回
-       // return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($userid) {
+       return Cache::tags($tag)->remember($tagKey, config('configure.sCache'), function () use ($userid) {
             $row = [
                 "refereeCount"=>0,//推荐量
                 "effectiveCount" => 0,//有效
@@ -139,7 +174,7 @@ class ClientService extends HomeBase
             //返回数据库层查询结果
             return $row;
 
-       // });
+       });
     }
 
     /***
@@ -294,7 +329,7 @@ class ClientService extends HomeBase
                 responseData(\StatusCode::NOT_EXIST_ERROR, "请求数据不存在");
             }else{
                 //检查客户是否是自己的
-                if($userid!==$row["refereeuserid"])
+                if($adminid!==$row["ownadminid"])
                 {
                     responseData(\StatusCode::NOT_EXIST_ERROR, "该客户不是您的客户，不能进行操作");
                 }

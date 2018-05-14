@@ -348,7 +348,7 @@ class ClientService extends AdminBase
             }
         }catch (Exception $e){
             DB::rollBack();
-            responseData(\StatusCode::ERROR,'编辑失败');
+            responseData(\StatusCode::ERROR,'移交失败');
         }
     }
 

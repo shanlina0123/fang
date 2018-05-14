@@ -30,6 +30,7 @@ class LoginOrRegisterService extends HomeBase
         $obj->economictid = $data['economictid'];
         $obj->isadminafter = 0;
         $obj->wechatopenid = $data['wechatopenid'];
+        $obj->created_at = date("Y-m-d H:i:s");
         $obj->status = 1;
         //判断用户状态
         if( $faceimg )

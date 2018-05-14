@@ -178,11 +178,10 @@ class AdminService extends AdminBase
                 $userUpdateData["adminid"] = $adminid;//后端用户id
                 $userUpdateData["economictid"] = 42;//房产经纪人
                 $userUpdateData["isadminafter"] = 1;//后端
-                $userUpdateData["wechatopenid"] = "";//
                 $userUpdateData["updated_at"] = date("Y-m-d H:i:s");
                 $userid= Users::where("id",$UserData["id"])->update($userUpdateData);
                 //同步openid
-                $updateOpen["wechatopenid"]="";
+                $updateOpen["wechatopenid"]=$UserData["wechatopenid"];
                 $rsupadminid=AdminUser::where("id",$adminid)->update($updateOpen);
                 //删除手机端token
                 $rsdeleid=UserToken::where("userid",$UserData["id"])->delete();
