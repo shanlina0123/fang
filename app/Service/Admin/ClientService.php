@@ -142,8 +142,8 @@ class ClientService extends AdminBase
             $obj->uuid = $res->uuid;
             $obj->name = $res->dynamicToClient?$res->dynamicToClient->name:'';
             $obj->mobile = $res->dynamicToClient?$res->dynamicToClient->mobile:'';
-            $obj->makedate =$res->makedate!="0000-00-00 00:00:00"?date("Y-m-d",strtotime($res->makedate)):"";
-            $obj->comedate =$res->comedate!="0000-00-00 00:00:00"?date("Y-m-d",strtotime($res->comedate)):"";
+            $obj->makedate =strtotime($res->makedate)?date("Y-m-d",strtotime($res->makedate)):"";
+            $obj->comedate =strtotime($res->comedate)?date("Y-m-d",strtotime($res->comedate)):"";
             $obj->followstatusid = $res->followstatusid;
             $company = $res->companyid;
             if( $company )
@@ -160,8 +160,8 @@ class ClientService extends AdminBase
             $obj->houseid=$res->houseid;
             $obj->housename=$res->housename;
             $obj->followcount = $res->followcount;
-            $obj->followdate =$res->followdate!="0000-00-00 00:00:00"?date("Y-m-d",strtotime($res->followdate)):date("Y-m-d");
-            $obj->dealdate =$res->dealdate!="0000-00-00 00:00:00"?date("Y-m-d",strtotime($res->dealdate)):"";
+            $obj->followdate =strtotime($res->followdate)?date("Y-m-d",strtotime($res->followdate)):"";
+            $obj->dealdate =strtotime($res->dealdate)?date("Y-m-d",strtotime($res->dealdate)):"";
 
             $obj->levelid = $res->levelid;
             return $obj;

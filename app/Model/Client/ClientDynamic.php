@@ -76,7 +76,7 @@ class ClientDynamic extends Model
      */
     public function dynamicToSelectStatus()
     {
-        return $this->belongsTo('App\Model\Data\Select','followstatusid','id');
+        return $this->belongsTo('App\Model\Data\SelectDefault','followstatusid','id');
     }
 
 }
