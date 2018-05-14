@@ -137,9 +137,9 @@ class ChartService extends AdminBase
                     ($v["dynamicToUser"]["nickname"]?$v["dynamicToUser"]["nickname"]:""),
                     ($v["housename"]?$v["housename"]:""),
                     ($v["dynamicToSelectComm"]["name"]?$v["dynamicToSelectComm"]["name"]:""),
-                    (($v["makedate"]&&$v["makedate"]!="0000-00-00 00:00:00")?$v["makedate"]:""),
-                    (($v["comedate"]&&$v["comedate"]!="0000-00-00 00:00:00")?$v["comedate"]:""),
-                    (($v["dealdate"]&&$v["dealdate"]!="0000-00-00 00:00:00")?$v["dealdate"]:""),
+                    (($v["makedate"]&&$v["makedate"]!="0000-00-00 00:00:00"&&$v["makedate"]!="1970-01-01 00:00:00")?$v["makedate"]:""),
+                    (($v["comedate"]&&$v["comedate"]!="0000-00-00 00:00:00"&&$v["comedate"]!="1970-01-01 00:00:00")?$v["comedate"]:""),
+                    (($v["dealdate"]&&$v["dealdate"]!="0000-00-00 00:00:00"&&$v["dealdate"]!="1970-01-01 00:00:00")?$v["dealdate"]:""),
                 ];
             }
             return $excelList;
