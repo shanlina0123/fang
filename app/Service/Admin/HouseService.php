@@ -226,6 +226,7 @@ class HouseService extends AdminBase
                     $arr['price'] = $data['price'];//单价
                     $arr['total'] = $data['total'];//总价
                     $arr['roomtypeid'] = $data['roomtypeid'];//房型
+                    $arr['content'] = $data['content'];//描述
                     break;
                 case 3:
                     //商铺
@@ -458,6 +459,7 @@ class HouseService extends AdminBase
                     $obj->price = $data['price'];//单价
                     $obj->total = $data['total'];//总价
                     $obj->roomtypeid = $data['roomtypeid'];//房型
+                    $obj->content = $data['content'];//房型
                     break;
                 case 3:
                     //商铺

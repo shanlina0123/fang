@@ -17,23 +17,60 @@ class PublicController extends AdminBaseController
     /**
      * 上传图片到本地临时目录
      */
+//    public function uploadImgToTemp(Request $request)
+//    {
+//
+//        if ($request->hasFile('file'))
+//        {
+//            $file = $request->file('file');
+//            $name = md5(uniqid()).'.'.$file->getClientOriginalExtension();
+//            $request->file('file')->move('temp/',$name);
+//            $src = new \stdClass();
+//            $src->src = "http://".$_SERVER['HTTP_HOST'].'/temp/'.$name;
+//            $src->name = $name;
+//            responseData(\StatusCode::SUCCESS,'上传成功',$src);
+//        }else
+//        {
+//            responseData(\StatusCode::ERROR,'上传失败');
+//        }
+//    }
+    /**
+     * 上传图片到本地临时目录
+     */
     public function uploadImgToTemp(Request $request)
     {
+        try {
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+                //检验大小
+                $filesize=$file->getSize();
+                if(!$filesize || $filesize>config("configure.maxImgSizeByte"))
+                {
+                    responseData(\StatusCode::ERROR, $filesize."图片大小不能低于0或超过".config("configure.maxImgSize"));
+                }
 
-        if ($request->hasFile('file'))
+                //检验文件类型
+                $fileTypes = array('image/jpeg','image/png');
+                $filetype=$file->getMimeType();
+                if(!in_array($filetype,$fileTypes)) {
+                    responseData(\StatusCode::ERROR, '文件格式不合法'.$filetype);
+                }
+
+                $name = md5(uniqid()) . '.' . $file->getClientOriginalExtension();
+                $request->file('file')->move('temp/', $name);
+                $src = new \stdClass();
+                $src->src = "http://" . $_SERVER['HTTP_HOST'] . '/temp/' . $name;
+                $src->name = $name;
+                responseData(\StatusCode::SUCCESS, '上传成功', $src);
+            } else {
+                responseData(\StatusCode::ERROR, '上传失败');
+            }
+        } catch (Exception $e)
         {
-            $file = $request->file('file');
-            $name = md5(uniqid()).'.'.$file->getClientOriginalExtension();
-            $request->file('file')->move('temp/',$name);
-            $src = new \stdClass();
-            $src->src = "http://".$_SERVER['HTTP_HOST'].'/temp/'.$name;
-            $src->name = $name;
-            responseData(\StatusCode::SUCCESS,'上传成功',$src);
-        }else
-        {
-            responseData(\StatusCode::ERROR,'上传失败');
+            responseData(\StatusCode::ERROR, '上传失败');
         }
     }
+
 
     /**
      *  省市json
